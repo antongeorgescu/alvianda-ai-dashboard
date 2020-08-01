@@ -1,1 +1,0 @@
-C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Wine-Quality-Estimator\WQE.Service.Python\WQE-Service-Python\obj\Any CPU\Debug\WQE-Service-Python.pyproj.CoreCompileInputs.cache
