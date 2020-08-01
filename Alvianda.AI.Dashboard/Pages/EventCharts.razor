@@ -1,0 +1,64 @@
+﻿@page "/eventcharts"
+
+@using ChartJs.Blazor.Charts
+@using ChartJs.Blazor.ChartJS.PieChart
+@using ChartJs.Blazor.ChartJS.Common.Properties
+@using ChartJs.Blazor.Util
+
+<h3>Event Log Charts</h3>
+<p class="default-font">This data is collected from the host server <b>@MachineIdentity</b></p>
+
+<table>
+    <thead style="background-color:gainsboro; border-color:gray;">
+        <tr>
+            <td>
+                <label style="width:73px;" for="start">Start date:</label>
+                <input type="date" id="startdate" name="search-start" @onchange="SelectStartDate" value="@fromDate" style='font-size:small;line-height: 1.428;'>
+                <label for="start">End date:</label>
+                <input type="date" id="enddate" name="search-end" @onchange="SelectEndDate" value="@toDate" style='font-size:small;line-height: 1.428;'>
+            </td>
+            <td>
+                @*<select @bind="SelectedChartType" class="select-box">*@
+                <select @onchange="SelectChartType" class="select-box">
+                    <option value="None">=== Select Chart Type ===</option>
+                    <option value="pieChart">Pie Chart</option>
+                    <option value="barChart">Bar Chart</option>
+                </select>
+            </td>
+            <td>
+                <button class="btn btn-primary" style='font-size:small;line-height: 1.428;width:179px;' @onclick="BuildChartLogCategsPerDateRange">Logs Distribution Chart</button>
+            </td>
+        </tr>
+    </thead>
+</table>
+@if (isError)
+{
+    <p style='font-size:small;color:red'>@errMessage</p>
+}
+@if (!isChartData)
+{
+    <p><mark><i>@loadingMessage</i></mark></p>
+}
+else
+{
+    <p>Data ready, please select a chart type from the dropdown box.</p>
+    <div style="visibility:@Charts.ChartList.First(x => x.ChartId == "pieChart").Visibility;width:@Charts.ChartList.First(x => x.ChartId == "pieChart").Width;height:@Charts.ChartList.First(x => x.ChartId == "pieChart").Height">
+        <b>Pie Chart</b>
+        <ChartJsPieChart @ref=@_pieChartJs
+                         Config=@_pieConfig
+                         Width="600"
+                         Height="300" />
+    </div>
+    <div style="visibility:@Charts.ChartList.First(x => x.ChartId == "barChart").Visibility;width:@Charts.ChartList.First(x => x.ChartId == "barChart").Width;height:@Charts.ChartList.First(x => x.ChartId == "barChart").Height">
+        <b>Bar Chart</b>
+        <ChartJsBarChart @ref=@_barChartJs
+                         Config=@_barConfig
+                         Width="600"
+                         Height="300" />
+    </div>
+}
+
+@*<p>Debugging info:@debugInfo</p>*@
+
+
+
