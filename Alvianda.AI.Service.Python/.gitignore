@@ -28,6 +28,7 @@ MANIFEST
 
 # Build results
 obj/
+Alvianda.AI.Service.Python/obj
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
