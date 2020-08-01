@@ -27,6 +27,7 @@ share/python-wheels/
 MANIFEST
 
 # Build results
+obj/
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/
