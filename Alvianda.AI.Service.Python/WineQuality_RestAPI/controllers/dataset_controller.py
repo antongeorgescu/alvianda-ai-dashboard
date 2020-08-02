@@ -10,7 +10,7 @@ import json
 
 from WineQuality_RestAPI.models import winedata_class
 
-@app.route('/data')
+@app.route('api/winedataset')
 def greeting():
     """Renders the controller greeting."""
     t = time.localtime()
@@ -19,7 +19,7 @@ def greeting():
     d = f'dataset controller accessed at {current_time}'
     return make_response(jsonify(d), 200)
 
-@app.route('/data/redwine')
+@app.route('api/winedataset/entries/redwine')
 def get_redwine_data():
     """Renders the red wine dataset."""
 
@@ -29,7 +29,7 @@ def get_redwine_data():
     df = wdata.redwine_data()
     return Response(df.to_json(orient="records"), mimetype='application/json')
 
-@app.route('/data/whitewine')
+@app.route('api/winedataset/entries/whitewine')
 def get_whitewine_data():
     """Renders the red wine dataset."""
 
@@ -39,7 +39,7 @@ def get_whitewine_data():
     df = wdata.whitewine_data()
     return Response(df.to_json(orient="records"), mimetype='application/json')
 
-@app.route('/data/ml/savedmodels')
+@app.route('api/winedataset/ml/savedmodels')
 def listsavedmodels():
     """Return saved ML models."""
     d = jsonify("model1","model2")

@@ -50,6 +50,7 @@ else
         <table class="table table-striped">
             <thead style='font-size:small;'>
                 <tr>
+                    <th scope="col">Id</th>
                     <th scope="col">Fixed Acidity</th>
                     <th scope="col">Volatile Acidity</th>
                     <th scope="col">Citric Acid</th>
@@ -69,20 +70,21 @@ else
                 {
                     @foreach (var entry in WinesetEntries)
                     {
-                        <tr>
-                            <td>@entry.FixedAcidity</td>
-                            <td>@entry.VolatileAcidity</td>
-                            <td>@entry.CitricAcid</td>
-                            <td>@entry.ResidualSugar</td>
-                            <td>@entry.Chlorides</td>
-                            <td>@entry.FreeSulphurDioxide</td>
-                            <td>@entry.TotalSulphurDioxide</td>
-                            <td>@entry.Density</td>
-                            <td>@entry.PH</td>
-                            <td>@entry.Sulphates</td>
-                            <td>@entry.Alcohol</td>
-                            <td><b>@entry.Quality</b></td>
-                        </tr>
+                    <tr>
+                        <td>@entry.Id</td>
+                        <td>@entry.FixedAcidity</td>
+                        <td>@entry.VolatileAcidity</td>
+                        <td>@entry.CitricAcid</td>
+                        <td>@entry.ResidualSugar</td>
+                        <td>@entry.Chlorides</td>
+                        <td>@entry.FreeSulphurDioxide</td>
+                        <td>@entry.TotalSulphurDioxide</td>
+                        <td>@entry.Density</td>
+                        <td>@entry.PH</td>
+                        <td>@entry.Sulphates</td>
+                        <td>@entry.Alcohol</td>
+                        <td><b>@entry.Quality</b></td>
+                    </tr>
                     }
                 }
             </tbody>

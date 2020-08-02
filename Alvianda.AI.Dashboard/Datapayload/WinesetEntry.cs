@@ -7,6 +7,7 @@ namespace Alvianda.AI.Dashboard.Datapayload
 {
     public class WinesetEntry
     {
+        public int Id { get; set; }
         public double FixedAcidity { get; set; }
         public double VolatileAcidity { get; set; }
         public double CitricAcid { get; set; }

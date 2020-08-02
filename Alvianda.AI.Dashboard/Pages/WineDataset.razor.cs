@@ -27,15 +27,11 @@ namespace Alvianda.AI.Dashboard.Pages
         [Inject] HttpClient Http { get; set; }
         [Inject] IAccessTokenProvider AuthService { get; set; }
         [Inject] IConfiguration Config { get; set; }
-        [Inject] EventViewerService DataService { get; set; }
+        [Inject] WinedatasetService DataService { get; set; }
         [Inject] IJSRuntime jsRuntime { get; set; }
         
-        private string MachineIdentity { get; set; }
-        private string MachineFullName { get; set; }
-        private IList<EventViewerMachine> EventViewerMachineList { get; set; }
-        public PaginatedList<EventViewerEntry> paginatedList; // = new PaginatedList<EventViewerEntry>();
+        public PaginatedList<WinesetEntry> paginatedList; // = new PaginatedList<EventViewerEntry>();
 
-        private List<Log> Logs;
         public string SelectedWineset { get; set; }
         private string LongMessage { get; set; }
         
@@ -55,11 +51,6 @@ namespace Alvianda.AI.Dashboard.Pages
         //string currentSortField = "Name";
         //string currentSortOrder = "Asc";
 
-        string toDate;
-        string fromDate;
-
-        string keywordList;
-
         int CapMaxRecs;
 
         private bool isError;
@@ -69,7 +60,7 @@ namespace Alvianda.AI.Dashboard.Pages
         {
             await GetCappedMaxRecs();
 
-            paginatedList = new PaginatedList<EventViewerEntry>();
+            paginatedList = new PaginatedList<WinesetEntry>();
         }
 
         public async Task PageIndexChanged(int newPageNumber)
@@ -92,7 +83,7 @@ namespace Alvianda.AI.Dashboard.Pages
         {
             try
             {
-                var serviceEndpoint = $"{Config.GetValue<string>("LoggerServicesAPI:BaseURI")}{Config.GetValue<string>("LoggerServicesAPI:EventViewerRouting")}/logs/capmaxrecs";
+                var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:WinesetRouting")}/data/capmaxrecs";
                 this.CapMaxRecs = await Http.GetFromJsonAsync<int>(serviceEndpoint);
                 maxRecords = this.CapMaxRecs;
             }
@@ -125,7 +116,7 @@ namespace Alvianda.AI.Dashboard.Pages
                 }
 
                 //var serviceEndpoint = $"{Config.GetSection("EventViewerLoggerAPI").GetValue<string>("BaseURI")}/api/logreader/logs/records/{SelectedLog}/{pageNumber}";
-                var serviceEndpoint = $"{Config.GetValue<string>("LoggerServicesAPI:BaseURI")}{Config.GetValue<string>("LoggerServicesAPI:WinesetRouting")}/data/{SelectedWineset}/{pageNumber}";
+                var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:WinesetRouting")}/entries/{SelectedWineset}/{pageNumber}";
                 var response = await Http.GetAsync(serviceEndpoint);
                 response.EnsureSuccessStatusCode();
 
@@ -178,7 +169,7 @@ namespace Alvianda.AI.Dashboard.Pages
         private async void UpdateCappedMaxRecs()
         {
             
-            var serviceEndpoint = $"{Config.GetValue<string>("LoggerServicesAPI:BaseURI")}{Config.GetValue<string>("LoggerServicesAPI:EventViewerRouting")}/logs/capmaxrecs";
+            var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:WinesetRouting")}/entries/capmaxrecs";
 
             //var payload = "{\"CapSize\":\"" + CapMaxRecs.ToString() + "\"}";
             CappedRecsSettings payload = new CappedRecsSettings() { CappedMaxRecs = this.CapMaxRecs.ToString() };
@@ -195,46 +186,6 @@ namespace Alvianda.AI.Dashboard.Pages
         private void ClearEntryDetails()
         {
             LongMessage = null;
-        }
-
-        private void ShowLogEntryDetails(EventViewerEntry entry)
-        {
-            LongMessage = $"LOG ENTRY DETAILS:{entry.Message}";
-        }
-
-        
-        public async Task SelectMachine(ChangeEventArgs e)
-        {
-            MachineIdentity = Convert.ToString(e.Value);
-            var serviceEndpoint = $"{Config.GetValue<string>("LoggerServicesAPI:BaseURI")}{Config.GetValue<string>("LoggerServicesAPI:EventViewerRouting")}/logs/machinename";
-
-            MachineSettings payload = new MachineSettings() { MachineName = MachineIdentity };
-            string jsonpayload = await Task.Run(() => JsonConvert.SerializeObject(payload));
-            HttpContent c = new StringContent(jsonpayload, Encoding.UTF8, "application/json");
-
-            var response = await Http.PostAsync(serviceEndpoint, c);
-            response.EnsureSuccessStatusCode();
-        }
-
-        public void SelectStartDate(ChangeEventArgs e)
-        {
-            fromDate = Convert.ToString(e.Value);
-        }
-
-        public void SelectEndDate(ChangeEventArgs e)
-        {
-            toDate = Convert.ToString(e.Value);
-        }
-
-        public void SetKeywordList(ChangeEventArgs e)
-        {
-            keywordList = Convert.ToString(e.Value);
-        }
-
-        public class Log
-        {
-            public string Name { get; set; }
-            public string DisplayName { get; set; }
         }
     }
 }
