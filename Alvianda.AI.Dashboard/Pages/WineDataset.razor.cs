@@ -44,22 +44,17 @@ namespace Alvianda.AI.Dashboard.Pages
         int pageIndex;
         bool hasNextPage;
         bool hasPreviousPage;
-        static int maxRecords;
-
+        
         // Page and Sort data
         int? pageNumber = 1;
         //string currentSortField = "Name";
         //string currentSortOrder = "Asc";
-
-        int CapMaxRecs;
 
         private bool isError;
         private string retrievEntriesMsg = "Retrieving records...";
 
         protected override async Task OnInitializedAsync()
         {
-            await GetCappedMaxRecs();
-
             paginatedList = new PaginatedList<WinesetEntry>();
         }
 
@@ -79,21 +74,6 @@ namespace Alvianda.AI.Dashboard.Pages
             StateHasChanged();
         }
 
-        private async Task GetCappedMaxRecs()
-        {
-            try
-            {
-                var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:WinesetRouting")}/data/capmaxrecs";
-                this.CapMaxRecs = await Http.GetFromJsonAsync<int>(serviceEndpoint);
-                maxRecords = this.CapMaxRecs;
-            }
-            catch (Exception exception)
-            {
-                LongMessage = $"Error:{exception.Message} [{exception.InnerException.Message}]";
-            }
-        }
-
-        
         private async Task GetWinesetEntries()
         {
             LongMessage = null;
@@ -104,19 +84,18 @@ namespace Alvianda.AI.Dashboard.Pages
             try
             {
                 // get a new access token if not already cached
-                if (Http.DefaultRequestHeaders.Authorization == null)
-                {
-                    var tokenResult = await AuthService.RequestAccessToken();
-                    string jwt = string.Empty;
-                    if (tokenResult.TryGetToken(out var token))
-                    {
-                        Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.Value}");
-                        jwt = $"Bearer {token.Value}";
-                    }
-                }
+                //if (Http.DefaultRequestHeaders.Authorization == null)
+                //{
+                //    var tokenResult = await AuthService.RequestAccessToken();
+                //    string jwt = string.Empty;
+                //    if (tokenResult.TryGetToken(out var token))
+                //    {
+                //        Http.DefaultRequestHeaders.Add("Authorization", $"Bearer {token.Value}");
+                //        jwt = $"Bearer {token.Value}";
+                //    }
+                //}
 
-                //var serviceEndpoint = $"{Config.GetSection("EventViewerLoggerAPI").GetValue<string>("BaseURI")}/api/logreader/logs/records/{SelectedLog}/{pageNumber}";
-                var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:WinesetRouting")}/entries/{SelectedWineset}/{pageNumber}";
+                var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:WinesetRouting")}/entries/{SelectedWineset}?pageno={pageNumber}";
                 var response = await Http.GetAsync(serviceEndpoint);
                 response.EnsureSuccessStatusCode();
 
@@ -129,15 +108,11 @@ namespace Alvianda.AI.Dashboard.Pages
 
                 WinesetEntries = paginatedList.Items;
 
-                //DetailBtnAttributes.Clear();
-                //LogEntries.ForEach(x => DetailBtnAttributes.Add(x.Id, new Tuple<string, string>("btn btn-success", "Show Details")));
-
                 totalPages = paginatedList.TotalPages;
                 pageIndex = paginatedList.PageIndex;
                 hasNextPage = paginatedList.HasNextPage;
                 hasPreviousPage = paginatedList.HasPreviousPage;
-                maxRecords = paginatedList.MaxRecords;
-
+                
                 StateHasChanged();
 
             }
@@ -160,32 +135,6 @@ namespace Alvianda.AI.Dashboard.Pages
                 retrievEntriesMsg = string.Empty;
                 LongMessage = $"Error:{exception.Message}";
             }
-        }
-
-        private void ChangedCappedMaxRecs(ChangeEventArgs e)
-        {
-            this.CapMaxRecs = int.Parse(e.Value.ToString());
-        }
-        private async void UpdateCappedMaxRecs()
-        {
-            
-            var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:WinesetRouting")}/entries/capmaxrecs";
-
-            //var payload = "{\"CapSize\":\"" + CapMaxRecs.ToString() + "\"}";
-            CappedRecsSettings payload = new CappedRecsSettings() { CappedMaxRecs = this.CapMaxRecs.ToString() };
-            string jsonpayload = await Task.Run(() => JsonConvert.SerializeObject(payload));
-            HttpContent c = new StringContent(jsonpayload, Encoding.UTF8, "application/json");
-            
-            var response = await Http.PostAsync(serviceEndpoint,c);
-            response.EnsureSuccessStatusCode();
-
-            maxRecords = this.CapMaxRecs;
-
-        }
-
-        private void ClearEntryDetails()
-        {
-            LongMessage = null;
         }
     }
 }

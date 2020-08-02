@@ -13,7 +13,7 @@
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <LaunchProvider>Web launcher</LaunchProvider>
-    <WebBrowserUrl>http://localhost:53535</WebBrowserUrl>
+    <WebBrowserUrl>http://localhost:53535/api/winedataset</WebBrowserUrl>
     <OutputPath>.</OutputPath>
     <SuppressCollectPythonCloudServiceFiles>true</SuppressCollectPythonCloudServiceFiles>
     <Name>Alvianda-AI-Service-Python</Name>

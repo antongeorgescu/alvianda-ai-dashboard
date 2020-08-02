@@ -14,7 +14,10 @@
         <button type="button" class="btn btn-primary btn-sm" disabled="@((PageIndex == TotalPages) ? "disabled" : null)" @onclick="@(() => OnClick.InvokeAsync(TotalPages))">
             <i class="fa fa-angle-double-right" aria-hidden="true"></i>
         </button>
-        <span>&nbsp;&nbsp;(Max #records retrieved capped at <mark><b>@MaxRecords</b></mark>)</span>
+        @if (MaxRecords > 0)
+        {
+            <span>&nbsp;&nbsp;(Max #records retrieved capped at <mark><b>@MaxRecords</b></mark>)</span>
+        }
     </div>
 }
 <style>

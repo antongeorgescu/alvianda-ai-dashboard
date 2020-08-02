@@ -74,6 +74,9 @@ namespace Alvianda.AI.Dashboard
             var eventViewerService = new EventViewerService(client, builder.Configuration);
             builder.Services.AddTransient(sp => eventViewerService);
 
+            var winedatasetService = new WinedatasetService(client, builder.Configuration);
+            builder.Services.AddTransient(sp => winedatasetService);
+
             // set up the authorization handler to inject tokens
             //builder.Services.AddTransient<CustomAuthorizationMessageHandler>();
 

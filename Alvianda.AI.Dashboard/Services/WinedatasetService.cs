@@ -53,22 +53,22 @@ namespace Alvianda.AI.Dashboard.Services
             {
                 var record = new WinesetEntry()
                 {
-                    //Id = logEntry.Id,
-                    //InstanceId = logEntry.InstanceId,
-                    //Message = logEntry.Message,
-                    //MessageShort = logEntry.MessageShort,
-                    //Source = logEntry.Source,
-                    //TimeGenerated = logEntry.TimeGenerated,
-                    //UserName = logEntry.UserName,
-                    //MachineName = logEntry.MachineName
+                    Id = line.Id,
+                    FixedAcidity = line.FixedAcidity,
+                    VolatileAcidity = line.VolatileAcidity,
+                    CitricAcid = line.CitricAcid,
+                    Chlorides = line.Chlorides,
+                    FreeSulphurDioxide = line.FreeSulphurDioxide,
+                    TotalSulphurDioxide = line.TotalSulphurDioxide,
+                    Density = line.Density,
+                    PH = line.PH,
+                    Sulphates = line.Sulphates,
+                    Alcohol = line.Alcohol,
+                    Quality = line.Quality
                 };
                 winesetEntries.Add(record);
             }
             return winesetEntries;
         }
-
-        
-
-
     }
 }
