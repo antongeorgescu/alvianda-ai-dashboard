@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+﻿using Alvianda.AI.Dashboard.Datapayload;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -10,7 +11,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Threading.Tasks;
 
-namespace Alvianda.AI.Dashboard.Data
+namespace Alvianda.AI.Dashboard.Services
 {
     public interface IEventViewerService
     {

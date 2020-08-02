@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Alvianda.AI.Dashboard.Models.SharedClasses
+namespace Alvianda.AI.Dashboard.Models.Settings
 {
     public class CappedRecsSettings
     {

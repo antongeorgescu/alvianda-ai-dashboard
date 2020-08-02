@@ -1,0 +1,96 @@
+﻿@page "/winedataset"
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+<style>
+#horizontalcontainer > div {
+    display: inline-block;
+}
+
+#horizontalcontainer {
+    width: 100%;
+}
+</style>
+<h3>Wine Datasets</h3>
+<table class="table" style='font-size:small;line-height: 1.428;'>
+    <thead style="background-color:gainsboro; border-color:gray;">
+        <tr>
+            <td>
+                <div>
+                    <label for="start">Select wine category:</label>
+                    <select @bind="@SelectedWineset" class="select-box">
+                        <option value="None">== None ==</option>
+                        <option value="White">White wine</option>
+                        <option value="Read">Red wine</option>
+                    </select>
+                </div>
+            </td>
+            <td class="text-left">
+                <button class="btn btn-primary" @onclick="@GetWinesetEntries" style='font-size:small;line-height: 1.428;width:179px;'>Get Wine Entries</button>
+            </td>
+        </tr>
+    </thead>
+</table>
+@if (isError)
+{
+    <p style='font-size:small;color:red'>@LongMessage</p>
+}
+else
+{
+    <p style='font-size:small;'>@(new MarkupString(LongMessage))</p>
+}
+
+@if (SelectedWineset != "None")
+{
+    @if (WinesetEntries == null)
+    {
+        <p><mark><i>@retrievEntriesMsg</i></mark></p>
+    }
+    else
+    {
+        <table class="table table-striped">
+            <thead style='font-size:small;'>
+                <tr>
+                    <th scope="col">Fixed Acidity</th>
+                    <th scope="col">Volatile Acidity</th>
+                    <th scope="col">Citric Acid</th>
+                    <th scope="col">Residual Sugar</th>
+                    <th scope="col">Chlorides</th>
+                    <th scope="col">Free Sulphur Dioxide</th>
+                    <th scope="col">Total Sulphur Dioxide</th>
+                    <th scope="col">Density</th>
+                    <th scope="col">pH</th>
+                    <th scope="col">Sulphates</th>
+                    <th scope="col">Alcohol</th>
+                    <th scope="col">Quality</th>
+                </tr>
+            </thead>
+            <tbody style='font-size:small;'>
+                @if (WinesetEntries.Count > 0)
+                {
+                    @foreach (var entry in WinesetEntries)
+                    {
+                        <tr>
+                            <td>@entry.FixedAcidity</td>
+                            <td>@entry.VolatileAcidity</td>
+                            <td>@entry.CitricAcid</td>
+                            <td>@entry.ResidualSugar</td>
+                            <td>@entry.Chlorides</td>
+                            <td>@entry.FreeSulphurDioxide</td>
+                            <td>@entry.TotalSulphurDioxide</td>
+                            <td>@entry.Density</td>
+                            <td>@entry.PH</td>
+                            <td>@entry.Sulphates</td>
+                            <td>@entry.Alcohol</td>
+                            <td><b>@entry.Quality</b></td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+        <div>
+            <Pager2 PageIndex=@pageIndex TotalPages=@totalPages OnClick="PageIndexChanged"
+                    HasNextPage=@hasNextPage HasPreviousPage=@hasPreviousPage MaxRecords=@maxRecords></Pager2>
+        </div>
+    }
+}
+

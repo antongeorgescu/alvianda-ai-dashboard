@@ -1,6 +1,7 @@
 ﻿using System;
 
-namespace Alvianda.AI.Dashboard.Data
+namespace Alvianda.AI.Dashboard.Services
+
 {
     public class TokenClient
     {

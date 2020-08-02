@@ -22,10 +22,11 @@ using ChartJs.Blazor.ChartJS.BarChart.Axes;
 using ChartJs.Blazor.ChartJS.Common.Axes;
 using ChartJs.Blazor.ChartJS.Common.Axes.Ticks;
 using ChartJs.Blazor.ChartJS.Common.Handlers;
-using Alvianda.AI.Dashboard.Data;
-using Alvianda.AI.Dashboard.Models.SharedClasses;
+using Alvianda.AI.Dashboard.Datapayload;
+using Alvianda.AI.Dashboard.Models.Settings;
 using Newtonsoft.Json;
 using System.Text;
+using Alvianda.AI.Dashboard.Settings;
 
 namespace Alvianda.AI.Dashboard.Pages
 {

@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Configuration;
-using Alvianda.AI.Dashboard.Data;
+using Alvianda.AI.Dashboard.Datapayload;
 using System.Net.Http;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Authorization;
@@ -15,7 +15,9 @@ using System.Text;
 using Newtonsoft.Json;
 using System.Linq;
 using System.Reflection.PortableExecutable;
-using Alvianda.AI.Dashboard.Models.SharedClasses;
+using Alvianda.AI.Dashboard.Models.Settings;
+using Alvianda.AI.Dashboard.Services;
+using Alvianda.AI.Dashboard.Settings;
 
 namespace Alvianda.AI.Dashboard.Pages
 {

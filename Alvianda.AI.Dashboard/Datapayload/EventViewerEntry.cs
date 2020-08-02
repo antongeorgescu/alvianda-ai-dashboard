@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Alvianda.AI.Dashboard.Data
+namespace Alvianda.AI.Dashboard.Datapayload
 {
     public class EventViewerEntry
     {

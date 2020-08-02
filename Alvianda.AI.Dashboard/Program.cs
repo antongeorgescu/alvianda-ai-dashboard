@@ -4,12 +4,14 @@ using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Http;
 using Microsoft.Extensions.Configuration;
-using Alvianda.AI.Dashboard.Data;
+using Alvianda.AI.Dashboard.Datapayload;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Cors.Internal;
 using System.Collections.Generic;
+using Alvianda.AI.Dashboard.Services;
+using Alvianda.AI.Dashboard.Settings;
 
 namespace Alvianda.AI.Dashboard
 {

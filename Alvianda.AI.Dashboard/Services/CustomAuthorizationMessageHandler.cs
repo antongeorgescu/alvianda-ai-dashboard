@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Configuration;
 
-namespace Alvianda.AI.Dashboard.Data
+namespace Alvianda.AI.Dashboard.Services
 {
     public class CustomAuthorizationMessageHandler : AuthorizationMessageHandler
     {
