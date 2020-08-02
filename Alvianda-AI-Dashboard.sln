@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alvianda-AI-Dashboard", "Al
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Alvianda-AI-Service-Net", "Alvianda.AI.Service.NET\Alvianda-AI-Service-Net.csproj", "{7264D798-7BAB-45CB-B0D1-0AD0D71774F5}"
 EndProject
-Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Alvianda-AI-Service-Python", "Alvianda.AI.Service.Python\WQE-Service-Python\Alvianda-AI-Service-Python.pyproj", "{A7A31FFA-32C2-4EBE-AAAD-654028F2E38E}"
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "Alvianda-AI-Service-Python", "Alvianda.AI.Service.Python\Alvianda-AI-Service-Python.pyproj", "{A7A31FFA-32C2-4EBE-AAAD-654028F2E38E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

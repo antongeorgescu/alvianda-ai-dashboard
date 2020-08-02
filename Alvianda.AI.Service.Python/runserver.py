@@ -3,7 +3,7 @@ This script runs the WQE_Service_Python application using a development server.
 """
 
 from os import environ
-from Alvianda_AI_Service_Python import app
+from WineQuality_RestAPI import app
 
 if __name__ == '__main__':
     HOST = environ.get('SERVER_HOST', 'localhost')

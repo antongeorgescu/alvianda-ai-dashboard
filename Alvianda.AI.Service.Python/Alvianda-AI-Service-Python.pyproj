@@ -32,45 +32,65 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="runserver.py" />
-    <Compile Include="Alvianda_AI_Service_Python\__init__.py" />
-    <Compile Include="Alvianda_AI_Service_Python\views.py" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Alvianda_AI_Service_Python\" />
-    <Folder Include="Alvianda_AI_Service_Python\static\" />
-    <Folder Include="Alvianda_AI_Service_Python\static\content\" />
-    <Folder Include="Alvianda_AI_Service_Python\static\fonts\" />
-    <Folder Include="Alvianda_AI_Service_Python\static\scripts\" />
-    <Folder Include="Alvianda_AI_Service_Python\templates\" />
+    <Compile Include="WineQuality_RestAPI\controllers\classification_controller.py" />
+    <Compile Include="WineQuality_RestAPI\controllers\dataset_controller.py" />
+    <Compile Include="WineQuality_RestAPI\controllers\__init__.py" />
+    <Compile Include="WineQuality_RestAPI\models\decisiontree_correlation_class.py" />
+    <Compile Include="WineQuality_RestAPI\models\knn_correlation_class.py" />
+    <Compile Include="WineQuality_RestAPI\models\knn_crossvalidation_class.py" />
+    <Compile Include="WineQuality_RestAPI\models\logisticregression_correlation_class.py" />
+    <Compile Include="WineQuality_RestAPI\models\naivebayess_correlation_class.py" />
+    <Compile Include="WineQuality_RestAPI\models\randomforest_correlation_class.py" />
+    <Compile Include="WineQuality_RestAPI\models\svm_correlation_class.py" />
+    <Compile Include="WineQuality_RestAPI\models\__init__.py" />
+    <Compile Include="WineQuality_RestAPI\views.py" />
+    <Compile Include="WineQuality_RestAPI\__init__.py" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="requirements.txt" />
-    <Content Include="Alvianda_AI_Service_Python\static\content\bootstrap.css" />
-    <Content Include="Alvianda_AI_Service_Python\static\content\bootstrap.min.css" />
-    <Content Include="Alvianda_AI_Service_Python\static\content\site.css" />
-    <Content Include="Alvianda_AI_Service_Python\static\fonts\glyphicons-halflings-regular.eot" />
-    <Content Include="Alvianda_AI_Service_Python\static\fonts\glyphicons-halflings-regular.svg" />
-    <Content Include="Alvianda_AI_Service_Python\static\fonts\glyphicons-halflings-regular.ttf" />
-    <Content Include="Alvianda_AI_Service_Python\static\fonts\glyphicons-halflings-regular.woff" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\bootstrap.js" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\bootstrap.min.js" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\jquery-1.10.2.intellisense.js" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\jquery-1.10.2.js" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\jquery-1.10.2.min.js" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\jquery-1.10.2.min.map" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\jquery.validate-vsdoc.js" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\jquery.validate.js" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\jquery.validate.min.js" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\jquery.validate.unobtrusive.js" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\jquery.validate.unobtrusive.min.js" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\modernizr-2.6.2.js" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\respond.js" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\respond.min.js" />
-    <Content Include="Alvianda_AI_Service_Python\static\scripts\_references.js" />
-    <Content Include="Alvianda_AI_Service_Python\templates\about.html" />
-    <Content Include="Alvianda_AI_Service_Python\templates\contact.html" />
-    <Content Include="Alvianda_AI_Service_Python\templates\index.html" />
-    <Content Include="Alvianda_AI_Service_Python\templates\layout.html" />
+    <Content Include="WineQuality_RestAPI\datasets\winequality-red.csv" />
+    <Content Include="WineQuality_RestAPI\datasets\winequality-white.csv" />
+    <Content Include="WineQuality_RestAPI\datasets\winequality.csv" />
+    <Content Include="WineQuality_RestAPI\static\content\bootstrap.css" />
+    <Content Include="WineQuality_RestAPI\static\content\bootstrap.min.css" />
+    <Content Include="WineQuality_RestAPI\static\content\site.css" />
+    <Content Include="WineQuality_RestAPI\static\fonts\glyphicons-halflings-regular.eot" />
+    <Content Include="WineQuality_RestAPI\static\fonts\glyphicons-halflings-regular.svg" />
+    <Content Include="WineQuality_RestAPI\static\fonts\glyphicons-halflings-regular.ttf" />
+    <Content Include="WineQuality_RestAPI\static\fonts\glyphicons-halflings-regular.woff" />
+    <None Include="WineQuality_RestAPI\static\scripts\_references.js" />
+    <Content Include="WineQuality_RestAPI\static\scripts\bootstrap.js" />
+    <Content Include="WineQuality_RestAPI\static\scripts\bootstrap.min.js" />
+    <None Include="WineQuality_RestAPI\static\scripts\jquery.validate-vsdoc.js" />
+    <None Include="WineQuality_RestAPI\static\scripts\jquery-1.10.2.intellisense.js" />
+    <Content Include="WineQuality_RestAPI\static\scripts\jquery-1.10.2.js" />
+    <Content Include="WineQuality_RestAPI\static\scripts\jquery-1.10.2.min.js" />
+    <Content Include="WineQuality_RestAPI\static\scripts\jquery-1.10.2.min.map" />
+    <Content Include="WineQuality_RestAPI\static\scripts\jquery.validate.js" />
+    <Content Include="WineQuality_RestAPI\static\scripts\jquery.validate.min.js" />
+    <Content Include="WineQuality_RestAPI\static\scripts\jquery.validate.unobtrusive.js" />
+    <Content Include="WineQuality_RestAPI\static\scripts\jquery.validate.unobtrusive.min.js" />
+    <Content Include="WineQuality_RestAPI\static\scripts\modernizr-2.6.2.js" />
+    <Content Include="WineQuality_RestAPI\static\scripts\respond.js" />
+    <Content Include="WineQuality_RestAPI\static\scripts\respond.min.js" />
+    <Content Include="WineQuality_RestAPI\templates\about.html" />
+    <Content Include="WineQuality_RestAPI\templates\contact.html" />
+    <Content Include="WineQuality_RestAPI\templates\index.html" />
+    <Content Include="WineQuality_RestAPI\templates\layout.html" />
+    <Content Include="WineQuality_RestAPI\__pycache__\views.cpython-38.pyc" />
+    <Content Include="WineQuality_RestAPI\__pycache__\__init__.cpython-38.pyc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="WineQuality_RestAPI\" />
+    <Folder Include="WineQuality_RestAPI\datasets\" />
+    <Folder Include="WineQuality_RestAPI\models\" />
+    <Folder Include="WineQuality_RestAPI\controllers\" />
+    <Folder Include="WineQuality_RestAPI\static\" />
+    <Folder Include="WineQuality_RestAPI\static\content\" />
+    <Folder Include="WineQuality_RestAPI\static\fonts\" />
+    <Folder Include="WineQuality_RestAPI\static\scripts\" />
+    <Folder Include="WineQuality_RestAPI\templates\" />
+    <Folder Include="WineQuality_RestAPI\__pycache__\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)\Python Tools\Microsoft.PythonTools.Web.targets" />
   <!-- Specify pre- and post-build commands in the BeforeBuild and 

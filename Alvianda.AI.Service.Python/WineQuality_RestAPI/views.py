@@ -4,7 +4,7 @@ Routes and views for the flask application.
 
 from datetime import datetime
 from flask import render_template
-from Alvianda_AI_Service_Python import app
+from WineQuality_RestAPI import app
 
 @app.route('/')
 @app.route('/home')
@@ -36,7 +36,4 @@ def about():
         message='Your application description page.'
     )
 
-@app.route('/ml/savedmodels')
-def listsavedmodels():
-    """Return saved ML models."""
-    return 'model 1, model 2'
+
