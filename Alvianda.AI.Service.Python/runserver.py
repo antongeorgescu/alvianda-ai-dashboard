@@ -6,9 +6,10 @@ from os import environ
 from WineQuality_RestAPI import app
 
 if __name__ == '__main__':
-    HOST = environ.get('SERVER_HOST', 'localhost')
     try:
-        PORT = int(environ.get('SERVER_PORT', '5555'))
+        HOST = environ.get('SERVER_HOST', 'localhost')
+        PORT = int(environ.get('SERVER_PORT', '53535'))
+        app.run(HOST, PORT)
     except ValueError:
-        PORT = 5555
-    app.run(HOST, PORT)
+        print("Error getting URL from environment variables.")
+    

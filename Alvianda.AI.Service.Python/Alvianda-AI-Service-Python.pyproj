@@ -13,7 +13,7 @@
     </SearchPath>
     <WorkingDirectory>.</WorkingDirectory>
     <LaunchProvider>Web launcher</LaunchProvider>
-    <WebBrowserUrl>http://localhost</WebBrowserUrl>
+    <WebBrowserUrl>http://localhost:53535</WebBrowserUrl>
     <OutputPath>.</OutputPath>
     <SuppressCollectPythonCloudServiceFiles>true</SuppressCollectPythonCloudServiceFiles>
     <Name>Alvianda-AI-Service-Python</Name>
@@ -42,6 +42,9 @@
     <Compile Include="WineQuality_RestAPI\models\naivebayess_correlation_class.py" />
     <Compile Include="WineQuality_RestAPI\models\randomforest_correlation_class.py" />
     <Compile Include="WineQuality_RestAPI\models\svm_correlation_class.py" />
+    <Compile Include="WineQuality_RestAPI\models\winedata_class.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="WineQuality_RestAPI\models\__init__.py" />
     <Compile Include="WineQuality_RestAPI\views.py" />
     <Compile Include="WineQuality_RestAPI\__init__.py" />

@@ -3,10 +3,12 @@ Routes and views for dataset endpoints.
 """
 
 from datetime import datetime
-from flask import make_response, render_template, jsonify
+from flask import make_response, render_template, jsonify, Response
 from WineQuality_RestAPI import app
 import time
 import json
+
+from WineQuality_RestAPI.models import winedata_class
 
 @app.route('/data')
 def greeting():
@@ -16,6 +18,26 @@ def greeting():
     
     d = f'dataset controller accessed at {current_time}'
     return make_response(jsonify(d), 200)
+
+@app.route('/data/redwine')
+def get_redwine_data():
+    """Renders the red wine dataset."""
+
+    REDWINE_PATH = "WineQuality_RestAPI/datasets/winequality-red.csv"
+    
+    wdata = winedata_class.WineData(REDWINE_PATH,"")
+    df = wdata.redwine_data()
+    return Response(df.to_json(orient="records"), mimetype='application/json')
+
+@app.route('/data/whitewine')
+def get_whitewine_data():
+    """Renders the red wine dataset."""
+
+    WHITEWINE_PATH = "WineQuality_RestAPI/datasets/winequality-white.csv"
+    
+    wdata = winedata_class.WineData("",WHITEWINE_PATH)
+    df = wdata.whitewine_data()
+    return Response(df.to_json(orient="records"), mimetype='application/json')
 
 @app.route('/data/ml/savedmodels')
 def listsavedmodels():
