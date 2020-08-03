@@ -29,27 +29,31 @@ def startup():
 def get_redwine_data():
     """Renders the red wine dataset, paged."""
     query_parameters = request.args
-    pageno = query_parameters.get('pageno')
+    pageno = int(query_parameters.get('pageno'))-1
     
     REDWINE_PATH = "WineQuality_RestAPI/datasets/winequality-red.csv"
     
     wdata = winedata_class.WineData(REDWINE_PATH,"")
     df = wdata.redwine_data()
     df['id'] = range(len(df))
-    return Response(df.to_json(orient="records"), mimetype='application/json')
+    dfret = df.iloc[pageno*PAGESIZE:(pageno+ 1)*PAGESIZE].to_dict('records')
+    #return Response(dfret.to_json(orient="records"), mimetype='application/json')
+    #return Response(dfret,mimetype='application/json')
+    return make_response(jsonify(dfret),200)
 
 @app.route('/api/winedataset/entries/white')
 def get_whitewine_data():
     """Renders the red wine dataset, paged."""
     query_parameters = request.args
-    pageno = query_parameters.get('pageno')
+    pageno = int(query_parameters.get('pageno'))-1
 
     WHITEWINE_PATH = "WineQuality_RestAPI/datasets/winequality-white.csv"
     
     wdata = winedata_class.WineData("",WHITEWINE_PATH)
     df = wdata.whitewine_data()
     df['id'] = range(len(df))
-    return Response(df.to_json(orient="records"), mimetype='application/json')
+    dfret = df.iloc[pageno*PAGESIZE:(pageno+ 1)*PAGESIZE].to_dict('records')
+    return make_response(jsonify(dfret),200)
 
 @app.route('/api/winedataset/ml/savedmodels')
 def listsavedmodels():

@@ -8,16 +8,8 @@ using Alvianda.AI.Dashboard.Datapayload;
 using System.Net.Http;
 using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Authorization;
-using System.Net.Http.Json;
-using Microsoft.AspNetCore.Components.Web;
 using System.Globalization;
-using System.Text;
-using Newtonsoft.Json;
-using System.Linq;
-using System.Reflection.PortableExecutable;
-using Alvianda.AI.Dashboard.Models.Settings;
 using Alvianda.AI.Dashboard.Services;
-using Alvianda.AI.Dashboard.Settings;
 
 namespace Alvianda.AI.Dashboard.Pages
 {

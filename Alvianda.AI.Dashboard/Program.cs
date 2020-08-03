@@ -91,7 +91,7 @@ namespace Alvianda.AI.Dashboard
             //builder.Services.AddScoped<AuthenticationStateProvider, MyAuthenticationStateProvider>();
 
             builder.Services.AddScoped<IEventViewerMachineListConfig>(scp => new EventViewerMachineListConfig(builder.Configuration));
-
+            builder.Services.AddCors();
             await builder.Build().RunAsync();
         }
     }
