@@ -2,13 +2,13 @@
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
 <style>
-#horizontalcontainer > div {
-    display: inline-block;
-}
+    #horizontalcontainer > div {
+        display: inline-block;
+    }
 
-#horizontalcontainer {
-    width: 100%;
-}
+    #horizontalcontainer {
+        width: 100%;
+    }
 </style>
 <h3>Wine Datasets</h3>
 <table class="table" style='font-size:small;line-height: 1.428;'>
@@ -39,8 +39,13 @@ else
     <p style='font-size:small;'>@(new MarkupString(LongMessage))</p>
 }
 
-@if (SelectedWineset != "None")
+@if (SelectedWineset == "None")
 {
+    <p>@promptUserToTakeAction</p>
+}
+else
+{
+    promptUserToTakeAction = string.Empty;
     @if (WinesetEntries == null)
     {
         <p><mark><i>@retrievEntriesMsg</i></mark></p>
@@ -70,28 +75,28 @@ else
                 {
                     @foreach (var entry in WinesetEntries)
                     {
-                    <tr>
-                        <td>@entry.Id</td>
-                        <td>@entry.FixedAcidity</td>
-                        <td>@entry.VolatileAcidity</td>
-                        <td>@entry.CitricAcid</td>
-                        <td>@entry.ResidualSugar</td>
-                        <td>@entry.Chlorides</td>
-                        <td>@entry.FreeSulphurDioxide</td>
-                        <td>@entry.TotalSulphurDioxide</td>
-                        <td>@entry.Density</td>
-                        <td>@entry.PH</td>
-                        <td>@entry.Sulphates</td>
-                        <td>@entry.Alcohol</td>
-                        <td><b>@entry.Quality</b></td>
-                    </tr>
+                        <tr>
+                            <td>@entry.Id</td>
+                            <td>@entry.FixedAcidity</td>
+                            <td>@entry.VolatileAcidity</td>
+                            <td>@entry.CitricAcid</td>
+                            <td>@entry.ResidualSugar</td>
+                            <td>@entry.Chlorides</td>
+                            <td>@entry.FreeSulphurDioxide</td>
+                            <td>@entry.TotalSulphurDioxide</td>
+                            <td>@entry.Density</td>
+                            <td>@entry.PH</td>
+                            <td>@entry.Sulphates</td>
+                            <td>@entry.Alcohol</td>
+                            <td><b>@entry.Quality</b></td>
+                        </tr>
                     }
                 }
             </tbody>
         </table>
         <div>
             <Pager2 PageIndex=@pageIndex TotalPages=@totalPages OnClick="PageIndexChanged"
-                    HasNextPage=@hasNextPage HasPreviousPage=@hasPreviousPage MaxRecords=0></Pager2>
+                    HasNextPage=@hasNextPage HasPreviousPage=@hasPreviousPage MaxRecords=@maxRecords></Pager2>
         </div>
     }
 }

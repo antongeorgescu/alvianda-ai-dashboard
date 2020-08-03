@@ -10,7 +10,9 @@ import json
 
 from WineQuality_RestAPI.models import winedata_class
 
-PAGESIZE = 0
+PAGESIZE = 25
+TOTALRECORDS_RED = 0;
+TOTALRECORDS_WHITE = 0;
 
 @app.route('/')
 @app.route('/api/winedataset')
@@ -19,11 +21,27 @@ def startup():
     t = time.localtime()
     current_time = time.strftime("%D %H:%M:%S", t)
     
-    global PAGESIZE
-    PAGESIZE = 25 #int.Parse(Configuration.GetValue<string>("LogReaderServiceSettings:PageSize"));
-
     d = f'dataset controller accessed at {current_time}'
     return make_response(jsonify(d), 200)
+
+@app.route('/api/winedataset/settings')
+def settings():
+    """Renders the pagination settings."""
+    global PAGESIZE, TOTALRECORDS_RED, TOTALRECORDS_WHITE
+
+    REDWINE_PATH = "WineQuality_RestAPI/datasets/winequality-red.csv"
+    WHITEWINE_PATH = "WineQuality_RestAPI/datasets/winequality-white.csv"
+
+    wineobj = winedata_class.WineData(REDWINE_PATH,WHITEWINE_PATH);
+    TOTALRECORDS_RED, TOTALRECORDS_WHITE = wineobj.datasets_lengths()
+    
+    settings = {
+        "pageSize":f'{PAGESIZE}',
+        "totalRecsRed":f'{TOTALRECORDS_RED}',
+        "totalRecsWhite":f'{TOTALRECORDS_WHITE}'
+    }
+
+    return make_response(json.dumps(settings), 200)
 
 @app.route('/api/winedataset/entries/red')
 def get_redwine_data():
@@ -36,9 +54,11 @@ def get_redwine_data():
     wdata = winedata_class.WineData(REDWINE_PATH,"")
     df = wdata.redwine_data()
     df['id'] = range(len(df))
+    df = df[["id","fixed acidity","volatile acidity","citric acid","residual sugar","chlorides","free sulfur dioxide","total sulfur dioxide","density","pH","sulphates","alcohol","quality"]]
+    dfret = df.to_dict('records')
     dfret = df.iloc[pageno*PAGESIZE:(pageno+ 1)*PAGESIZE].to_dict('records')
     #return Response(dfret.to_json(orient="records"), mimetype='application/json')
-    #return Response(dfret,mimetype='application/json')
+    #return Response(jsonify(dfret),mimetype='application/json')
     return make_response(jsonify(dfret),200)
 
 @app.route('/api/winedataset/entries/white')
@@ -52,6 +72,7 @@ def get_whitewine_data():
     wdata = winedata_class.WineData("",WHITEWINE_PATH)
     df = wdata.whitewine_data()
     df['id'] = range(len(df))
+    df = df[["id","fixed acidity","volatile acidity","citric acid","residual sugar","chlorides","free sulfur dioxide","total sulfur dioxide","density","pH","sulphates","alcohol","quality"]]
     dfret = df.iloc[pageno*PAGESIZE:(pageno+ 1)*PAGESIZE].to_dict('records')
     return make_response(jsonify(dfret),200)
 

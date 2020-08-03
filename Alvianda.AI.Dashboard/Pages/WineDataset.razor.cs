@@ -10,6 +10,9 @@ using Microsoft.JSInterop;
 using Microsoft.AspNetCore.Authorization;
 using System.Globalization;
 using Alvianda.AI.Dashboard.Services;
+using System.Json;
+using System.Linq;
+using Newtonsoft.Json.Linq;
 
 namespace Alvianda.AI.Dashboard.Pages
 {
@@ -34,8 +37,12 @@ namespace Alvianda.AI.Dashboard.Pages
         
         int totalPages { get; set; }
         int pageIndex;
+        int MAXRECORDS_RED;
+        int MAXRECORDS_WHITE;
+        int PAGESIZE;
         bool hasNextPage;
         bool hasPreviousPage;
+        int maxRecords;
         
         // Page and Sort data
         int? pageNumber = 1;
@@ -43,11 +50,24 @@ namespace Alvianda.AI.Dashboard.Pages
         //string currentSortOrder = "Asc";
 
         private bool isError;
-        private string retrievEntriesMsg = "Retrieving records...";
+        private string retrievEntriesMsg = "Waiting to kick off retrieve or retrieving records from the server...";
+        private string promptUserToTakeAction = "Please make your selections...";
 
         protected override async Task OnInitializedAsync()
         {
-            paginatedList = new PaginatedList<WinesetEntry>();
+            SelectedWineset = "None";
+            
+            var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:WinesetRouting")}/settings";
+            var response = await Http.GetAsync(serviceEndpoint);
+            response.EnsureSuccessStatusCode();
+            var responseString = await response.Content.ReadAsStringAsync();
+
+            var settings = JObject.Parse(responseString);
+            
+            PAGESIZE = int.Parse(settings["pageSize"].ToString());
+            MAXRECORDS_RED = int.Parse(settings["totalRecsRed"].ToString());
+            MAXRECORDS_WHITE = int.Parse(settings["totalRecsWhite"].ToString());                
+
         }
 
         public async Task PageIndexChanged(int newPageNumber)
@@ -91,12 +111,28 @@ namespace Alvianda.AI.Dashboard.Pages
                 var response = await Http.GetAsync(serviceEndpoint);
                 response.EnsureSuccessStatusCode();
 
-                using var responseStream = await response.Content.ReadAsStreamAsync();
-                var paginatedList = await System.Text.Json.JsonSerializer.DeserializeAsync<PaginatedList<WinesetEntry>>(responseStream, new System.Text.Json.JsonSerializerOptions
+                //var responseStream = await response.Content.ReadAsStreamAsync();
+                //var paginatedList = await System.Text.Json.JsonSerializer.DeserializeAsync<PaginatedList<WinesetEntry>>(responseString, new System.Text.Json.JsonSerializerOptions
+                //{
+                //    PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
+                //    PropertyNameCaseInsensitive = true,
+                //});
+                
+                var responseString = await response.Content.ReadAsStringAsync();
+
+                var objList = System.Text.Json.JsonSerializer.Deserialize<WinesetEntry[]>(responseString);
+
+                if (SelectedWineset == "red")
                 {
-                    PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
-                    PropertyNameCaseInsensitive = true,
-                });
+                    paginatedList = new PaginatedList<WinesetEntry>(objList.ToList(), MAXRECORDS_RED, (int)pageNumber, PAGESIZE);
+                    maxRecords = MAXRECORDS_RED;
+                }
+
+                if (SelectedWineset == "white")
+                {
+                    paginatedList = new PaginatedList<WinesetEntry>(objList.ToList(), MAXRECORDS_WHITE, (int)pageNumber, PAGESIZE);
+                    maxRecords = MAXRECORDS_WHITE;
+                }
 
                 WinesetEntries = paginatedList.Items;
 
