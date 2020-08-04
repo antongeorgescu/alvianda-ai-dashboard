@@ -45,7 +45,7 @@ namespace Alvianda.AI.Dashboard.Services
 
         private async Task<List<WinesetEntry>> GetWinesetEntries(string wineCategory)
         {
-            var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:WinesetRouting")}/entries/{wineCategory}";
+            var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:DatasetRouting")}/entries/{wineCategory}";
             var wineResponse = await _httpClient.GetFromJsonAsync<List<WinesetEntry>>(serviceEndpoint);
 
             var winesetEntries = new List<WinesetEntry>();

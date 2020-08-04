@@ -10,3 +10,4 @@ CORS(app)
 
 import WineQuality_RestAPI.views
 import WineQuality_RestAPI.controllers.dataset_controller
+import WineQuality_RestAPI.controllers.analytics_controller

@@ -57,7 +57,7 @@ namespace Alvianda.AI.Dashboard.Pages
         {
             SelectedWineset = "None";
             
-            var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:WinesetRouting")}/settings";
+            var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:DatasetRouting")}/settings";
             var response = await Http.GetAsync(serviceEndpoint);
             response.EnsureSuccessStatusCode();
             var responseString = await response.Content.ReadAsStringAsync();
@@ -107,7 +107,7 @@ namespace Alvianda.AI.Dashboard.Pages
                 //    }
                 //}
 
-                var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:WinesetRouting")}/entries/{SelectedWineset}?pageno={pageNumber}";
+                var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:DatasetRouting")}/entries/{SelectedWineset}?pageno={pageNumber}";
                 var response = await Http.GetAsync(serviceEndpoint);
                 response.EnsureSuccessStatusCode();
 

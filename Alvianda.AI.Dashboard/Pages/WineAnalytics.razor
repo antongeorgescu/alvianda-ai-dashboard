@@ -1,0 +1,69 @@
+﻿@page "/wineanalytics"
+@*@implements IDisposable*@
+
+@*<div class="form-group">
+        <table style="padding:5px;">
+            <thead>
+                <tr>
+                    <td><label>Chat Service - use Analytics Controller with Signal-R</label></td>
+                </tr>
+            </thead>
+            <tr>
+                <td>
+                    <label>
+                        User:
+                        <input @bind="userInput" />
+                    </label>
+                </td>
+                <td>
+                    <label>
+                        Message:
+                        <input @bind="messageInput" size="50" />
+                    </label>
+                </td>
+                <td><button @onclick="Connect">Connect Chat Service</button></td>
+                <td><button @onclick="Send">Send Message</button></td>
+            </tr>
+        </table>
+    </div>*@
+<h3>Wine Analytics with Machine Learning: Training and Fitting Algorithms</h3>
+<table class="table" style='font-size:small;line-height: 1.428;'>
+    <thead style="background-color:gainsboro; border-color:gray;">
+        <tr>
+            <td>
+                <div>
+                    <label for="start">Select algorithm:</label>
+                    <select @bind="@SelectedAlgorithm" class="select-box">
+                        <option value="None">== None ==</option>
+                        <option value="decision-tree">Decision Tree</option>
+                        <option value="naive-bayes">Naive Bayes</option>
+                    </select>
+                </div>
+            </td>
+            <td class="text-left">
+                <button class="btn btn-primary" @onclick="@RunMachineLearningAnalysis" style='font-size:small;line-height: 1.428;width:205px;'>Run Machine Learning Analysis</button>
+            </td>
+        </tr>
+    </thead>
+</table>
+<hr/>
+
+<div>
+    <label>Session Summary:</label>
+    <ul id="messagesList">
+        @foreach (var message in messages)
+        {
+            if (message.Item1 == "error")
+            {
+                <li style="color:red">[@message.Item1] @message.Item2</li>
+            }
+            if (message.Item1 == "info")
+            {
+                <li style="color:green">[@message.Item1] @message.Item2</li>
+            }
+        }
+    </ul>
+</div>
+
+@code {
+}
