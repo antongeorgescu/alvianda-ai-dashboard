@@ -14,124 +14,144 @@ from sklearn.metrics import confusion_matrix,f1_score
 from sklearn.preprocessing import StandardScaler
 
 class DecisionTreeAnalyzer:
-    last_error = ''    
-    def __init__(self, redwine_data_path, whitewine_data_path):
+    def __init__(self,redwine_dataset_path,whitewine_dataset_path):
         try:
-            self.REDWINE_PATH = redwine_data_path
-            self.WHITEWINE_PATH = whitewine_data_path
-
             # read red wine set of observations
-            data_red = pd.read_csv(self.REDWINE_PATH,sep=',')
+            data_red = pd.read_csv(redwine_dataset_path,sep=',')
             data_red['color'] = 1 #redwine
 
             # read white wine set of observations
-            data_white = pd.read_csv(self.WHITEWINE_PATH,sep=',')
+            data_white = pd.read_csv(whitewine_dataset_path,sep=',')
             data_white['color'] = 0 #whitewine
             # merge the two sets in one
-            self.data = data_red.merge(data_white, how='outer')
-            self.fields = list(data.columns)
+            self.merged_data = data_red.merge(data_white, how='outer')
+            self.fields = list(self.merged_data.columns)
        
         except:
             self.last_error = sys.exc_info()[1]
             raise Exception(self.last_error)
 
 
-    def create_histrograms():
-        # show the histograms of values per feature (eg most of whines are at about 8 proof strength)
-        sns.set()
-        self.data.hist(figsize=(10,10),color='red', bins=13)
-        plt.show()
+    def create_histrograms(self):
+        try:
+            # show the histograms of values per feature (eg most of whines are at about 8 proof strength)
+            sns.set()
+            self.merged_data.hist(figsize=(10,10),color='red', bins=13)
+            plt.show()
 
-        # show the historgram of wine rankings (quality between 1 and 10)
-        self.data['quality'].hist(color='red', bins=13)
-        plt.show()
+            # show the historgram of wine rankings (quality between 1 and 10)
+            self.merged_data['quality'].hist(color='red', bins=13)
+            plt.show()
+        except:
+            self.last_error = sys.exc_info()[1]
+            raise Exception(self.last_error)
 
     
-    def reduce_dimensionality():
-        # based on the "quality histograms" above, we will drop the ratings with low counts (we will keep only 3 dimesnions = 5,6,7)
-        self.data = data.drop(self.data[self.data.quality == 1].index)    # not recorded anyway
-        self.data = data.drop(self.data[self.data.quality == 2].index)    # not recorded anyway
-        self.data = data.drop(self.data[self.data.quality == 10].index)   # not recorded anyway
-        self.data = data.drop(self.data[self.data.quality == 9].index)
-        self.data = data.drop(self.data[self.data.quality == 3].index)
-        self.data = data.drop(self.data[self.data.quality == 8].index)
-        data = data.drop(data[data.quality == 4].index)
+    def reduce_dimensionality(self):
+        try:
+            # based on the "quality histograms" above, we will drop the ratings with low counts (we will keep only 3 dimesnions = 5,6,7)
+            self.merged_data = self.merged_data.drop(self.merged_data[self.merged_data.quality == 1].index)    # not recorded anyway
+            self.merged_data = self.merged_data.drop(self.merged_data[self.merged_data.quality == 2].index)    # not recorded anyway
+            self.merged_data = self.merged_data.drop(self.merged_data[self.merged_data.quality == 10].index)   # not recorded anyway
+            self.merged_data = self.merged_data.drop(self.merged_data[self.merged_data.quality == 9].index)
+            self.merged_data = self.merged_data.drop(self.merged_data[self.merged_data.quality == 3].index)
+            self.merged_data = self.merged_data.drop(self.merged_data[self.merged_data.quality == 8].index)
+            self.merged_data = self.merged_data.drop(self.merged_data[self.merged_data.quality == 4].index)
 
-        self.fields = list(self.data.columns)
-        self.fields = list(data.columns[:-2])
-        fields.append('color')  #adding color back
-        self.X = data[fields]
-        self.y = data['quality']
+            self.fields = list(self.merged_data.columns)
+            self.fields = list(self.merged_data.columns[:-2])
+            self.fields.append('color')  #adding color back
+            self.X = self.merged_data[self.fields]
+            self.y = self.merged_data['quality']
+        except:
+            self.last_error = sys.exc_info()[1]
+            raise Exception(self.last_error)
 
-    def identify_correlations():
+    def identify_correlations(self):
         # A Pearson correlation was used to identify which features correlate with wine quality. It looks as if higher the alcohol content the higher the quality. Lower density and volatile acidity also correlated with better quality as seen in the pairwise correlation chart the chart below. Only the top 5 correlated features were carried over to the KNN models.
 
-        correlations = data[fields].corrwith(y)
-        correlations.sort_values(inplace=True)
+        try:
+            correlations = self.merged_data[self.fields].corrwith(self.y)
+            correlations.sort_values(inplace=True)
 
-        # the following fields are the 5 retained as having the highest correlations to wine quality
-        fields = correlations.map(abs).sort_values().iloc[-5:].index
-        print(fields) #prints the top two abs correlations
+            # the following fields are the 5 retained as having the highest correlations to wine quality
+            self.fields = correlations.map(abs).sort_values().iloc[-5:].index
+            print(self.fields) #prints the top two abs correlations
         
 
-        # The figure below shows Pearson Pairwise correlation of features to wine quality.
-        # Looks like alcohol and density are the most correlated with quality
-        ax = correlations.plot(kind='bar')
-        ax.set(ylim=[-1, 1], ylabel='pearson correlation')
+            # The figure below shows Pearson Pairwise correlation of features to wine quality.
+            # Looks like alcohol and density are the most correlated with quality
+            ax = correlations.plot(kind='bar')
+            ax.set(ylim=[-1, 1], ylabel='pearson correlation')
+        except:
+            self.last_error = sys.exc_info()[1]
+            raise Exception(self.last_error)
 
-    def scale_dataset(scaler = 'MINMAXSCALER'):
+    def scale_dataset(self,scaler = 'MINMAXSCALER'):
         # two types of scalers: MINMAXSCALER, STANDARDSCALER
-        X = data[fields]
-        if (scaler == 'MINMAXSCALER'):
-            
-            scaler = MinMaxScaler()
-            X = scaler.fit_transform(X)
-        if (scaler == 'STANDARDSCALER'):
-            # Alternative to previous scalar
-            
-            scaler = StandardScaler()
-            # Fit on training set only.
-            X = scaler.fit_transform(X)
-
-        X = pd.DataFrame(X, columns=['%s_scaled' % fld for fld in fields])
         
-    def train_and_fit_model():
+        try:
+            self.X = self.merged_data[self.fields]
+            if (scaler == 'MINMAXSCALER'):
+                scaler = MinMaxScaler()
+                self.X = scaler.fit_transform(self.X)
+            if (scaler == 'STANDARDSCALER'):
+                # Alternative to previous scalar
+            
+                scaler = StandardScaler()
+                # Fit on training set only.
+                self.X = scaler.fit_transform(self.X)
+
+            self.X = pd.DataFrame(X, columns=['%s_scaled' % fld for fld in self.fields])
+        except:
+            self.last_error = sys.exc_info()[1]
+            raise Exception(self.last_error)
+
+    def train_and_fit_model(self):
         # test_size: what proportion of original data is used for test set
-        X_train, X_test, y_train, y_test = train_test_split(
-            X, y, test_size=1/7.0, random_state=122)
-
-        dtree = DecisionTreeClassifier(max_depth=10, random_state=101,
-                                    max_features = None, min_samples_leaf = 30)
-
-        startproc = time.time()
-
-        # fit the model with training data
-        dtree.fit(X_train, y_train)
-
-        # predict the wine rankings for the test data set
-        y_pred = dtree.predict(X_test)
-        proctime = time.time() - startproc
-
-        print(y_pred,X_test)
-
-    def calculate_accuracy():
-        # how did our model perform?
-        count_misclassified = (y_test != y_pred).sum()
-        print('Misclassified samples: {}'.format(count_misclassified))
-        accuracy = accuracy_score(y_test, y_pred)
-        print('Accuracy: {:.2f}'.format(accuracy))
-
         
+        try:
+            self.X_train, self.X_test, self.y_train, self.y_test = train_test_split(
+                self.X, self.y, test_size=1/7.0, random_state=122)
 
-        # Calculate the accuracy of prediction
-        # Get the accuracy score
-        accuracy = accuracy_score(y_test, y_pred)
-        print('Accuracy: {:.4f}'.format(accuracy))
+            dtree = DecisionTreeClassifier(max_depth=10, random_state=101,
+                                        max_features = None, min_samples_leaf = 30)
 
-        f1score = f1_score(y_test, y_pred, average='micro')
-        print('F1_Score: {:.4f}'.format(f1score))
+            startproc = time.time()
 
-    def about_confusion_matrix():
+            # fit the model with training data
+            dtree.fit(self.X_train, self.y_train)
+
+            # predict the wine rankings for the test data set
+            self.y_pred = dtree.predict(self.X_test)
+            proctime = time.time() - startproc
+
+            print(self.y_pred,self.X_test)
+        except:
+            self.last_error = sys.exc_info()[1]
+            raise Exception(self.last_error)
+
+    def calculate_accuracy(self):
+        # how did our model perform?
+        
+        try:
+            count_misclassified = (self.y_test != self.y_pred).sum()
+            print('Misclassified samples: {}'.format(count_misclassified))
+            accuracy = accuracy_score(self.y_test, self.y_pred)
+            print('Accuracy: {:.2f}'.format(accuracy))
+        
+            # Calculate the accuracy of prediction
+            # Get the accuracy score
+            accuracy = accuracy_score(self.y_test, self.y_pred)
+            print('Accuracy: {:.4f}'.format(accuracy))
+
+            f1score = f1_score(self.y_test, self.y_pred, average='micro')
+            print('F1_Score: {:.4f}'.format(f1score))
+        except:
+            self.last_error = sys.exc_info()[1]
+            raise Exception(self.last_error)
+
+    def about_confusion_matrix(self):
         # ### About Confusion Matrix
         # 
         # A confusion matrix is a table that is often used to describe the performance of a classification model (or "classifier") 
@@ -174,24 +194,33 @@ class DecisionTreeAnalyzer:
         # ![Confusion Matrix - Theoretical Foundation](https://raw.githubusercontent.com/antongeorgescu/machine-learning-documentation/master/images/Confusion-Matrix-2.PNG) 
         return
 
-    def calculate_confusion_matrix():
+    def calculate_confusion_matrix(self):
         # Get the confusion matrix
-        cm = confusion_matrix(y_test, y_pred)
-        print(cm)
-        cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
+        
+        try:
+            cm = confusion_matrix(self.y_test, self.y_pred)
+            print(cm)
+            cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 
-        sns.heatmap(cm, annot=True, fmt='.2g');
-        plt.title('Confusion matrix of the KNN classifier')    
-        plt.tight_layout()
+            sns.heatmap(cm, annot=True, fmt='.2g');
+            plt.title('Confusion matrix of the KNN classifier')    
+            plt.tight_layout()
+        except:
+            self.last_error = sys.exc_info()[1]
+            raise Exception(self.last_error)
 
-    def save_model():
-        summaryfile = 'ModelsFitness.txt'
-        nbdir = os.getcwd()
-        fsummary = open(f'{nbdir}\\{summaryfile}',"a") 
-        fsummary.write('Wine Quality Analysis with Decision Tree\tProcessing (sec):{:.4f}\tAccuracy: {:.4f}\tF1-Score: {:.4f}\r\n'.format(proctime,accuracy,f1score))
-        fsummary.close() 
-        # save model
-        return
+    def save_model(self):
+        try:
+            summaryfile = 'ModelsFitness.txt'
+            nbdir = os.getcwd()
+            fsummary = open(f'{nbdir}\\{summaryfile}',"a") 
+            fsummary.write('Wine Quality Analysis with Decision Tree\tProcessing (sec):{:.4f}\tAccuracy: {:.4f}\tF1-Score: {:.4f}\r\n'.format(proctime,accuracy,f1score))
+            fsummary.close() 
+            # save model
+            return
+        except:
+            self.last_error = sys.exc_info()[1]
+            raise Exception(self.last_error)
     
-    def get_model(model_id):
+    def get_model(self,model_id):
         return    
