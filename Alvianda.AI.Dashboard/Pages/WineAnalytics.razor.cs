@@ -4,18 +4,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Configuration;
-using Alvianda.AI.Dashboard.Datapayload;
 using System.Net.Http;
 using Microsoft.JSInterop;
-using Microsoft.AspNetCore.Authorization;
-using System.Globalization;
 using Alvianda.AI.Dashboard.Services;
-using System.Json;
-using System.Linq;
-using Newtonsoft.Json.Linq;
-
-using Microsoft.AspNetCore.SignalR.Client;
 using NUglify;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Alvianda.AI.Dashboard.Pages
 {
@@ -32,6 +26,12 @@ namespace Alvianda.AI.Dashboard.Pages
 
         public string SelectedAlgorithm { get; set; }
         private List<Tuple<string,string>> messages = new List<Tuple<string,string>>();
+
+        private string attributesHistogramTitle;
+        private string attributesHistogramChart;
+        private string qualityHistogramTitle;
+        private string qualityHistogramChart;
+
         //private string userInput;
         //private string messageInput;
 
@@ -89,8 +89,18 @@ namespace Alvianda.AI.Dashboard.Pages
                 }
                 else
                 {
-                    responseString = responseString.Replace('"', ' ');
-                    messages.Add(new Tuple<string,string>("info",responseString));
+                    //responseString = responseString.Replace("'", string.Empty);
+                    IList<JToken> responseList = JsonConvert.DeserializeObject(responseString) as IList<JToken>;
+
+                    attributesHistogramTitle = responseList[1].Value<string>().Split(',')[0];
+                    qualityHistogramTitle = responseList[1].Value<string>().Split(',')[1];
+
+                    attributesHistogramChart = $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[0]}";
+                    qualityHistogramChart = $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[1]}";
+
+                    messages.Add(new Tuple<string,string>("info",responseList[2].Value<string>()));
+
+                    // get the chart files from response
                 }
                     
             }

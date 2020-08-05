@@ -37,11 +37,13 @@ class DecisionTreeAnalyzer:
             # show the histograms of values per feature (eg most of whines are at about 8 proof strength)
             sns.set()
             self.merged_data.hist(figsize=(10,10),color='red', bins=13)
-            plt.show()
+            plt.savefig(f'{os.getcwd()}/WineQuality_RestAPI/static/attribute_historgram.jpg')
 
             # show the historgram of wine rankings (quality between 1 and 10)
             self.merged_data['quality'].hist(color='red', bins=13)
-            plt.show()
+            plt.savefig(f'{os.getcwd()}/WineQuality_RestAPI/static/quality_histogram.jpg')
+
+            return "attribute_historgram.jpg,quality_histogram.jpg","Wine Attributes Histogram,Wine Quality Histogram"
         except:
             self.last_error = sys.exc_info()[1]
             raise Exception(self.last_error)

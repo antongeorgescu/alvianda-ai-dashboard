@@ -36,7 +36,9 @@ def run_analysis():
     rundata = {
         "startproc" : "",
         "endproc" : "",
-        "duration" : 0.0
+        "duration" : 0.0,
+        "csgraphfiles" : "",
+        "csgraphtitles" : ""
     }
     dtanalyzer = None
 
@@ -44,26 +46,23 @@ def run_analysis():
         if (algorithm == "decision-tree"):
             
             startproc = time.time()
-            rundata["startproc"] = datetime.now().strftime("%H:%M:%S.%f")       
+            startprocstr = datetime.now().strftime("%H:%M:%S.%f")       
             
             dtanalyzer = DecisionTreeAnalyzer(REDWINE_PATH,WHITEWINE_PATH)  
             
-            dtanalyzer.create_histrograms()
-
-            #TODO develop here
-            histogram = None
-            #retHisto = url_for('static',filename=histogram)
+            rundata["csgraphfiles"],rundata["csgraphtitles"] = dtanalyzer.create_histrograms()
 
             dtanalyzer.reduce_dimensionality()
             dtanalyzer.identify_correlations()
 
-            endproc = time.time() 
-            rundata["endproc"] = datetime.now().strftime("%H:%M:%S.%f")
-            rundata["duration"] = time.time() - startproc
+            endproc = time.time()
+            endprocstr = datetime.now().strftime("%H:%M:%S.%f")
+            proc_duration = time.time() - startproc
     except Exception as error:
         return make_response(error,500)
-    run_summary = f'run {algorithm} analyzer from {rundata["startproc"]} to {rundata["endproc"]}, for the duration of {rundata["duration"]} sec'
-    return make_response(jsonify(run_summary),200)
+    run_summary = f'run {algorithm} analyzer from {startprocstr} to {endprocstr}, for the duration of {proc_duration} sec'
+    
+    return make_response(jsonify(rundata["csgraphfiles"],rundata["csgraphtitles"],run_summary),200)
 
 @app.route('/api/wineanalytics/trainmodel')
 def train_model():
