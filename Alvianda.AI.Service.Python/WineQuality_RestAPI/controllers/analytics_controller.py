@@ -5,7 +5,7 @@ Routes and views for analytics endpoints.
 from requests import Session
 from signalr import Connection
 from datetime import datetime
-from flask import make_response, render_template, jsonify, Response, request
+from flask import make_response, render_template, jsonify, Response, request, url_for
 from WineQuality_RestAPI import app
 import time
 import json
@@ -19,6 +19,9 @@ def validate():
     current_time = time.strftime("%D %H:%M:%S", t)
     
     d = f'analytics controller accessed at {current_time}'
+
+    snowUrl = url_for('static',filename='John-Snow.jpg')
+
     return make_response(jsonify(d), 200)
 
 @app.route('/api/wineanalytics/runanalyzer')
@@ -38,6 +41,25 @@ def run_analysis():
             dtanalyzer.create_histrograms()
             dtanalyzer.reduce_dimensionality()
             dtanalyzer.identify_correlations()
+    except Exception as error:
+        return make_response(error,500)
+
+    return make_response(jsonify(rundata),200)
+
+@app.route('/api/wineanalytics/trainmodel')
+def train_model():
+    query_parameters = request.args
+    algorithm = query_parameters.get('algorithm')
+    
+    REDWINE_PATH = "../datasets/winequality-red.csv"
+    WHITEWINE_PATH = "../datasets/winequality-white.csv"
+
+    rundata = None  # should be a dictionary
+    dtanalyzer = None
+
+    try:
+        if (algorithm == "decision-tree"):
+            dtanalyzer = DecisionTreeAnalyzer(REDWINE_PATH,WHITEWINE_PATH)  
             dtanalyzer.scale_dataset()
             dtanalyzer.train_and_fit_model()
             dtanalyzer.calculate_accuracy()
@@ -47,6 +69,7 @@ def run_analysis():
         return make_response(error,500)
 
     return make_response(jsonify(rundata),200)
+
 
 @app.route('/api/wineanalytics/chathub')
 def chat():

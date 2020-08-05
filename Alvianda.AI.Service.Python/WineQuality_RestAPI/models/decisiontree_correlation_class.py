@@ -30,8 +30,7 @@ class DecisionTreeAnalyzer:
             # merge the two sets in one
             self.data = data_red.merge(data_white, how='outer')
             self.fields = list(data.columns)
-        
-            self.last_step_completed = 1
+       
         except:
             self.last_error = sys.exc_info()[1]
             raise Exception(self.last_error)
