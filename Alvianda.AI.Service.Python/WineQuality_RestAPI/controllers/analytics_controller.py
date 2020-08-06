@@ -37,8 +37,12 @@ def run_analysis():
         "startproc" : "",
         "endproc" : "",
         "duration" : 0.0,
-        "csgraphfiles" : "",
-        "csgraphtitles" : ""
+        "cshistogramcharts" : "",
+        "cshistogramtitles" : "",
+        "quality_drop" : "",
+        "correlationchart" : "",
+        "correlationtitle" : "",
+        "correlated_attributes": ""
     }
     dtanalyzer = None
 
@@ -50,10 +54,11 @@ def run_analysis():
             
             dtanalyzer = DecisionTreeAnalyzer(REDWINE_PATH,WHITEWINE_PATH)  
             
-            rundata["csgraphfiles"],rundata["csgraphtitles"] = dtanalyzer.create_histrograms()
+            rundata["cshistogramcharts"],rundata["cshistogramtitles"] = dtanalyzer.create_histrograms()
 
-            dtanalyzer.reduce_dimensionality()
-            dtanalyzer.identify_correlations()
+            rundata["quality_drop"] = dtanalyzer.reduce_dimensionality()
+
+            rundata["correlated_attributes"],rundata["correlationchart"],rundata["correlationtitle"] = dtanalyzer.identify_correlations()
 
             endproc = time.time()
             endprocstr = datetime.now().strftime("%H:%M:%S.%f")
@@ -62,7 +67,13 @@ def run_analysis():
         return make_response(error,500)
     run_summary = f'run {algorithm} analyzer from {startprocstr} to {endprocstr}, for the duration of {proc_duration} sec'
     
-    return make_response(jsonify(rundata["csgraphfiles"],rundata["csgraphtitles"],run_summary),200)
+    return make_response(jsonify(rundata["cshistogramcharts"],
+                                 rundata["cshistogramtitles"],
+                                 rundata["quality_drop"],
+                                 rundata["correlationchart"],
+                                 rundata["correlationtitle"],
+                                 rundata["correlated_attributes"],
+                                 run_summary),200)
 
 @app.route('/api/wineanalytics/trainmodel')
 def train_model():

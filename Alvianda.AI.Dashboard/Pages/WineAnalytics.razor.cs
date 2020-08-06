@@ -31,7 +31,13 @@ namespace Alvianda.AI.Dashboard.Pages
         private string attributesHistogramChart;
         private string qualityHistogramTitle;
         private string qualityHistogramChart;
+        private string qualityValuesDropped;
+        private string correlationChart;
+        private string correlationTitle;
+        private string correlationAttributes;
 
+        private bool isRunDataAvailable = false;
+        private string waitMessage = string.Empty;
         //private string userInput;
         //private string messageInput;
 
@@ -74,6 +80,8 @@ namespace Alvianda.AI.Dashboard.Pages
             string responseString = string.Empty;
             try
             {
+                isRunDataAvailable = false;
+                waitMessage = "Wait while retrieving your records and analyze the data...";
                 var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer?algorithm={SelectedAlgorithm}";
                 var response = await Http.GetAsync(serviceEndpoint);
                 //response.EnsureSuccessStatusCode();
@@ -89,6 +97,7 @@ namespace Alvianda.AI.Dashboard.Pages
                 }
                 else
                 {
+                    
                     //responseString = responseString.Replace("'", string.Empty);
                     IList<JToken> responseList = JsonConvert.DeserializeObject(responseString) as IList<JToken>;
 
@@ -98,9 +107,17 @@ namespace Alvianda.AI.Dashboard.Pages
                     attributesHistogramChart = $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[0]}";
                     qualityHistogramChart = $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[1]}";
 
-                    messages.Add(new Tuple<string,string>("info",responseList[2].Value<string>()));
+                    qualityValuesDropped = responseList[2].Value<string>();
 
-                    // get the chart files from response
+                    correlationChart = $"http:////localhost:53535//static//{responseList[3].Value<string>()}";
+                    correlationTitle = responseList[4].Value<string>();
+
+                    correlationAttributes = responseList[5].Value<string>();
+
+                    messages.Add(new Tuple<string,string>("info",responseList[6].Value<string>()));
+
+                    waitMessage = string.Empty;
+                    isRunDataAvailable = true;
                 }
                     
             }
