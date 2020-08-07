@@ -41,7 +41,9 @@
                 </div>
             </td>
             <td class="text-left">
-                <button class="btn btn-primary" @onclick="@RunMachineLearningAnalysis" style='font-size:small;line-height: 1.428;width:205px;'>Run Machine Learning Analysis</button>
+                <button class="btn btn-primary" @onclick="@RunDatasetAnalysis" style='font-size:small;line-height: 1.428;'>Run Dataset Analysis</button>
+                <button class="btn btn-primary" @onclick="@RunMachineLearningModel" style='font-size:small;line-height: 1.428;'>Train &amp; Test ML Model</button>
+                <button class="btn btn-primary" @onclick="() => { messages.Clear(); }" style='font-size:small;line-height: 1.428;'>Clear MessagesList</button>
             </td>
         </tr>
     </thead>
@@ -49,7 +51,7 @@
 <hr />
 
 <div>
-    <label>Session Summary:</label>
+    <label>Session Messages:</label>
     <ul id="messagesList">
         @foreach (var message in messages)
         {
@@ -69,31 +71,100 @@
 
 @if (isRunDataAvailable)
 {
-<table border="3">
-    <tr>
-        <td><b>Chart: @attributesHistogramTitle</b></td>
-        <td>@qualityHistogramTitle</td>
-    </tr>
-    <tr>
-        <td><img src=@attributesHistogramChart width="100%" height="400" /></td>
-        <td><img src=@qualityHistogramChart /></td>
-    </tr>
-    <tr>
-        <td><b>Correlation Attributes:</b> @correlationAttributes</td>
-        <td><b>Quality Values Dropped:</b> @qualityValuesDropped</td>
-    </tr>
-    <tr>
-        <td><b>Chart: @correlationTitle</b></td>
-        <td>&nbsp;</td>
-    </tr>
-    <tr>
-        <td><img src=@correlationChart height="100%"/></td>
-        <td>&nbsp;</td>    
-    </tr>
+    <div>
+        <label>Session Results:</label>
+        <table border="1">
+            <tr>
+                <td><b>Chart: @attributesHistogramTitle</b></td>
+                <td>
+                    <img src=@attributesHistogramChart
+                         width="30" height="20"
+                         onmouseover="JavaScript:this.style.cursor='pointer'"
+                         onmouseout="JavaScript:this.style.cursor='default'"
+                         @onclick="@(x => ModalShow(attributesHistogramTitle,attributesHistogramChart))" />&nbsp;(click for chart image)
+                </td>
+            </tr>
+            <tr>
+                <td><b>Chart: @qualityHistogramTitle</b></td>
+                <td>
+                    <img src=@qualityHistogramChart
+                         width="30" height="20"
+                         onmouseover="JavaScript:this.style.cursor='pointer'"
+                         onmouseout="JavaScript:this.style.cursor='default'"
+                         @onclick="@(x => ModalShow(qualityHistogramTitle,qualityHistogramChart))" />&nbsp;(click for chart image)
+                </td>
+            </tr>
+            <tr>
+                <td><b>Correlation Attributes</b> </td>
+                <td>@correlationAttributes</td>
+            </tr>
+            <tr>
+                <td><b>Quality Values Dropped</b></td>
+                <td>@qualityValuesDropped</td>
+            </tr>
+            <tr>
+                <td><b>Chart: @correlationTitle</b></td>
+                <td>
+                    <img src=@correlationChart
+                         width="30" height="20"
+                         onmouseover="JavaScript:this.style.cursor='pointer'"
+                         onmouseout="JavaScript:this.style.cursor='default'"
+                         @onclick="@(x => ModalShow(correlationTitle,correlationChart))" />&nbsp;(click for chart image)
+                </td>
+            </tr>
+        </table>
+    </div>
+}
+<hr />
+@*<button class="btn btn-primary" @onclick="@ModalShow">Show Dialog!</button>*@
+@if (showModal)
+{
+    <div class="modal fade show" id="myModal" style="display:block" aria-modal="true" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
 
-</table>
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">Chart: @selectedChartName</h4>
+                    <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <img src=@selectedChartSource width="475" height="400" />
+                </div>
+
+                <!-- Modal footer -->
+                @*<div class="modal-footer">
+                        <button type="button" class="btn" @onclick="@ModalCancel">Cancel</button>
+                        <button type="button" class="btn btn-danger" @onclick=@ModalOk>Delete</button>
+                    </div>*@
+
+            </div>
+        </div>
+    </div>
 }
 
 <!--<img src="http://localhost:53535/static/John-Snow.jpg" />-->
 @code {
+    bool showModal = false;
+    string selectedChartName;
+    string selectedChartSource;
+
+    void ModalShow(string chartName, string chartSource)
+    {
+        selectedChartName = chartName;
+        selectedChartSource = chartSource;
+        showModal = true;
+    }
+    void ModalCancel()
+    {
+        showModal = false;
+    }
+
+    void ModalOk()
+    {
+        Console.WriteLine("Modal ok");
+        showModal = false;
+    }
 }

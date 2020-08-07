@@ -66,16 +66,30 @@ namespace Alvianda.AI.Dashboard.Pages
 
         async Task ValidateAnalyticsService()
         {
-            var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/validate";
-            var response = await Http.GetAsync(serviceEndpoint);
-            response.EnsureSuccessStatusCode();
+            try
+            {
+                var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/validate";
+                var response = await Http.GetAsync(serviceEndpoint);
+                response.EnsureSuccessStatusCode();
 
-            var responseString = await response.Content.ReadAsStringAsync();
-
-            messages.Add(new Tuple<string,string>("info",responseString));
+                var responseString = await response.Content.ReadAsStringAsync();
+                if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
+                {
+                    responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
+                    var result = Uglify.HtmlToText(responseString);
+                    var resultCode = result.Code.Replace('"', ' ');
+                    messages.Add(new Tuple<string, string>("error", resultCode));
+                }
+                else
+                    messages.Add(new Tuple<string, string>("info", responseString));
+            }
+            catch(Exception ex)
+            {
+                messages.Add(new Tuple<string, string>("error", $"{ex.Message} [Source={ex.Source}:{ex.StackTrace}]"));
+            }
         }
 
-        async Task RunMachineLearningAnalysis()
+        async Task RunDatasetAnalysis()
         {
             string responseString = string.Empty;
             try
@@ -125,6 +139,11 @@ namespace Alvianda.AI.Dashboard.Pages
             {
                 messages.Add(new Tuple<string, string>("error", ex.Message));
             }
+        }
+
+        async Task RunMachineLearningModel()
+        {
+            return;
         }
 
         //Task Send() =>
