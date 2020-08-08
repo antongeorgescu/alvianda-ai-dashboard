@@ -14,7 +14,7 @@ using System.Json;
 using System.Linq;
 using Newtonsoft.Json.Linq;
 
-namespace Alvianda.AI.Dashboard.Pages
+namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
 {
     [Authorize]
     public partial class WineDataset : ComponentBase

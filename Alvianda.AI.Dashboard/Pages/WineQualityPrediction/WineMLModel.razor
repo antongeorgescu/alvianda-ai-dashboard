@@ -1,0 +1,137 @@
+﻿@page "/winequalityprediction/winemlmodel"
+@*@implements IDisposable*@
+
+@inject IJSRuntime JSRuntime;
+
+@*<div class="form-group">
+        <table style="padding:5px;">
+            <thead>
+                <tr>
+                    <td><label>Chat Service - use Analytics Controller with Signal-R</label></td>
+                </tr>
+            </thead>
+            <tr>
+                <td>
+                    <label>
+                        User:
+                        <input @bind="userInput" />
+                    </label>
+                </td>
+                <td>
+                    <label>
+                        Message:
+                        <input @bind="messageInput" size="50" />
+                    </label>
+                </td>
+                <td><button @onclick="Connect">Connect Chat Service</button></td>
+                <td><button @onclick="Send">Send Message</button></td>
+            </tr>
+        </table>
+    </div>*@
+<h3>Machine Learning: Predictive Algorithm Modeling</h3>
+<table class="table" style='font-size:small;line-height: 1.428;'>
+    <thead style="background-color:gainsboro; border-color:gray;">
+        <tr>
+            <td>
+                <div>
+                    <label for="start">Select algorithm:</label>
+                    <select @bind="@SelectedAlgorithm" class="select-box">
+                        <option value="None">== None ==</option>
+                        <option value="decision-tree">Decision Tree</option>
+                        <option value="naive-bayes">Naive Bayes</option>
+                    </select>
+                </div>
+            </td>
+            <td class="text-left">
+                <button class="btn btn-primary" @onclick="@RunMachineLearningModel" style='font-size:small;line-height: 1.428;'>Train &amp; Test ML Model</button>
+                <button class="btn btn-primary" @onclick="() => { messages.Clear(); }" style='font-size:small;line-height: 1.428;'>Clear MessagesList</button>
+            </td>
+        </tr>
+    </thead>
+</table>
+<hr />
+
+<div>
+    <label>Session Messages:</label>
+    <ul id="messagesList">
+        @foreach (var message in messages)
+        {
+            if (message.Item1 == "error")
+            {
+                <li style="color:red">[@message.Item1] @message.Item2</li>
+            }
+            if (message.Item1 == "info")
+            {
+                <li style="color:green">[@message.Item1] @message.Item2</li>
+            }
+        }
+    </ul>
+</div>
+
+<p><i><mark>@waitMessage</mark></i></p>
+
+@if (isRunDataAvailable)
+{
+    <div>
+        <label>Session Predictive Algorithm Modeling Results:</label>
+        <table border="1">
+            <tr>
+                <td><b>@resultOneName</b></td>
+                <td>@resultOneData</td>
+            </tr>
+        </table>
+    </div>
+}
+<hr />
+
+@if (showModal)
+{
+    <div class="modal fade show" id="myModal" style="display:block;" aria-modal="true" role="dialog">
+        <div class="modal-dialog" modal-lg>
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">@selectedResultName</h4>
+                    <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <p>@selectedResultContent</p>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" @onclick=@ModalOk>Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!--<img src="http://localhost:53535/static/John-Snow.jpg" />-->
+@code {
+
+    bool showModal = false;
+    string selectedResultName;
+    string selectedResultContent;
+
+    void ModalShow(string resultName, string resultContent)
+    {
+        selectedResultName = resultName;
+        selectedResultContent = resultContent;
+        showModal = true;
+    }
+    void ModalCancel()
+    {
+        showModal = false;
+    }
+
+    void ModalOk()
+    {
+        Console.WriteLine("Modal ok");
+        showModal = false;
+    }
+
+}

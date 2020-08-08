@@ -1,5 +1,7 @@
-﻿@page "/wineanalytics"
+﻿@page "/winequalityprediction/wineanalytics"
 @*@implements IDisposable*@
+
+@inject IJSRuntime JSRuntime;
 
 @*<div class="form-group">
         <table style="padding:5px;">
@@ -26,11 +28,11 @@
             </tr>
         </table>
     </div>*@
-<h3>Wine Analytics with Machine Learning: Training and Fitting Algorithms</h3>
+<h3>Data Preparation: Analytics and Dimensionality Reduction</h3>
 <table class="table" style='font-size:small;line-height: 1.428;'>
     <thead style="background-color:gainsboro; border-color:gray;">
         <tr>
-            <td>
+            @*<td>
                 <div>
                     <label for="start">Select algorithm:</label>
                     <select @bind="@SelectedAlgorithm" class="select-box">
@@ -39,10 +41,10 @@
                         <option value="naive-bayes">Naive Bayes</option>
                     </select>
                 </div>
-            </td>
+            </td>*@
             <td class="text-left">
                 <button class="btn btn-primary" @onclick="@RunDatasetAnalysis" style='font-size:small;line-height: 1.428;'>Run Dataset Analysis</button>
-                <button class="btn btn-primary" @onclick="@RunMachineLearningModel" style='font-size:small;line-height: 1.428;'>Train &amp; Test ML Model</button>
+                @*<button class="btn btn-primary" @onclick="@RunMachineLearningModel" style='font-size:small;line-height: 1.428;'>Train &amp; Test ML Model</button>*@
                 <button class="btn btn-primary" @onclick="() => { messages.Clear(); }" style='font-size:small;line-height: 1.428;'>Clear MessagesList</button>
             </td>
         </tr>
@@ -116,6 +118,7 @@
     </div>
 }
 <hr />
+
 @if (showModal)
 {
     <div class="modal fade show" id="myModal" style="display:block;" aria-modal="true" role="dialog">
@@ -134,11 +137,9 @@
                 </div>
 
                 <!-- Modal footer -->
-                @*<div class="modal-footer">
-                        <button type="button" class="btn" @onclick="@ModalCancel">Cancel</button>
-                        <button type="button" class="btn btn-danger" @onclick=@ModalOk>Delete</button>
-                    </div>*@
-
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" @onclick=ShowActualSizeImage>Render chart in separate window...</button>
+                </div>
             </div>
         </div>
     </div>
@@ -146,6 +147,8 @@
 
 <!--<img src="http://localhost:53535/static/John-Snow.jpg" />-->
 @code {
+    private string testChartSource = @"http://localhost:53535/static/John-Snow.jpg";
+
     bool showModal = false;
     string selectedChartName;
     string selectedChartSource;
@@ -165,5 +168,10 @@
     {
         Console.WriteLine("Modal ok");
         showModal = false;
+    }
+
+    private async Task ShowActualSizeImage()
+    {
+        await JSRuntime.InvokeAsync<string>("showActualSizeImage", selectedChartSource);
     }
 }

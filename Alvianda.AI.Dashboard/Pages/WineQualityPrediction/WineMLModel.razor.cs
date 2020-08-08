@@ -11,9 +11,9 @@ using NUglify;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Alvianda.AI.Dashboard.Pages
+namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
 {
-    public partial class WineAnalytics : ComponentBase
+    public partial class WineMLModel : ComponentBase
     {
         [Inject] HttpClient Http { get; set; }
         [Inject] IAccessTokenProvider AuthService { get; set; }
@@ -26,21 +26,13 @@ namespace Alvianda.AI.Dashboard.Pages
 
         public string SelectedAlgorithm { get; set; }
         private List<Tuple<string,string>> messages = new List<Tuple<string,string>>();
-
-        private string attributesHistogramTitle;
-        private string attributesHistogramChart;
-        private string qualityHistogramTitle;
-        private string qualityHistogramChart;
-        private string qualityValuesDropped;
-        private string correlationChart;
-        private string correlationTitle;
-        private string correlationAttributes;
-
-        private int chartWidth;
-        private int chartHeight;
-
-        private bool isRunDatasetAnalysisAvailable = false;
+                
+        private bool isRunDataAvailable = false;
         private string waitMessage = string.Empty;
+
+        private string resultOneName;
+        private string resultOneData;
+
         //private string userInput;
         //private string messageInput;
 
@@ -53,8 +45,6 @@ namespace Alvianda.AI.Dashboard.Pages
             //    .WithUrl(_url)
             //    .Build();
 
-            chartWidth = Config.GetValue<int>("AppSettings:ModalDialog:Width");
-            chartHeight = Config.GetValue<int>("AppSettings:ModalDialog:Height");
             await ValidateAnalyticsService();
         }
 
@@ -95,13 +85,13 @@ namespace Alvianda.AI.Dashboard.Pages
             }
         }
 
-        async Task RunDatasetAnalysis()
+        async Task RunMachineLearningModel()
         {
             string responseString = string.Empty;
             try
             {
-                isRunDatasetAnalysisAvailable = false;
-                waitMessage = "Wait while retrieving dataset records and analyze the data...";
+                isRunDataAvailable = false;
+                waitMessage = "Wait while retrieving machine learning model generation data...";
                 var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset";
                 var response = await Http.GetAsync(serviceEndpoint);
                 //response.EnsureSuccessStatusCode();
@@ -121,23 +111,13 @@ namespace Alvianda.AI.Dashboard.Pages
                     //responseString = responseString.Replace("'", string.Empty);
                     IList<JToken> responseList = JsonConvert.DeserializeObject(responseString) as IList<JToken>;
 
-                    attributesHistogramTitle = responseList[1].Value<string>().Split(',')[0];
-                    qualityHistogramTitle = responseList[1].Value<string>().Split(',')[1];
+                    messages.Add(new Tuple<string,string>("info","Received modeling data from server..."));
 
-                    attributesHistogramChart = $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[0]}";
-                    qualityHistogramChart = $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[1]}";
-
-                    qualityValuesDropped = responseList[2].Value<string>();
-
-                    correlationChart = $"http:////localhost:53535//static//{responseList[3].Value<string>()}";
-                    correlationTitle = responseList[4].Value<string>();
-
-                    correlationAttributes = responseList[5].Value<string>();
-
-                    messages.Add(new Tuple<string,string>("info",responseList[6].Value<string>()));
+                    resultOneName = "Result-One Name";
+                    resultOneData = "Result-One Data";
 
                     waitMessage = string.Empty;
-                    isRunDatasetAnalysisAvailable = true;
+                    isRunDataAvailable = true;
                 }
                     
             }
@@ -146,12 +126,7 @@ namespace Alvianda.AI.Dashboard.Pages
                 messages.Add(new Tuple<string, string>("error", ex.Message));
             }
         }
-
-        async Task RunMachineLearningModel()
-        {
-            return;
-        }
-
+                
         //Task Send() =>
         //    hubConnection.SendAsync("SendMessage", userInput, messageInput);
 

@@ -36,29 +36,29 @@
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="#" @onclick="()=>expandSubNav2 = !expandSubNav2">
-                <span class="oi oi-plus" aria-hidden="true"></span><h5> Wine Quality Estimator</h5>
+                <span class="oi oi-plus" aria-hidden="true"></span><h5> [ML] Wine Quality Modeling</h5>
             </NavLink>
             @if (expandSubNav2)
             {
         <ul>
             <li>
-                <NavLink class="expand-menu" href="winedataset">
-                    <span class="oi oi-list-rich" aria-hidden="true"></span><h6> Wine Dataset Viewer</h6>
+                <NavLink class="expand-menu" href="winequalityprediction/winedataset">
+                    <span class="oi oi-list-rich" aria-hidden="true"></span><h6> Dataset Viewer</h6>
                 </NavLink>
             </li>
             <li>
-                <NavLink class="expand-menu" href="wineanalytics">
-                    <span class="oi oi-graph" aria-hidden="true"></span><h6> Wine Dataset Analytics</h6>
+                <NavLink class="expand-menu" href="winequalityprediction/wineanalytics">
+                    <span class="oi oi-graph" aria-hidden="true"></span><h6> Data Preparation</h6>
                 </NavLink>
             </li>
             <li>
-                <NavLink class="expand-menu" href="predictmodels">
-                    <span class="oi oi-document" aria-hidden="true"></span><h6> Train and Fit Models</h6>
+                <NavLink class="expand-menu" href="winequalityprediction/winemlmodel">
+                    <span class="oi oi-document" aria-hidden="true"></span><h6> Predictive Modeling</h6>
                 </NavLink>
             </li>
             <li>
-                <NavLink class="expand-menu" href="estimatequality">
-                    <span class="oi oi-calculator" aria-hidden="true"></span><h6> Predict Wine Quality</h6>
+                <NavLink class="expand-menu" href="winequalityprediction/estimatequality">
+                    <span class="oi oi-calculator" aria-hidden="true"></span><h6> Quality Prediction</h6>
                 </NavLink>
             </li>
         </ul>
