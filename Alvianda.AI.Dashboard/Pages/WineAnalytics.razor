@@ -69,10 +69,10 @@
 
 <p><i><mark>@waitMessage</mark></i></p>
 
-@if (isRunDataAvailable)
+@if (isRunDatasetAnalysisAvailable)
 {
     <div>
-        <label>Session Results:</label>
+        <label>Session Dataset Analysis Results:</label>
         <table border="1">
             <tr>
                 <td><b>Chart: @attributesHistogramTitle</b></td>
@@ -116,11 +116,10 @@
     </div>
 }
 <hr />
-@*<button class="btn btn-primary" @onclick="@ModalShow">Show Dialog!</button>*@
 @if (showModal)
 {
-    <div class="modal fade show" id="myModal" style="display:block" aria-modal="true" role="dialog">
-        <div class="modal-dialog">
+    <div class="modal fade show" id="myModal" style="display:block;" aria-modal="true" role="dialog">
+        <div class="modal-dialog" modal-lg>
             <div class="modal-content">
 
                 <!-- Modal Header -->
@@ -131,7 +130,7 @@
 
                 <!-- Modal body -->
                 <div class="modal-body">
-                    <img src=@selectedChartSource width="475" height="400" />
+                    <img src=@selectedChartSource width="@chartWidth" height="@chartHeight" />
                 </div>
 
                 <!-- Modal footer -->

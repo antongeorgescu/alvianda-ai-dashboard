@@ -25,10 +25,10 @@ def validate():
 
     return make_response(jsonify(d), 200)
 
-@app.route('/api/wineanalytics/runanalyzer')
+@app.route('/api/wineanalytics/runanalyzer/dataset')
 def run_analysis():
-    query_parameters = request.args
-    algorithm = query_parameters.get('algorithm')
+    #query_parameters = request.args
+    #algorithm = query_parameters.get('algorithm')
     
     REDWINE_PATH = f'{os.getcwd()}/WineQuality_RestAPI/datasets/winequality-red.csv'
     WHITEWINE_PATH = f'{os.getcwd()}/WineQuality_RestAPI/datasets/winequality-white.csv'
@@ -47,25 +47,23 @@ def run_analysis():
     dtanalyzer = None
 
     try:
-        if (algorithm == "decision-tree"):
+        startproc = time.time()
+        startprocstr = datetime.now().strftime("%H:%M:%S.%f")       
             
-            startproc = time.time()
-            startprocstr = datetime.now().strftime("%H:%M:%S.%f")       
+        dtanalyzer = DecisionTreeAnalyzer(REDWINE_PATH,WHITEWINE_PATH)  
             
-            dtanalyzer = DecisionTreeAnalyzer(REDWINE_PATH,WHITEWINE_PATH)  
-            
-            rundata["cshistogramcharts"],rundata["cshistogramtitles"] = dtanalyzer.create_histrograms()
+        rundata["cshistogramcharts"],rundata["cshistogramtitles"] = dtanalyzer.create_histrograms()
 
-            rundata["quality_drop"] = dtanalyzer.reduce_dimensionality()
+        rundata["quality_drop"] = dtanalyzer.reduce_dimensionality()
 
-            rundata["correlated_attributes"],rundata["correlationchart"],rundata["correlationtitle"] = dtanalyzer.identify_correlations()
+        rundata["correlated_attributes"],rundata["correlationchart"],rundata["correlationtitle"] = dtanalyzer.identify_correlations()
 
-            endproc = time.time()
-            endprocstr = datetime.now().strftime("%H:%M:%S.%f")
-            proc_duration = time.time() - startproc
+        endproc = time.time()
+        endprocstr = datetime.now().strftime("%H:%M:%S.%f")
+        proc_duration = time.time() - startproc
     except Exception as error:
         return make_response(error,500)
-    run_summary = f'run {algorithm} analyzer from {startprocstr} to {endprocstr}, for the duration of {proc_duration} sec'
+    run_summary = f'run dataset analyzer from {startprocstr} to {endprocstr}, for the duration of {proc_duration} sec'
     
     return make_response(jsonify(rundata["cshistogramcharts"],
                                  rundata["cshistogramtitles"],

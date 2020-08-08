@@ -36,7 +36,10 @@ namespace Alvianda.AI.Dashboard.Pages
         private string correlationTitle;
         private string correlationAttributes;
 
-        private bool isRunDataAvailable = false;
+        private int chartWidth;
+        private int chartHeight;
+
+        private bool isRunDatasetAnalysisAvailable = false;
         private string waitMessage = string.Empty;
         //private string userInput;
         //private string messageInput;
@@ -49,6 +52,9 @@ namespace Alvianda.AI.Dashboard.Pages
             //    //.WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
             //    .WithUrl(_url)
             //    .Build();
+
+            chartWidth = Config.GetValue<int>("AppSettings:ModalDialog:Width");
+            chartHeight = Config.GetValue<int>("AppSettings:ModalDialog:Height");
             await ValidateAnalyticsService();
         }
 
@@ -94,9 +100,9 @@ namespace Alvianda.AI.Dashboard.Pages
             string responseString = string.Empty;
             try
             {
-                isRunDataAvailable = false;
-                waitMessage = "Wait while retrieving your records and analyze the data...";
-                var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer?algorithm={SelectedAlgorithm}";
+                isRunDatasetAnalysisAvailable = false;
+                waitMessage = "Wait while retrieving dataset records and analyze the data...";
+                var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset";
                 var response = await Http.GetAsync(serviceEndpoint);
                 //response.EnsureSuccessStatusCode();
 
@@ -131,7 +137,7 @@ namespace Alvianda.AI.Dashboard.Pages
                     messages.Add(new Tuple<string,string>("info",responseList[6].Value<string>()));
 
                     waitMessage = string.Empty;
-                    isRunDataAvailable = true;
+                    isRunDatasetAnalysisAvailable = true;
                 }
                     
             }

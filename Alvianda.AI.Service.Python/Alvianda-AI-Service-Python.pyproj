@@ -63,6 +63,7 @@
     <Content Include="WineQuality_RestAPI\static\fonts\glyphicons-halflings-regular.ttf" />
     <Content Include="WineQuality_RestAPI\static\fonts\glyphicons-halflings-regular.woff" />
     <None Include="WineQuality_RestAPI\static\scripts\_references.js" />
+    <Content Include="WineQuality_RestAPI\static\John-Snow.jpg" />
     <Content Include="WineQuality_RestAPI\static\scripts\bootstrap.js" />
     <Content Include="WineQuality_RestAPI\static\scripts\bootstrap.min.js" />
     <None Include="WineQuality_RestAPI\static\scripts\jquery.validate-vsdoc.js" />
