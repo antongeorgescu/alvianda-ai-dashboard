@@ -12,6 +12,7 @@ import json
 import os
 
 from WineQuality_RestAPI.models.decisiontree_correlation_class import DecisionTreeAnalyzer
+from WineQuality_RestAPI.models.data_preparation_singleton import DataPreparationSingleton
 
 @app.route('/api/wineanalytics/validate')
 def validate():
@@ -50,7 +51,7 @@ def run_analysis():
         startproc = time.time()
         startprocstr = datetime.now().strftime("%H:%M:%S.%f")       
             
-        dtanalyzer = DecisionTreeAnalyzer(REDWINE_PATH,WHITEWINE_PATH)  
+        dtanalyzer = DataPreparationSingleton(REDWINE_PATH,WHITEWINE_PATH)  
             
         rundata["cshistogramcharts"],rundata["cshistogramtitles"] = dtanalyzer.create_histrograms()
 

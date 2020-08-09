@@ -36,6 +36,12 @@
     <Compile Include="WineQuality_RestAPI\controllers\classification_controller.py" />
     <Compile Include="WineQuality_RestAPI\controllers\dataset_controller.py" />
     <Compile Include="WineQuality_RestAPI\controllers\__init__.py" />
+    <Compile Include="WineQuality_RestAPI\models\base_algorithm_class.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="WineQuality_RestAPI\models\data_preparation_singleton.py">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="WineQuality_RestAPI\models\decisiontree_correlation_class.py" />
     <Compile Include="WineQuality_RestAPI\models\knn_correlation_class.py" />
     <Compile Include="WineQuality_RestAPI\models\knn_crossvalidation_class.py" />
