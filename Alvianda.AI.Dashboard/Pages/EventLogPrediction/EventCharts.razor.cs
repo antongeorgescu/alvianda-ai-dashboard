@@ -28,7 +28,7 @@ using Newtonsoft.Json;
 using System.Text;
 using Alvianda.AI.Dashboard.Settings;
 
-namespace Alvianda.AI.Dashboard.Pages
+namespace Alvianda.AI.Dashboard.Pages.EventLogPrediction
 {
 
     [Authorize]

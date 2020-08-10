@@ -67,5 +67,9 @@
     <PackageReference Include="System.Diagnostics.EventLog" Version="4.7.0" />
     <PackageReference Include="System.Json" Version="4.7.1" />
     <PackageReference Include="System.Net.Http.Json" Version="3.2.0-preview5.20210.3" />
+  </ItemGroup>	
+
+  <ItemGroup>
+    <Folder Include="Pages\EventLogPrediction\" />
   </ItemGroup>
 </Project>

@@ -19,6 +19,7 @@ class DecisionTreeAnalyzer(BaseBaseAlgorithmClass):
     def __init__(self,merged_dataset,field_list):
         merged_data = merged_dataset
         fields = field_list
+        self.y = merged_data['quality']
         super()._init__(merged_dataset,field_list)
     
     def scale_dataset(self,scaler = 'MINMAXSCALER'):
@@ -48,8 +49,6 @@ class DecisionTreeAnalyzer(BaseBaseAlgorithmClass):
         except:
             self.last_error = sys.exc_info()[1]
             raise Exception(self.last_error)
-
-    
 
     def about_confusion_matrix(self):
         result = super().about_confusion_matrix()

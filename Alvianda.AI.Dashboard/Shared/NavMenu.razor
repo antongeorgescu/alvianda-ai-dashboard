@@ -16,18 +16,18 @@
         </li>
         <li class="nav-item px-3">
             <NavLink class="nav-link" href="#" @onclick="()=>expandSubNav = !expandSubNav">
-                <span class="oi oi-plus" aria-hidden="true"></span><h5> E-Viewer</h5>
+                <span class="oi oi-plus" aria-hidden="true"></span><h5> [ML] Event Log Modeling</h5>
             </NavLink>
             @if (expandSubNav)
             {
                 <ul>
                     <li>
-                        <NavLink class="expand-menu" href="eventviewer">
+                        <NavLink class="expand-menu" href="eventlogprediction/eventviewer">
                             <span class="oi oi-list-rich" aria-hidden="true"></span><h6> Event Log Entries</h6>
                         </NavLink>
                     </li>
                     <li>
-                        <NavLink class="expand-menu" href="eventcharts">
+                        <NavLink class="expand-menu" href="eventlogprediction/eventcharts">
                             <span class="oi oi-graph" aria-hidden="true"></span><h6> Event Log Charts</h6>
                         </NavLink>
                     </li>
@@ -40,28 +40,28 @@
             </NavLink>
             @if (expandSubNav2)
             {
-        <ul>
-            <li>
-                <NavLink class="expand-menu" href="winequalityprediction/winedataset">
-                    <span class="oi oi-list-rich" aria-hidden="true"></span><h6> Dataset Viewer</h6>
-                </NavLink>
-            </li>
-            <li>
-                <NavLink class="expand-menu" href="winequalityprediction/wineanalytics">
-                    <span class="oi oi-graph" aria-hidden="true"></span><h6> Data Preparation</h6>
-                </NavLink>
-            </li>
-            <li>
-                <NavLink class="expand-menu" href="winequalityprediction/winemlmodel">
-                    <span class="oi oi-document" aria-hidden="true"></span><h6> Predictive Modeling</h6>
-                </NavLink>
-            </li>
-            <li>
-                <NavLink class="expand-menu" href="winequalityprediction/estimatequality">
-                    <span class="oi oi-calculator" aria-hidden="true"></span><h6> Quality Prediction</h6>
-                </NavLink>
-            </li>
-        </ul>
+                <ul>
+                    <li>
+                        <NavLink class="expand-menu" href="winequalityprediction/winedataset">
+                            <span class="oi oi-list-rich" aria-hidden="true"></span><h6> Dataset Viewer</h6>
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink class="expand-menu" href="winequalityprediction/wineanalytics">
+                            <span class="oi oi-graph" aria-hidden="true"></span><h6> Data Preparation</h6>
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink class="expand-menu" href="winequalityprediction/winemlmodel">
+                            <span class="oi oi-document" aria-hidden="true"></span><h6> Predictive Modeling</h6>
+                        </NavLink>
+                    </li>
+                    <li>
+                        <NavLink class="expand-menu" href="winequalityprediction/estimatequality">
+                            <span class="oi oi-calculator" aria-hidden="true"></span><h6> Quality Prediction</h6>
+                        </NavLink>
+                    </li>
+                </ul>
             }
         </li>
         @if (!isDebug)

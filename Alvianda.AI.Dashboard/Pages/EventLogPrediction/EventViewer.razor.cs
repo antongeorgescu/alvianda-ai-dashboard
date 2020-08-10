@@ -19,7 +19,7 @@ using Alvianda.AI.Dashboard.Models.Settings;
 using Alvianda.AI.Dashboard.Services;
 using Alvianda.AI.Dashboard.Settings;
 
-namespace Alvianda.AI.Dashboard.Pages
+namespace Alvianda.AI.Dashboard.Pages.EventLogPrediction
 {
     [Authorize]
     public partial class EventViewer : ComponentBase

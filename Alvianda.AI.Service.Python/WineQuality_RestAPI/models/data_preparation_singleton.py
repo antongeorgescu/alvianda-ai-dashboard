@@ -104,6 +104,8 @@ class DataPreparationSingleton:
             except:
                 self.last_error = sys.exc_info()[1]
                 raise Exception(self.last_error)
+        def __get_observations_and_labels__(self):
+            return self.X, self.y
     instance = None
     def __init__(self,redwine_dataset_path,whitewine_dataset_path):
         if not DataPreparationSingleton.instance:
@@ -114,6 +116,8 @@ class DataPreparationSingleton:
         return self.instance.__reduce_dimensionality__()
     def identify_correlations(self):
         return self.instance.__identify_correlations__()
+    def get_observations_and_labels(self):
+        return super().__get_observations_and_labels__()
     def test_create_histrograms(self):
         chart_path = f'{os.getcwd()}/WineQuality_RestAPI/static'
 
