@@ -15,7 +15,7 @@ from sklearn.preprocessing import StandardScaler
 
 from WineQuality_RestAPI.models.base_algorithm_class import BaseAlgorithmClass
 
-class DecisionTreeAnalyzer(BaseBaseAlgorithmClass):
+class DecisionTreeAnalyzer(BaseAlgorithmClass):
     def __init__(self,merged_dataset,field_list):
         merged_data = merged_dataset
         fields = field_list

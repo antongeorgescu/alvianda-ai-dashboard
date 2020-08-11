@@ -36,6 +36,13 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         private string correlationTitle;
         private string correlationAttributes;
 
+        // Visibility attributes
+        bool isVisibleChartHistogram = false;
+        bool isVisibleQualityHistogram = false;
+        bool isVisibleCorrelationAttributes = false;
+        bool isVisibleQualityValuesDropped = false;
+        bool isVisibleCorrelationChart = false;
+
         private int chartWidth;
         private int chartHeight;
 
@@ -43,6 +50,8 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         private string waitMessage = string.Empty;
         //private string userInput;
         //private string messageInput;
+
+        WinePreparedataService prepdataService;
 
         protected override async Task OnInitializedAsync()
         {
@@ -53,6 +62,7 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
             //    .WithUrl(_url)
             //    .Build();
 
+            prepdataService = new WinePreparedataService(Http, Config);
             chartWidth = Config.GetValue<int>("AppSettings:ModalDialog:Width");
             chartHeight = Config.GetValue<int>("AppSettings:ModalDialog:Height");
             await ValidateAnalyticsService();
@@ -72,28 +82,84 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
 
         async Task ValidateAnalyticsService()
         {
-            try
-            {
-                var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/validate";
-                var response = await Http.GetAsync(serviceEndpoint);
-                response.EnsureSuccessStatusCode();
+            //try
+            //{
+            //    var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/validate";
+            //    var response = await Http.GetAsync(serviceEndpoint);
+            //    response.EnsureSuccessStatusCode();
 
-                var responseString = await response.Content.ReadAsStringAsync();
-                if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
-                {
-                    responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
-                    var result = Uglify.HtmlToText(responseString);
-                    var resultCode = result.Code.Replace('"', ' ');
-                    messages.Add(new Tuple<string, string>("error", resultCode));
-                }
-                else
-                    messages.Add(new Tuple<string, string>("info", responseString));
-            }
-            catch(Exception ex)
-            {
-                messages.Add(new Tuple<string, string>("error", $"{ex.Message} [Source={ex.Source}:{ex.StackTrace}]"));
-            }
+            //    var responseString = await response.Content.ReadAsStringAsync();
+            //    if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
+            //    {
+            //        responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
+            //        var result = Uglify.HtmlToText(responseString);
+            //        var resultCode = result.Code.Replace('"', ' ');
+            //        messages.Add(new Tuple<string, string>("error", resultCode));
+            //    }
+            //    else
+            //        messages.Add(new Tuple<string, string>("info", responseString));
+            //}
+            //catch(Exception ex)
+            //{
+            //    messages.Add(new Tuple<string, string>("error", $"{ex.Message} [Source={ex.Source}:{ex.StackTrace}]"));
+            //}
+            Tuple<string,string> response = await prepdataService.ValidatePrepDataService();
+            if (response.Item1 == "data")
+                messages.Add(new Tuple<string, string>("info", response.Item2));
+
         }
+
+        //async Task RunDatasetAnalysis()
+        //{
+        //    string responseString = string.Empty;
+        //    try
+        //    {
+        //        isRunDatasetAnalysisAvailable = false;
+        //        waitMessage = "Wait while retrieving dataset records and analyze the data...";
+        //        var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset";
+        //        var response = await Http.GetAsync(serviceEndpoint);
+        //        //response.EnsureSuccessStatusCode();
+
+        //        responseString = await response.Content.ReadAsStringAsync();
+
+        //        if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
+        //        {
+        //            responseString = string.Concat("\"",responseString.Replace('"', '*'),"\"");
+        //            var result = Uglify.HtmlToText(responseString);
+        //            var resultCode = result.Code.Replace('"', ' ');
+        //            messages.Add(new Tuple<string,string>("error",resultCode));
+        //        }
+        //        else
+        //        {
+
+        //            //responseString = responseString.Replace("'", string.Empty);
+        //            IList<JToken> responseList = JsonConvert.DeserializeObject(responseString) as IList<JToken>;
+
+        //            attributesHistogramTitle = responseList[1].Value<string>().Split(',')[0];
+        //            qualityHistogramTitle = responseList[1].Value<string>().Split(',')[1];
+
+        //            attributesHistogramChart = $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[0]}";
+        //            qualityHistogramChart = $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[1]}";
+
+        //            qualityValuesDropped = responseList[2].Value<string>();
+
+        //            correlationChart = $"http:////localhost:53535//static//{responseList[3].Value<string>()}";
+        //            correlationTitle = responseList[4].Value<string>();
+
+        //            correlationAttributes = responseList[5].Value<string>();
+
+        //            messages.Add(new Tuple<string,string>("info",responseList[6].Value<string>()));
+
+        //            waitMessage = string.Empty;
+        //            isRunDatasetAnalysisAvailable = true;
+        //        }
+
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        messages.Add(new Tuple<string, string>("error", ex.Message));
+        //    }
+        //}
 
         async Task RunDatasetAnalysis()
         {
@@ -102,46 +168,35 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
             {
                 isRunDatasetAnalysisAvailable = false;
                 waitMessage = "Wait while retrieving dataset records and analyze the data...";
-                var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset";
-                var response = await Http.GetAsync(serviceEndpoint);
-                //response.EnsureSuccessStatusCode();
 
-                responseString = await response.Content.ReadAsStringAsync();
-
-                if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
+                var responseDictionary = await prepdataService.RunPrepDataAnalysis();
+                if (responseDictionary.ContainsKey("error"))
                 {
-                    responseString = string.Concat("\"",responseString.Replace('"', '*'),"\"");
-                    var result = Uglify.HtmlToText(responseString);
-                    var resultCode = result.Code.Replace('"', ' ');
-                    messages.Add(new Tuple<string,string>("error",resultCode));
+                    messages.Add(new Tuple<string, string>("error", responseDictionary["error"]));
                 }
-                else
-                {
-                    
-                    //responseString = responseString.Replace("'", string.Empty);
-                    IList<JToken> responseList = JsonConvert.DeserializeObject(responseString) as IList<JToken>;
+                else 
+                { 
+                    attributesHistogramTitle = responseDictionary["attributesHistogramTitle"];
+                    qualityHistogramTitle = responseDictionary["qualityHistogramTitle"];
 
-                    attributesHistogramTitle = responseList[1].Value<string>().Split(',')[0];
-                    qualityHistogramTitle = responseList[1].Value<string>().Split(',')[1];
+                    attributesHistogramChart = responseDictionary["attributesHistogramChart"];
+                    qualityHistogramChart = responseDictionary["qualityHistogramChart"];
 
-                    attributesHistogramChart = $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[0]}";
-                    qualityHistogramChart = $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[1]}";
+                    qualityValuesDropped = responseDictionary["qualityValuesDropped"];
 
-                    qualityValuesDropped = responseList[2].Value<string>();
+                    correlationChart = responseDictionary["correlationChart"];
+                    correlationTitle = responseDictionary["correlationTitle"];
 
-                    correlationChart = $"http:////localhost:53535//static//{responseList[3].Value<string>()}";
-                    correlationTitle = responseList[4].Value<string>();
+                    correlationAttributes = responseDictionary["correlationAttributes"];
 
-                    correlationAttributes = responseList[5].Value<string>();
-
-                    messages.Add(new Tuple<string,string>("info",responseList[6].Value<string>()));
+                    messages.Add(new Tuple<string, string>("info", responseDictionary["infomessage"]));
 
                     waitMessage = string.Empty;
                     isRunDatasetAnalysisAvailable = true;
                 }
-                    
+
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 messages.Add(new Tuple<string, string>("error", ex.Message));
             }

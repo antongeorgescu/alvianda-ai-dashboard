@@ -76,7 +76,7 @@
     <div>
         <label>Session Dataset Analysis Results:</label>
         <table border="1">
-            <tr>
+            <tr style="visibility:@isVisibleChartHistogram">
                 <td><b>Chart: @attributesHistogramTitle</b></td>
                 <td>
                     <img src=@attributesHistogramChart
@@ -86,7 +86,7 @@
                          @onclick="@(x => ModalShow(attributesHistogramTitle,attributesHistogramChart))" />&nbsp;(click for chart image)
                 </td>
             </tr>
-            <tr>
+            <tr style="visibility:@isVisibleQualityHistogram">
                 <td><b>Chart: @qualityHistogramTitle</b></td>
                 <td>
                     <img src=@qualityHistogramChart
@@ -96,15 +96,15 @@
                          @onclick="@(x => ModalShow(qualityHistogramTitle,qualityHistogramChart))" />&nbsp;(click for chart image)
                 </td>
             </tr>
-            <tr>
+            <tr style="visibility:@isVisibleCorrelationAttributes">
                 <td><b>Correlation Attributes</b> </td>
                 <td>@correlationAttributes</td>
             </tr>
-            <tr>
+            <tr style="visibility:@isVisibleQualityValuesDropped">
                 <td><b>Quality Values Dropped</b></td>
                 <td>@qualityValuesDropped</td>
             </tr>
-            <tr>
+            <tr style="visibility:@isVisibleCorrelationChart">
                 <td><b>Chart: @correlationTitle</b></td>
                 <td>
                     <img src=@correlationChart
