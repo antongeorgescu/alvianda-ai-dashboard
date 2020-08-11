@@ -29,16 +29,16 @@ namespace Alvianda.AI.Dashboard.Services
             _configuration = configuration;
         }
 
-        public Task<Tuple<string,string>> ValidatePrepDataService()
+        public async Task<Tuple<string,string>> ValidatePrepDataService()
         {
             try
             {
                 var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/validate";
-                return base.HttpGetRequest(serviceEndpoint);
+                return await base.HttpGetRequest(serviceEndpoint);
             }
             catch (Exception ex)
             {
-                return new Task<Tuple<string, string>>(() => new Tuple<string,string>("error", ex.Message));
+                return await new Task<Tuple<string, string>>(() => new Tuple<string,string>("error", ex.Message));
             }
         }
 
@@ -48,9 +48,9 @@ namespace Alvianda.AI.Dashboard.Services
             try
             {
                 var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset";
-                var responseString = base.HttpGetRequest(serviceEndpoint);
+                var responseString = await base.HttpGetRequest(serviceEndpoint);
 
-                IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Result.Item2) as IList<JToken>;
+                IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Item2) as IList<JToken>;
 
                 responseDictionary.Add("attributesHistogramTitle", responseList[1].Value<string>().Split(',')[0]);
                 responseDictionary.Add("qualityHistogramTitle",responseList[1].Value<string>().Split(',')[1]);
@@ -67,7 +67,8 @@ namespace Alvianda.AI.Dashboard.Services
 
                 responseDictionary.Add("infomessage",responseList[6].Value<string>());
 
-                return await new Task<Dictionary<string,string>>(() => responseDictionary);
+                //return await new Task<Dictionary<string,string>>(() => responseDictionary);
+                return responseDictionary;
 
             }
             catch (Exception ex)

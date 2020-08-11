@@ -82,84 +82,11 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
 
         async Task ValidateAnalyticsService()
         {
-            //try
-            //{
-            //    var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/validate";
-            //    var response = await Http.GetAsync(serviceEndpoint);
-            //    response.EnsureSuccessStatusCode();
-
-            //    var responseString = await response.Content.ReadAsStringAsync();
-            //    if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
-            //    {
-            //        responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
-            //        var result = Uglify.HtmlToText(responseString);
-            //        var resultCode = result.Code.Replace('"', ' ');
-            //        messages.Add(new Tuple<string, string>("error", resultCode));
-            //    }
-            //    else
-            //        messages.Add(new Tuple<string, string>("info", responseString));
-            //}
-            //catch(Exception ex)
-            //{
-            //    messages.Add(new Tuple<string, string>("error", $"{ex.Message} [Source={ex.Source}:{ex.StackTrace}]"));
-            //}
             Tuple<string,string> response = await prepdataService.ValidatePrepDataService();
             if (response.Item1 == "data")
                 messages.Add(new Tuple<string, string>("info", response.Item2));
 
         }
-
-        //async Task RunDatasetAnalysis()
-        //{
-        //    string responseString = string.Empty;
-        //    try
-        //    {
-        //        isRunDatasetAnalysisAvailable = false;
-        //        waitMessage = "Wait while retrieving dataset records and analyze the data...";
-        //        var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset";
-        //        var response = await Http.GetAsync(serviceEndpoint);
-        //        //response.EnsureSuccessStatusCode();
-
-        //        responseString = await response.Content.ReadAsStringAsync();
-
-        //        if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
-        //        {
-        //            responseString = string.Concat("\"",responseString.Replace('"', '*'),"\"");
-        //            var result = Uglify.HtmlToText(responseString);
-        //            var resultCode = result.Code.Replace('"', ' ');
-        //            messages.Add(new Tuple<string,string>("error",resultCode));
-        //        }
-        //        else
-        //        {
-
-        //            //responseString = responseString.Replace("'", string.Empty);
-        //            IList<JToken> responseList = JsonConvert.DeserializeObject(responseString) as IList<JToken>;
-
-        //            attributesHistogramTitle = responseList[1].Value<string>().Split(',')[0];
-        //            qualityHistogramTitle = responseList[1].Value<string>().Split(',')[1];
-
-        //            attributesHistogramChart = $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[0]}";
-        //            qualityHistogramChart = $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[1]}";
-
-        //            qualityValuesDropped = responseList[2].Value<string>();
-
-        //            correlationChart = $"http:////localhost:53535//static//{responseList[3].Value<string>()}";
-        //            correlationTitle = responseList[4].Value<string>();
-
-        //            correlationAttributes = responseList[5].Value<string>();
-
-        //            messages.Add(new Tuple<string,string>("info",responseList[6].Value<string>()));
-
-        //            waitMessage = string.Empty;
-        //            isRunDatasetAnalysisAvailable = true;
-        //        }
-
-        //    }
-        //    catch(Exception ex)
-        //    {
-        //        messages.Add(new Tuple<string, string>("error", ex.Message));
-        //    }
-        //}
 
         async Task RunDatasetAnalysis()
         {
