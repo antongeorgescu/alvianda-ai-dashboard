@@ -1,17 +1,11 @@
-using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http;
-using Microsoft.Extensions.Configuration;
-using Alvianda.AI.Dashboard.Datapayload;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Cors.Internal;
-using System.Collections.Generic;
 using Alvianda.AI.Dashboard.Services;
 using Alvianda.AI.Dashboard.Settings;
+using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using System;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Alvianda.AI.Dashboard
 {
@@ -21,7 +15,7 @@ namespace Alvianda.AI.Dashboard
         {
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
-                        
+
             // set up a delegate to get the endpoint of EventViewerLogger API 
             // to fetch the token
             static string evLoggerApiId(WebAssemblyHostBuilder builder) =>
@@ -44,7 +38,7 @@ namespace Alvianda.AI.Dashboard
                     .GetValue<string>("COMP_UI_ClientId");
 
             //builder.Services.AddBlazoredLocalStorage();
-             
+
             // Configure the default client(talks to own domain)
             var client = new HttpClient()
             {
@@ -64,7 +58,7 @@ namespace Alvianda.AI.Dashboard
                 options.ProviderOptions.DefaultAccessTokenScopes.Add($"{evLoggerApiId(builder)}");
 
             });
-             
+
 
             //builder.Services.Configure<MvcOptions>(options => {
             //    options.Filters.Add(new CorsAuthorizationFilterFactory("AllowSpecificOrigin"));

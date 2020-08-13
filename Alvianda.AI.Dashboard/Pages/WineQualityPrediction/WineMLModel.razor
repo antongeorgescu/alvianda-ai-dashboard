@@ -34,11 +34,23 @@
         <tr>
             <td>
                 <div>
+                    <input type="radio" id="classification" name="algtype" value="classification" @onchange="PopulateAlgorithmList">
+                    <label for="classification">Classification</label><br>
+                    <input type="radio" id="regression" name="algtype" value="regression" @onchange="PopulateAlgorithmList">
+                    <label for="regression">Regression</label><br>
+                </div>
+            </td>
+            <td>
+                <div>
                     <label for="start">Select algorithm:</label>
                     <select @bind="@SelectedAlgorithm" class="select-box">
                         <option value="None">== None ==</option>
-                        <option value="decision-tree">Decision Tree</option>
-                        <option value="naive-bayes">Naive Bayes</option>
+                        @if (isAlgorithmListAvailable)
+                            @foreach (var algorithm in Algorithms)
+                            {
+                                <option value="@algorithm.Name">@algorithm.DisplayName</option>
+                            }
+                        }
                     </select>
                 </div>
             </td>
@@ -70,16 +82,16 @@
 
 <p><i><mark>@waitMessage</mark></i></p>
 
-@if (isRunDataAvailable)
+@if (isModelDataAvailable)
 {
     <div>
         <label>Session Predictive Algorithm Modeling Results:</label>
-        <table border="1">
+        @*<table border="1">
             <tr>
                 <td><b>@resultOneName</b></td>
                 <td>@resultOneData</td>
             </tr>
-        </table>
+        </table>*@
     </div>
 }
 <hr />

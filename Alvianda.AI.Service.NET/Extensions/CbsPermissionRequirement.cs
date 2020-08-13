@@ -1,25 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.IO;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Web.Mvc;
 
 namespace Alvianda.AI.Service.CoreNet.Extensions
 {
     public class CbsPermissionRequirement : TypeFilterAttribute
     {
-        public CbsPermissionRequirement(string claimValue,string source) : base(typeof(ScopeFilter))
+        public CbsPermissionRequirement(string claimValue, string source) : base(typeof(ScopeFilter))
         {
-            Arguments = new object[] { new Claim("scp",claimValue),source };
+            Arguments = new object[] { new Claim("scp", claimValue), source };
         }
     }
-    
+
     public class ScopeFilter : Microsoft.AspNetCore.Mvc.Filters.IAuthorizationFilter
     {
         readonly Claim _claim;
@@ -76,7 +72,7 @@ namespace Alvianda.AI.Service.CoreNet.Extensions
                         }
                     }
                 }
-                
+
                 if (_source == "AAD")
                     if (!secToken.Claims.ToList<Claim>().Exists(x => x.Type == _claim.Type && x.Value == _claim.Value))
                     {

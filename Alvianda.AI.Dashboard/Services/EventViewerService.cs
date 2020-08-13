@@ -1,21 +1,16 @@
 ﻿using Alvianda.AI.Dashboard.Datapayload;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Alvianda.AI.Dashboard.Services
 {
     public interface IEventViewerService
     {
-        Task<List<EventViewerEntry>> GetPaginatedResult(string logCategory,int currentPage, int pageSize = 10);
+        Task<List<EventViewerEntry>> GetPaginatedResult(string logCategory, int currentPage, int pageSize = 10);
         Task<int> GetCount(string logCategory);
     }
 
@@ -31,7 +26,7 @@ namespace Alvianda.AI.Dashboard.Services
             _configuration = configuration;
         }
 
-        public async Task<List<EventViewerEntry>> GetPaginatedResult(string logCategory,int currentPage, int pageSize = 10)
+        public async Task<List<EventViewerEntry>> GetPaginatedResult(string logCategory, int currentPage, int pageSize = 10)
         {
             var data = await GetEventViewerEntries(logCategory);
             return data.OrderBy(d => d.Id).Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Alvianda.AI.Dashboard.Services
+﻿namespace Alvianda.AI.Dashboard.Services
 
 {
     public class TokenClient

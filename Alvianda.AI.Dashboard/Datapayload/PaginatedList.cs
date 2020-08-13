@@ -2,16 +2,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace Alvianda.AI.Dashboard.Datapayload
 {
     public class PaginatedList<T>
     {
-        public PaginatedList()
-        {
-
-        }
+        public PaginatedList(){}
         public int PageIndex { get; set; }
         public int TotalPages { get; set; }
         public int MaxRecords { get; set; }

@@ -1,11 +1,6 @@
-﻿using Microsoft.CodeAnalysis.Operations;
-using Microsoft.Extensions.Configuration;
-using NUglify;
+﻿using NUglify;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
 namespace Alvianda.AI.Dashboard.Services
@@ -13,13 +8,13 @@ namespace Alvianda.AI.Dashboard.Services
     public class BaseService
     {
         private HttpClient _httpClient;
-        
+
         public BaseService(HttpClient client)
         {
             _httpClient = client;
         }
 
-        protected async Task<Tuple<string,string>> HttpGetRequest(string serviceEndpoint)
+        protected async Task<Tuple<string, string>> HttpGetRequest(string serviceEndpoint)
         {
             try
             {
@@ -45,6 +40,6 @@ namespace Alvianda.AI.Dashboard.Services
             }
         }
 
-        
+
     }
 }

@@ -1,15 +1,15 @@
-﻿using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Alvianda.AI.Dashboard.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Configuration;
-using System.Net.Http;
 using Microsoft.JSInterop;
-using Alvianda.AI.Dashboard.Services;
-using NUglify;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NUglify;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
 {
@@ -25,63 +25,47 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         //private HubConnection hubConnection;
 
         public string SelectedAlgorithm { get; set; }
-        private List<Tuple<string,string>> messages = new List<Tuple<string,string>>();
-                
-        private bool isRunDataAvailable = false;
+        public string SelectedAlgorithmType { get; set; }
+        IList<Algorithm> Algorithms;
+        private List<Tuple<string, string>> messages = new List<Tuple<string, string>>();
+
+        private bool isModelDataAvailable = false;
+        private bool isAlgorithmListAvailable = false;
         private string waitMessage = string.Empty;
 
-        private string resultOneName;
-        private string resultOneData;
-
-        //private string userInput;
-        //private string messageInput;
+        WineMlmodelService mlmodelService;
 
         protected override async Task OnInitializedAsync()
         {
-            //Uri _url = new Uri("http://localhost:53535/api/wineanalytics/chathub");
-
-            //hubConnection = new HubConnectionBuilder()
-            //    //.WithUrl(NavigationManager.ToAbsoluteUri("/chathub"))
-            //    .WithUrl(_url)
-            //    .Build();
-
-            await ValidateAnalyticsService();
+            mlmodelService = new WineMlmodelService(Http, Config);
         }
 
-        //async Task Connect()
-        //{
-        //    hubConnection.On<string, string>("ReceiveMessage", (user, message) =>
-        //    {
-        //        var encodedMsg = $"{user}: {message}";
-        //        messages.Add(encodedMsg);
-        //        StateHasChanged();
-        //    });
+        async Task PopulateAlgorithmList(ChangeEventArgs arg)
+        {
+            string algorithmType = arg.Value.ToString();
+            await GetAlgorithmList(algorithmType).ConfigureAwait(true);
+        }
 
-        //    //await hubConnection.StartAsync();
-        //}
-
-        async Task ValidateAnalyticsService()
+        async Task GetAlgorithmList(string algorithmType)
         {
             try
             {
-                var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/validate";
-                var response = await Http.GetAsync(serviceEndpoint);
-                response.EnsureSuccessStatusCode();
-
-                var responseString = await response.Content.ReadAsStringAsync();
-                if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
+                isAlgorithmListAvailable = false;
+                var response = await mlmodelService.GetAlgorithmList(algorithmType).ConfigureAwait(true);
+                if (response.Item1 == "info")
                 {
-                    responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
-                    var result = Uglify.HtmlToText(responseString);
-                    var resultCode = result.Code.Replace('"', ' ');
-                    messages.Add(new Tuple<string, string>("error", resultCode));
+                    Algorithms = response.Item2;
+                    isAlgorithmListAvailable = true;
+                    return;
                 }
-                else
-                    messages.Add(new Tuple<string, string>("info", responseString));
+                if (response.Item1 == "error")
+                {
+                    throw new Exception(response.Item3);
+                }
             }
             catch(Exception ex)
             {
-                messages.Add(new Tuple<string, string>("error", $"{ex.Message} [Source={ex.Source}:{ex.StackTrace}]"));
+                messages.Add(new Tuple<string, string>("error", ex.Message));
             }
         }
 
@@ -90,43 +74,41 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
             string responseString = string.Empty;
             try
             {
-                isRunDataAvailable = false;
-                waitMessage = "Wait while retrieving machine learning model generation data...";
-                var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset";
-                var response = await Http.GetAsync(serviceEndpoint);
-                //response.EnsureSuccessStatusCode();
+                isModelDataAvailable = false;
+                waitMessage = "Wait while we are running the selected algorithm and analyze the model...";
 
-                responseString = await response.Content.ReadAsStringAsync();
-
-                if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
+                var responseDictionary = await mlmodelService.RunMachineLearningModel(SelectedAlgorithm).ConfigureAwait(true);
+                if (responseDictionary.ContainsKey("error"))
                 {
-                    responseString = string.Concat("\"",responseString.Replace('"', '*'),"\"");
-                    var result = Uglify.HtmlToText(responseString);
-                    var resultCode = result.Code.Replace('"', ' ');
-                    messages.Add(new Tuple<string,string>("error",resultCode));
+                    messages.Add(new Tuple<string, string>("error", responseDictionary["error"]));
                 }
                 else
                 {
-                    
-                    //responseString = responseString.Replace("'", string.Empty);
-                    IList<JToken> responseList = JsonConvert.DeserializeObject(responseString) as IList<JToken>;
+                    //attributesHistogramTitle = responseDictionary["attributesHistogramTitle"];
+                    //qualityHistogramTitle = responseDictionary["qualityHistogramTitle"];
 
-                    messages.Add(new Tuple<string,string>("info","Received modeling data from server..."));
+                    //attributesHistogramChart = responseDictionary["attributesHistogramChart"];
+                    //qualityHistogramChart = responseDictionary["qualityHistogramChart"];
 
-                    resultOneName = "Result-One Name";
-                    resultOneData = "Result-One Data";
+                    //qualityValuesDropped = responseDictionary["qualityValuesDropped"];
+
+                    //correlationChart = responseDictionary["correlationChart"];
+                    //correlationTitle = responseDictionary["correlationTitle"];
+
+                    //correlationAttributes = responseDictionary["correlationAttributes"];
+
+                    messages.Add(new Tuple<string, string>("info", responseDictionary["infomessage"]));
 
                     waitMessage = string.Empty;
-                    isRunDataAvailable = true;
+                    isModelDataAvailable = true;
                 }
-                    
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 messages.Add(new Tuple<string, string>("error", ex.Message));
             }
         }
-                
+
         //Task Send() =>
         //    hubConnection.SendAsync("SendMessage", userInput, messageInput);
 

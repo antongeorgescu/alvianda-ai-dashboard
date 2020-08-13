@@ -1,12 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
-using System.Threading.Tasks;
-using System.Web.Mvc;
 
 namespace Alvianda.AI.Service.CoreNet.Extensions
 {
@@ -14,10 +10,10 @@ namespace Alvianda.AI.Service.CoreNet.Extensions
     {
         public CbsRoleRequirement(string claimValue) : base(typeof(RoleFilter))
         {
-            Arguments = new object[] { new Claim("roles",claimValue) };
+            Arguments = new object[] { new Claim("roles", claimValue) };
         }
     }
-    
+
     public class RoleFilter : Microsoft.AspNetCore.Mvc.Filters.IAuthorizationFilter
     {
         readonly Claim _claim;

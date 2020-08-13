@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Alvianda.AI.Service.CoreNet.Classes;
-using Newtonsoft.Json;
-using System.Diagnostics;
-using System.Security.Claims;
-using System.IdentityModel.Tokens.Jwt;
-using Microsoft.AspNetCore.Http;
-using Alvianda.AI.Service.CoreNet.Extensions;
+﻿using Alvianda.AI.Service.CoreNet.Classes;
 using Alvianda.AI.Service.CoreNet.Data;
-using Microsoft.Extensions.Configuration;
-using System.Text.RegularExpressions;
-using System.Security.Cryptography;
+using Alvianda.AI.Service.CoreNet.Extensions;
 using Alvianda.AI.Service.CoreNet.Models.SharedClasses;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Text.RegularExpressions;
 
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -59,7 +54,7 @@ namespace Alvianda.AI.Service.CoreNet.Controllers
         [HttpGet]
         [Route("logs/categories")]
         [CbsRoleRequirement("COMPAgent")]
-        [CbsPermissionRequirement("API.LogReader","AAD")]
+        [CbsPermissionRequirement("API.LogReader", "AAD")]
         public ActionResult<IList<Log>> Logs()
         {
             var localMachine = System.Net.Dns.GetHostName();
@@ -117,15 +112,15 @@ namespace Alvianda.AI.Service.CoreNet.Controllers
                 paginatedResult.MaxRecords = MAXRECORDS;
             else
                 paginatedResult.MaxRecords = (int)maxRetrieved;
-            
+
             return Ok(paginatedResult);
         }
-        
+
         [HttpGet("logs/records/{logName}/{fromDate}/{toDate}/{pageNumber}/{maxRetrieved}")]
         [HttpGet("logs/records/{logName}/{fromDate}/{toDate}/{pageNumber}")]
         [Route("logs/records")]
         [CbsRoleRequirement("COMPAgent")]
-        [CbsPermissionRequirement("API.LogReader","AAD")]
+        [CbsPermissionRequirement("API.LogReader", "AAD")]
         public ActionResult<PaginatedList<LogEntry>> DatedLogEntriesPaged(
                                                                 string logName,
                                                                 string fromDate,
@@ -188,7 +183,7 @@ namespace Alvianda.AI.Service.CoreNet.Controllers
         [Route("logs/categories")]
         [CbsRoleRequirement("COMPAgent")]
         [CbsPermissionRequirement("API.LogReader.Charts", "IDM")]
-        public ActionResult<List<Tuple<Log,int>>> DatedLogsDistribution(
+        public ActionResult<List<Tuple<Log, int>>> DatedLogsDistribution(
                                                                 string fromDate,
                                                                 string toDate)
         {
@@ -205,7 +200,7 @@ namespace Alvianda.AI.Service.CoreNet.Controllers
             IList<Log> logs = new List<Log>();
             foreach (var log in System.Diagnostics.EventLog.GetEventLogs())
             {
-                if (fromDate == "null" && toDate=="null")
+                if (fromDate == "null" && toDate == "null")
                     logs.Add(new Log() { Name = log.Log, DisplayName = log.LogDisplayName, EntriesCount = log.Entries.Count });
                 else
                 {
@@ -217,7 +212,7 @@ namespace Alvianda.AI.Service.CoreNet.Controllers
                     logs.Add(new Log() { Name = log.Log, DisplayName = log.LogDisplayName, EntriesCount = count });
                 }
             }
-            
+
             if (logs == null)
                 return NotFound(null);
 
@@ -230,7 +225,7 @@ namespace Alvianda.AI.Service.CoreNet.Controllers
         [HttpGet("logs/records/{logName}/keywords/{keywordList}")]
         [Route("logs/records")]
         [CbsRoleRequirement("COMPAgent")]
-        [CbsPermissionRequirement("API.LogReader","AAD")]
+        [CbsPermissionRequirement("API.LogReader", "AAD")]
         public ActionResult<PaginatedList<LogEntry>> KeywordsLogEntriesPaged(
                                                                 string logName,
                                                                 string keywordList,
@@ -304,14 +299,14 @@ namespace Alvianda.AI.Service.CoreNet.Controllers
             }
             catch (Exception ex)
             {
-                return Problem(detail: ex.Message,title: ex.Source);
+                return Problem(detail: ex.Message, title: ex.Source);
             }
         }
 
         [HttpGet("logs/records/{logName}")]
         [Route("logs/records")]
         [CbsRoleRequirement("COMPAgent")]
-        [CbsPermissionRequirement(claimValue:"API.LogReader",source:"AAD")]
+        [CbsPermissionRequirement(claimValue: "API.LogReader", source: "AAD")]
         public ActionResult<IList<LogEntry>> LogEntries(string logName)
         {
             var localMachine = System.Net.Dns.GetHostName();
@@ -349,7 +344,7 @@ namespace Alvianda.AI.Service.CoreNet.Controllers
         [HttpGet("logs/count/{logName}")]
         [Route("logs/count")]
         [CbsRoleRequirement("COMPAgent")]
-        [CbsPermissionRequirement("API.LogReader","AAD")]
+        [CbsPermissionRequirement("API.LogReader", "AAD")]
         public ActionResult<int> LogEntriesCount(string logName)
         {
             var localMachine = System.Net.Dns.GetHostName();

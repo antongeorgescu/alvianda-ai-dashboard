@@ -17,8 +17,8 @@ from WineQuality_RestAPI.models.base_algorithm_class import BaseAlgorithmClass
 
 class DecisionTreeAnalyzer(BaseAlgorithmClass):
     def __init__(self,merged_dataset,field_list):
-        merged_data = merged_dataset
-        fields = field_list
+        self.merged_data = merged_dataset
+        self.fields = field_list
         self.y = merged_data['quality']
         super()._init__(merged_dataset,field_list)
     
@@ -45,7 +45,7 @@ class DecisionTreeAnalyzer(BaseAlgorithmClass):
             self.y_pred = dtree.predict(self.X_test)
             proctime = time.time() - startproc
 
-            print(self.y_pred,self.X_test)
+            return self.X_test,self.y_pred
         except:
             self.last_error = sys.exc_info()[1]
             raise Exception(self.last_error)

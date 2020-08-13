@@ -1,32 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components;
-using ChartJs.Blazor.Charts;
-using ChartJs.Blazor.ChartJS.PieChart;
+﻿using Alvianda.AI.Dashboard.Models.Settings;
+using Alvianda.AI.Dashboard.Settings;
 using ChartJs.Blazor.ChartJS.BarChart;
-using ChartJs.Blazor.ChartJS.LineChart;
-using ChartJs.Blazor.ChartJS.Common.Properties;
-using ChartJs.Blazor.ChartJS.Common.Enums;
-using TData = ChartJs.Blazor.ChartJS.Common.Wrappers;
-using ChartJs.Blazor.Util;
-using Microsoft.Extensions.Configuration;
-using System.Net.Http;
-using System.Net.Http.Json;
-using ChartJs.Blazor.ChartJS.Common;
-using System.Security.Cryptography.X509Certificates;
-using ChartJs.Blazor.ChartJS.BubbleChart;
 using ChartJs.Blazor.ChartJS.BarChart.Axes;
+using ChartJs.Blazor.ChartJS.Common;
 using ChartJs.Blazor.ChartJS.Common.Axes;
 using ChartJs.Blazor.ChartJS.Common.Axes.Ticks;
-using ChartJs.Blazor.ChartJS.Common.Handlers;
-using Alvianda.AI.Dashboard.Datapayload;
-using Alvianda.AI.Dashboard.Models.Settings;
+using ChartJs.Blazor.ChartJS.Common.Enums;
+using ChartJs.Blazor.ChartJS.Common.Properties;
+using ChartJs.Blazor.ChartJS.LineChart;
+using ChartJs.Blazor.ChartJS.PieChart;
+using ChartJs.Blazor.Charts;
+using ChartJs.Blazor.Util;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text;
-using Alvianda.AI.Dashboard.Settings;
+using System.Threading.Tasks;
+using TData = ChartJs.Blazor.ChartJS.Common.Wrappers;
 
 namespace Alvianda.AI.Dashboard.Pages.EventLogPrediction
 {
@@ -62,7 +58,7 @@ namespace Alvianda.AI.Dashboard.Pages.EventLogPrediction
 
         private IList<string> labels;
         private IList<double> values;
-        
+
         protected string pieChartVisible { get; set; }
         protected string barChartVisible { get; set; }
         //private string debugInfo;
@@ -78,8 +74,8 @@ namespace Alvianda.AI.Dashboard.Pages.EventLogPrediction
             {
                 ChartId = "pieChart",
                 Visibility = "hidden",
-                Height=0,
-                Width=0
+                Height = 0,
+                Width = 0
             });
             charts.Add(new Charts.ChartSettings()
             {
@@ -260,7 +256,7 @@ namespace Alvianda.AI.Dashboard.Pages.EventLogPrediction
                 loadingMessage = string.Empty;
             }
         }
-        
+
         public void SelectStartDate(ChangeEventArgs e)
         {
             fromDate = Convert.ToString(e.Value);
@@ -289,7 +285,7 @@ namespace Alvianda.AI.Dashboard.Pages.EventLogPrediction
     public static class Charts
     {
         public static IList<ChartSettings> ChartList;
-        
+
         public static void Initialize(IList<ChartSettings> charts)
         {
             ChartList = charts;
@@ -300,12 +296,13 @@ namespace Alvianda.AI.Dashboard.Pages.EventLogPrediction
                 chart.Width = 0;
             }
         }
-        
+
         public static void Show(string chartId)
         {
             var selectedChartId = ChartList.Select(x => x).First(x => x.ChartId == chartId).ChartId;
 
-            ChartList.ToList<ChartSettings>().ForEach(x => {
+            ChartList.ToList<ChartSettings>().ForEach(x =>
+            {
                 if (x.ChartId == selectedChartId)
                 {
                     x.Visibility = "visible";

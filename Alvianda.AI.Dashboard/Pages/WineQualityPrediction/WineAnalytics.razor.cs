@@ -1,15 +1,12 @@
-﻿using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Alvianda.AI.Dashboard.Services;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Configuration;
-using System.Net.Http;
 using Microsoft.JSInterop;
-using Alvianda.AI.Dashboard.Services;
-using NUglify;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
 {
@@ -25,7 +22,7 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         //private HubConnection hubConnection;
 
         //public string SelectedAlgorithm { get; set; }
-        private List<Tuple<string,string>> messages = new List<Tuple<string,string>>();
+        private List<Tuple<string, string>> messages = new List<Tuple<string, string>>();
 
         private string attributesHistogramTitle;
         private string attributesHistogramChart;
@@ -82,7 +79,7 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
 
         async Task ValidateAnalyticsService()
         {
-            Tuple<string,string> response = await prepdataService.ValidatePrepDataService();
+            Tuple<string, string> response = await prepdataService.ValidatePrepDataService();
             if (response.Item1 == "data")
                 messages.Add(new Tuple<string, string>("info", response.Item2));
 
@@ -101,8 +98,8 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
                 {
                     messages.Add(new Tuple<string, string>("error", responseDictionary["error"]));
                 }
-                else 
-                { 
+                else
+                {
                     attributesHistogramTitle = responseDictionary["attributesHistogramTitle"];
                     qualityHistogramTitle = responseDictionary["qualityHistogramTitle"];
 

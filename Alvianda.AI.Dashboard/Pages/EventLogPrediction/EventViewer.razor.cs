@@ -1,23 +1,21 @@
-﻿using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
-using Microsoft.Extensions.Configuration;
-using Alvianda.AI.Dashboard.Datapayload;
-using System.Net.Http;
-using Microsoft.JSInterop;
-using Microsoft.AspNetCore.Authorization;
-using System.Net.Http.Json;
-using Microsoft.AspNetCore.Components.Web;
-using System.Globalization;
-using System.Text;
-using Newtonsoft.Json;
-using System.Linq;
-using System.Reflection.PortableExecutable;
+﻿using Alvianda.AI.Dashboard.Datapayload;
 using Alvianda.AI.Dashboard.Models.Settings;
 using Alvianda.AI.Dashboard.Services;
 using Alvianda.AI.Dashboard.Settings;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
+using Microsoft.Extensions.Configuration;
+using Microsoft.JSInterop;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Json;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Alvianda.AI.Dashboard.Pages.EventLogPrediction
 {
@@ -45,7 +43,7 @@ namespace Alvianda.AI.Dashboard.Pages.EventLogPrediction
 
         //private IDictionary<long, Tuple<string, string>> DetailBtnAttributes = new Dictionary<long, Tuple<string, string>>();
         CultureInfo provider = CultureInfo.InvariantCulture;
-        
+
         int totalPages { get; set; }
         int pageIndex;
         bool hasNextPage;
@@ -316,7 +314,7 @@ namespace Alvianda.AI.Dashboard.Pages.EventLogPrediction
         private async Task GetDatedLogEntries()
         {
             LongMessage = null;
-            
+
             if (SelectedLog == null)
                 return;
 
@@ -353,7 +351,7 @@ namespace Alvianda.AI.Dashboard.Pages.EventLogPrediction
 
                 //DetailBtnAttributes.Clear();
                 //LogEntries.ForEach(x => DetailBtnAttributes.Add(x.Id, new Tuple<string, string>("btn btn-success", "Show Details")));
-                
+
                 totalPages = paginatedList.TotalPages;
                 pageIndex = paginatedList.PageIndex;
                 hasNextPage = paginatedList.HasNextPage;
@@ -403,15 +401,15 @@ namespace Alvianda.AI.Dashboard.Pages.EventLogPrediction
         }
         private async void UpdateCappedMaxRecs()
         {
-            
+
             var serviceEndpoint = $"{Config.GetValue<string>("LoggerServicesAPI:BaseURI")}{Config.GetValue<string>("LoggerServicesAPI:EventViewerRouting")}/logs/capmaxrecs";
 
             //var payload = "{\"CapSize\":\"" + CapMaxRecs.ToString() + "\"}";
             CappedRecsSettings payload = new CappedRecsSettings() { CappedMaxRecs = this.CapMaxRecs.ToString() };
             string jsonpayload = await Task.Run(() => JsonConvert.SerializeObject(payload));
             HttpContent c = new StringContent(jsonpayload, Encoding.UTF8, "application/json");
-            
-            var response = await Http.PostAsync(serviceEndpoint,c);
+
+            var response = await Http.PostAsync(serviceEndpoint, c);
             response.EnsureSuccessStatusCode();
 
             maxRecords = this.CapMaxRecs;

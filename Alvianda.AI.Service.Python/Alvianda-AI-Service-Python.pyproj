@@ -57,6 +57,12 @@
     <Compile Include="WineQuality_RestAPI\__init__.py" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Database\Sqlite\DatasetMLAnalytics.db" />
+    <Content Include="Database\Sqlite\sqldiff.exe" />
+    <Content Include="Database\Sqlite\sqlite3.def" />
+    <Content Include="Database\Sqlite\sqlite3.dll" />
+    <Content Include="Database\Sqlite\sqlite3.exe" />
+    <Content Include="Database\Sqlite\sqlite3_analyzer.exe" />
     <Content Include="requirements.txt" />
     <Content Include="WineQuality_RestAPI\datasets\winequality-red.csv" />
     <Content Include="WineQuality_RestAPI\datasets\winequality-white.csv" />
@@ -92,6 +98,8 @@
     <Content Include="WineQuality_RestAPI\__pycache__\__init__.cpython-38.pyc" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Database\" />
+    <Folder Include="Database\Sqlite\" />
     <Folder Include="WineQuality_RestAPI\" />
     <Folder Include="WineQuality_RestAPI\datasets\" />
     <Folder Include="WineQuality_RestAPI\models\" />

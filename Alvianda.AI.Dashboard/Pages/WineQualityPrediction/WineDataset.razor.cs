@@ -1,18 +1,17 @@
-﻿using Microsoft.AspNetCore.Components;
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using Alvianda.AI.Dashboard.Datapayload;
+using Alvianda.AI.Dashboard.Services;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Configuration;
-using Alvianda.AI.Dashboard.Datapayload;
-using System.Net.Http;
 using Microsoft.JSInterop;
-using Microsoft.AspNetCore.Authorization;
-using System.Globalization;
-using Alvianda.AI.Dashboard.Services;
-using System.Json;
-using System.Linq;
 using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Globalization;
+using System.Linq;
+using System.Net.Http;
+using System.Threading.Tasks;
 
 namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
 {
@@ -24,17 +23,17 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         [Inject] IConfiguration Config { get; set; }
         [Inject] WinedatasetService DataService { get; set; }
         [Inject] IJSRuntime jsRuntime { get; set; }
-        
+
         public PaginatedList<WinesetEntry> paginatedList; // = new PaginatedList<EventViewerEntry>();
 
         public string SelectedWineset { get; set; }
         private string LongMessage { get; set; }
-        
+
         private List<WinesetEntry> WinesetEntries;
 
         //private IDictionary<long, Tuple<string, string>> DetailBtnAttributes = new Dictionary<long, Tuple<string, string>>();
         CultureInfo provider = CultureInfo.InvariantCulture;
-        
+
         int totalPages { get; set; }
         int pageIndex;
         int MAXRECORDS_RED;
@@ -43,7 +42,7 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         bool hasNextPage;
         bool hasPreviousPage;
         int maxRecords;
-        
+
         // Page and Sort data
         int? pageNumber = 1;
         //string currentSortField = "Name";
@@ -56,17 +55,17 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         protected override async Task OnInitializedAsync()
         {
             SelectedWineset = "None";
-            
+
             var serviceEndpoint = $"{Config.GetValue<string>("WinesetServiceAPI:BaseURI")}{Config.GetValue<string>("WinesetServiceAPI:DatasetRouting")}/settings";
             var response = await Http.GetAsync(serviceEndpoint);
             response.EnsureSuccessStatusCode();
             var responseString = await response.Content.ReadAsStringAsync();
 
             var settings = JObject.Parse(responseString);
-            
+
             PAGESIZE = int.Parse(settings["pageSize"].ToString());
             MAXRECORDS_RED = int.Parse(settings["totalRecsRed"].ToString());
-            MAXRECORDS_WHITE = int.Parse(settings["totalRecsWhite"].ToString());                
+            MAXRECORDS_WHITE = int.Parse(settings["totalRecsWhite"].ToString());
 
         }
 
@@ -89,7 +88,7 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         private async Task GetWinesetEntries()
         {
             LongMessage = null;
-            
+
             if (SelectedWineset == "None")
                 return;
 
@@ -117,7 +116,7 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
                 //    PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase,
                 //    PropertyNameCaseInsensitive = true,
                 //});
-                
+
                 var responseString = await response.Content.ReadAsStringAsync();
 
                 var objList = System.Text.Json.JsonSerializer.Deserialize<WinesetEntry[]>(responseString);
@@ -140,7 +139,7 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
                 pageIndex = paginatedList.PageIndex;
                 hasNextPage = paginatedList.HasNextPage;
                 hasPreviousPage = paginatedList.HasPreviousPage;
-                
+
                 StateHasChanged();
 
             }

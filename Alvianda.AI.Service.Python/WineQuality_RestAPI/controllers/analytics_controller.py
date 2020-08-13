@@ -10,6 +10,8 @@ from WineQuality_RestAPI import app
 import time
 import json
 import os
+import sqlite3
+import sys
 
 from WineQuality_RestAPI.models.decisiontree_correlation_class import DecisionTreeAnalyzer
 from WineQuality_RestAPI.models.data_preparation_singleton import DataPreparationSingleton
@@ -25,6 +27,33 @@ def validate():
     snowUrl = url_for('static',filename='John-Snow.jpg')
 
     return make_response(jsonify(d), 200)
+
+@app.route('/api/wineanalytics/algorithms')
+def algorithmlist():
+    query_parameters = request.args
+    algorithmType = query_parameters.get('type')
+
+    try:
+        DB_PATH = f'{os.getcwd()}/Database/Sqlite/DatasetMLAnalytics.db'
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        if (algorithmType == 'classification'):
+            t = (1,)
+            c.execute('SELECT Id,Name,DisplayName,Description FROM Algorithm WHERE TypeId=?', t)
+        if (algorithmType == 'regression'):
+            t = (1,)
+            c.execute('SELECT Id,Name,DisplayName,Description FROM Algorithm WHERE TypeId=?', t)
+        rows = c.fetchall()
+
+        #return make_response(jsonify(rows), 200)
+        result = json.dumps( [dict(ix) for ix in rows] )
+        return result
+    except (RuntimeError, TypeError, NameError) as err:
+        return make_response(jsonify(err.args), 500)
+    except:
+        return make_response(jsonify(sys.exc_info()[0]), 500)
 
 @app.route('/api/wineanalytics/runanalyzer/dataset')
 def run_analysis():
@@ -89,7 +118,7 @@ def train_model():
         if (algorithm == "decision-tree"):
             dtanalyzer = DecisionTreeAnalyzer(REDWINE_PATH,WHITEWINE_PATH)  
             dtanalyzer.scale_dataset()
-            dtanalyzer.train_and_fit_model()
+            X_test,y_pred = dtanalyzer.train_and_fit_model()
             dtanalyzer.calculate_accuracy()
             dtanalyzer.calculate_confusion_matrix()
             dtanalyzer.save_model()

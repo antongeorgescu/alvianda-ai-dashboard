@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Alvianda.AI.Service.CoreNet.Data
+﻿namespace Alvianda.AI.Service.CoreNet.Data
 {
-    public interface IEventViewerConfiguration {
+    public interface IEventViewerConfiguration
+    {
         public void SetMachineName(string name);
         public string GetMachineName();
     }
