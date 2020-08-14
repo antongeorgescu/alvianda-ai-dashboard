@@ -62,7 +62,12 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
             prepdataService = new WinePreparedataService(Http, Config);
             chartWidth = Config.GetValue<int>("AppSettings:ModalDialog:Width");
             chartHeight = Config.GetValue<int>("AppSettings:ModalDialog:Height");
-            await ValidateAnalyticsService();
+        }
+
+        async Task TestDataPreparationService()
+        {
+            await ValidateGetAnalyticsService().ConfigureAwait(true);
+            await ValidatePostAnalyticsService().ConfigureAwait(true);
         }
 
         //async Task Connect()
@@ -77,15 +82,62 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         //    //await hubConnection.StartAsync();
         //}
 
-        async Task ValidateAnalyticsService()
+        async Task ValidateGetAnalyticsService()
         {
-            Tuple<string, string> response = await prepdataService.ValidatePrepDataService();
+            Tuple<string, string> response = await prepdataService.ValidateGetPrepDataService().ConfigureAwait(true);
             if (response.Item1 == "data")
                 messages.Add(new Tuple<string, string>("info", response.Item2));
+        }
 
+        async Task ValidatePostAnalyticsService()
+        {
+            Tuple<string, string> response = await prepdataService.ValidatePostPrepDataService().ConfigureAwait(true);
+            if (response.Item1 == "data")
+                messages.Add(new Tuple<string, string>("info", response.Item2));
         }
 
         async Task RunDatasetAnalysis()
+        {
+            string responseString = string.Empty;
+            try
+            {
+                isRunDatasetAnalysisAvailable = false;
+                waitMessage = "Wait while retrieving dataset records and analyze the data...";
+
+                var responseDictionary = await prepdataService.RunPrepDataAnalysis();
+                if (responseDictionary.ContainsKey("error"))
+                {
+                    messages.Add(new Tuple<string, string>("error", responseDictionary["error"]));
+                }
+                else
+                {
+                    attributesHistogramTitle = responseDictionary["attributesHistogramTitle"];
+                    qualityHistogramTitle = responseDictionary["qualityHistogramTitle"];
+
+                    attributesHistogramChart = responseDictionary["attributesHistogramChart"];
+                    qualityHistogramChart = responseDictionary["qualityHistogramChart"];
+
+                    qualityValuesDropped = responseDictionary["qualityValuesDropped"];
+
+                    correlationChart = responseDictionary["correlationChart"];
+                    correlationTitle = responseDictionary["correlationTitle"];
+
+                    correlationAttributes = responseDictionary["correlationAttributes"];
+
+                    messages.Add(new Tuple<string, string>("info", responseDictionary["infomessage"]));
+
+                    waitMessage = string.Empty;
+                    isRunDatasetAnalysisAvailable = true;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                messages.Add(new Tuple<string, string>("error", ex.Message));
+            }
+        }
+
+        async Task PersistProcessedData()
         {
             string responseString = string.Empty;
             try

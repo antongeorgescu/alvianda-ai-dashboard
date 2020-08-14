@@ -33,7 +33,6 @@
   <ItemGroup>
     <Compile Include="runserver.py" />
     <Compile Include="WineQuality_RestAPI\controllers\analytics_controller.py" />
-    <Compile Include="WineQuality_RestAPI\controllers\classification_controller.py" />
     <Compile Include="WineQuality_RestAPI\controllers\dataset_controller.py" />
     <Compile Include="WineQuality_RestAPI\controllers\__init__.py" />
     <Compile Include="WineQuality_RestAPI\models\base_algorithm_class.py">

@@ -18,11 +18,11 @@ namespace Alvianda.AI.Dashboard.Services
         {
             try
             {
-                var response = await _httpClient.GetAsync(serviceEndpoint);
+                var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
                 response.EnsureSuccessStatusCode();
 
-                var responseString = await response.Content.ReadAsStringAsync();
-                if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
+                var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+                if (responseString.Contains("!DOCTYPE HTML PUBLIC",StringComparison.InvariantCulture))
                 {
                     responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
                     var result = Uglify.HtmlToText(responseString);
@@ -40,6 +40,31 @@ namespace Alvianda.AI.Dashboard.Services
             }
         }
 
+        protected async Task<Tuple<string, string>> HttpPostRequest(string serviceEndpoint, HttpContent content)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync(serviceEndpoint,content).ConfigureAwait(true);
+                response.EnsureSuccessStatusCode();
+
+                var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+                if (responseString.Contains("!DOCTYPE HTML PUBLIC",StringComparison.CurrentCulture))
+                {
+                    responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
+                    var result = Uglify.HtmlToText(responseString);
+                    var resultCode = result.Code.Replace('"', ' ');
+                    throw new Exception(resultCode);
+                    //return new Tuple<string, string>("error", resultCode);
+                }
+                else
+                    return new Tuple<string, string>("data", responseString);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"{ex.Message} [Source={ex.Source}:{ex.StackTrace}]");
+                //return new Tuple<string, string>("error", $"{ex.Message} [Source={ex.Source}:{ex.StackTrace}]");
+            }
+        }
 
     }
 }

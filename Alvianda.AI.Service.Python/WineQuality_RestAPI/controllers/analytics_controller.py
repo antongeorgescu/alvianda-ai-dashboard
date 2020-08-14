@@ -16,17 +16,22 @@ import sys
 from WineQuality_RestAPI.models.decisiontree_correlation_class import DecisionTreeAnalyzer
 from WineQuality_RestAPI.models.data_preparation_singleton import DataPreparationSingleton
 
-@app.route('/api/wineanalytics/validate')
+DB_PATH = f'{os.getcwd()}/Database/Sqlite/DatasetMLAnalytics.db'
+
+@app.route('/api/wineanalytics/validate', methods=['GET','POST'])
 def validate():
     """Renders the controller greeting."""
     t = time.localtime()
     current_time = time.strftime("%D %H:%M:%S", t)
     
-    d = f'analytics controller accessed at {current_time}'
-
-    snowUrl = url_for('static',filename='John-Snow.jpg')
-
-    return make_response(jsonify(d), 200)
+    if request.method == 'GET':
+        d = f'validate analytics controller method=GET at {current_time}'
+        snowUrl = url_for('static',filename='John-Snow.jpg')
+        return make_response(jsonify(d), 200)
+    
+    if request.method == 'POST':
+        d = request.json
+        return make_response(jsonify(d), 200)
 
 @app.route('/api/wineanalytics/algorithms')
 def algorithmlist():
@@ -34,7 +39,6 @@ def algorithmlist():
     algorithmType = query_parameters.get('type')
 
     try:
-        DB_PATH = f'{os.getcwd()}/Database/Sqlite/DatasetMLAnalytics.db'
         conn = sqlite3.connect(DB_PATH)
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
@@ -102,6 +106,83 @@ def run_analysis():
                                  rundata["correlationtitle"],
                                  rundata["correlated_attributes"],
                                  run_summary),200)
+
+@app.route('/api/wineanalytics/processdata', methods=['GET', 'POST','DELETE'])
+def processdata():
+    try:
+        if request.method == 'GET':
+            sessionId = request.args.get('sessionid', default='', type=str)
+            applicationId = request.args.get('applicationid', default='', type=str)
+            algorithmid = request.args.get('algorithmid', default=0, type=int)
+        
+            conn = sqlite3.connect(DB_PATH)
+            conn.row_factory = sqlite3.Row
+            c = conn.cursor()
+
+            t = (1,)
+            c.execute('SELECT Id,Name,DisplayName,Description FROM Algorithm WHERE TypeId=?', t)
+            rows = c.fetchall()
+
+            #return make_response(jsonify(rows), 200)
+            result = json.dumps( [dict(ix) for ix in rows] )
+
+        if request.method == 'POST':
+            sessionid = request.form.get('sessionid')
+            algorithmid = request.form.get('algorithmid')
+            applicationid = request.form.get('applicationid')
+            doname = request.form.get('dataobjectname')
+            dodescription = request.form.get('dataobjectdescription')
+            dovalue = request.form.get('dataobjectvalue')
+            
+            ## Insert the information in the database
+            conn = sqlite3.connect(DB_PATH)
+            c = comm.cursor()
+            query = 'INSERT INTO  ApplicationData (SessionId,ApplicationId,AlgorithmId) '
+            query += f'VALUES (\'{sessionid}\',{algorithmid},{applicationid},\'{doname}\',\'{dodescription}\',\'{dovalue}\')'
+            c.execute(query)
+            ##Do something like insert in DB or Render somewhere etc. it's up to you....... :)
+        
+        return make_response(jsonify(result), 200)
+        #return jsonify(isError= False,
+        #            message= "Success",
+        #            statusCode= 200,
+        #            data= data), 200    
+
+    except (RuntimeError, TypeError, NameError) as err:
+        return make_response(jsonify(err.args), 500)
+    except:
+        return make_response(jsonify(sys.exc_info()[0]), 500)
+
+@app.route('/api/wineanalytics/processdata/all', methods=['GET'])
+def processdataall():
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        t = (1,)
+        query = 'select ad.SessionId, a.Name, a.Description,'
+        query += 'ag.Name, ag.DisplayName, t.Name,'
+        query += 't.Description, ad.DataobjectName,'
+        query += 'ad.DataobjectDescription, ad.DataobjectValue, ad.UpdateDt '
+        query += 'from ApplicationData ad '
+        query += 'inner join Application a on ad.ApplicationId = a.ApplicationId '
+        query += 'inner join Algorithm ag on ag.Id = ad.AlgorithmId '
+        query += 'inner join AlgorithmType t on ag.TypeId = t.Id'
+        c.execute(query)
+        rows = c.fetchall()
+
+        result = json.dumps( [dict(ix) for ix in rows] )
+        return make_response(jsonify(result), 200)
+        #return jsonify(isError= False,
+        #            message= "Success",
+        #            statusCode= 200,
+        #            data= data), 200    
+
+    except (RuntimeError, TypeError, NameError) as err:
+        return make_response(jsonify(err.args), 500)
+    except:
+        return make_response(jsonify(sys.exc_info()[0]), 500)
 
 @app.route('/api/wineanalytics/trainmodel')
 def train_model():

@@ -27,9 +27,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Datapayload\EventViewerApiAuthorizationMessageHandler.cs" />
-    <Compile Remove="Datapayload\MyAuthenticationStateProvider.cs" />
-    <Compile Remove="Datapayload\PaginationModel.cs" />
+    <Compile Remove="DataPayload\EventViewerApiAuthorizationMessageHandler.cs" />
+    <Compile Remove="DataPayload\MyAuthenticationStateProvider.cs" />
+    <Compile Remove="DataPayload\PaginationModel.cs" />
   </ItemGroup>
   
   <ItemGroup>
