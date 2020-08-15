@@ -12,6 +12,7 @@ import json
 import os
 import sqlite3
 import sys
+import uuid
 
 from WineQuality_RestAPI.models.decisiontree_correlation_class import DecisionTreeAnalyzer
 from WineQuality_RestAPI.models.data_preparation_singleton import DataPreparationSingleton
@@ -43,12 +44,8 @@ def algorithmlist():
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
 
-        if (algorithmType == 'classification'):
-            t = (1,)
-            c.execute('SELECT Id,Name,DisplayName,Description FROM Algorithm WHERE TypeId=?', t)
-        if (algorithmType == 'regression'):
-            t = (1,)
-            c.execute('SELECT Id,Name,DisplayName,Description FROM Algorithm WHERE TypeId=?', t)
+        t = (int(algorithmType),)
+        c.execute('SELECT Id,Name,DisplayName,Description FROM Algorithm WHERE TypeId=?', t)
         rows = c.fetchall()
 
         #return make_response(jsonify(rows), 200)
@@ -122,16 +119,33 @@ def run_analysis_persist():
         observations, labels = dtanalyzer.get_observations_and_labels() 
             
         # save in db both observations and labels 
+        guid = str(uuid.uuid4())
+        conn = sqlite3.connect(DB_PATH)
+        c = conn.cursor()
+        
+        query = 'INSERT INTO  ApplicationData (SessionId,ApplicationId,AlgorithmId,DataobjectName,DataobjectDescription,DataobjectValue) '
+        query += 'VALUES (?,?,?,?,?,?)'
+        
+        t = (guid,1,99,'processed_observations','processed_observations',observations.to_json())
+        c.execute(query,t)
+        
+        t = (guid,1,99,'processed_labels','processed_labels',labels.to_json())
+        c.execute(query,t)
+        conn.commit();
 
         endproc = time.time()
         endprocstr = datetime.now().strftime("%H:%M:%S.%f")
         proc_duration = time.time() - startproc
+    except sqlite3.Error as error:
+        return make_response(f'Failed to insert data into sqlite table: {error}',500)
     except Exception as error:
         return make_response(error,500)
-    run_summary = f'run dataset and labels persisting procedure from {startprocstr} to {endprocstr}, for the duration of {proc_duration} sec'
-    
-    return make_response(jsonify(run_summary),200)
-
+    finally:
+        if (conn):
+            conn.close()
+        duration = "{:.2f}".format(proc_duration)
+        run_summary = f'[sessionid:{guid}] run dataset and labels persisting procedure from {startprocstr} to {endprocstr}, for the duration of {duration} sec'
+        return make_response(jsonify(run_summary),200)
 
 @app.route('/api/wineanalytics/processdata', methods=['GET', 'POST','DELETE'])
 def processdata():
