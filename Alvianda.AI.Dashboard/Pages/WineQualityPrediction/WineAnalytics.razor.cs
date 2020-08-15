@@ -3,8 +3,10 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Json;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -32,6 +34,9 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         private string correlationChart;
         private string correlationTitle;
         private string correlationAttributes;
+
+        private JObject preparredDataset;
+        private JObject fieldSet;
 
         // Visibility attributes
         bool isVisibleChartHistogram = false;
@@ -62,6 +67,7 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
             prepdataService = new WinePreparedataService(Http, Config);
             chartWidth = Config.GetValue<int>("AppSettings:ModalDialog:Width");
             chartHeight = Config.GetValue<int>("AppSettings:ModalDialog:Height");
+            await ValidateGetAnalyticsService().ConfigureAwait(true);
         }
 
         async Task TestDataPreparationService()
@@ -104,7 +110,7 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
                 isRunDatasetAnalysisAvailable = false;
                 waitMessage = "Wait while retrieving dataset records and analyze the data...";
 
-                var responseDictionary = await prepdataService.RunPrepDataAnalysis();
+                var responseDictionary = await prepdataService.RunPrepDataAnalysis().ConfigureAwait(true);
                 if (responseDictionary.ContainsKey("error"))
                 {
                     messages.Add(new Tuple<string, string>("error", responseDictionary["error"]));
@@ -126,6 +132,10 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
 
                     messages.Add(new Tuple<string, string>("info", responseDictionary["infomessage"]));
 
+                    //preparredDataset = JObject.Parse(responseDictionary["preparredDataset"]);
+                    //fieldSet = JObject.Parse(responseDictionary["fieldSet"]);
+                    //messages.Add(new Tuple<string, string>("info", "Preparred dataset completed"));
+
                     waitMessage = string.Empty;
                     isRunDatasetAnalysisAvailable = true;
                 }
@@ -143,28 +153,15 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
             try
             {
                 isRunDatasetAnalysisAvailable = false;
-                waitMessage = "Wait while retrieving dataset records and analyze the data...";
+                waitMessage = "Wait while we save both preparred dataset and its labels...";
 
-                var responseDictionary = await prepdataService.RunPrepDataAnalysis();
+                var responseDictionary = await prepdataService.PersistProcessedData().ConfigureAwait(true);
                 if (responseDictionary.ContainsKey("error"))
                 {
                     messages.Add(new Tuple<string, string>("error", responseDictionary["error"]));
                 }
                 else
                 {
-                    attributesHistogramTitle = responseDictionary["attributesHistogramTitle"];
-                    qualityHistogramTitle = responseDictionary["qualityHistogramTitle"];
-
-                    attributesHistogramChart = responseDictionary["attributesHistogramChart"];
-                    qualityHistogramChart = responseDictionary["qualityHistogramChart"];
-
-                    qualityValuesDropped = responseDictionary["qualityValuesDropped"];
-
-                    correlationChart = responseDictionary["correlationChart"];
-                    correlationTitle = responseDictionary["correlationTitle"];
-
-                    correlationAttributes = responseDictionary["correlationAttributes"];
-
                     messages.Add(new Tuple<string, string>("info", responseDictionary["infomessage"]));
 
                     waitMessage = string.Empty;

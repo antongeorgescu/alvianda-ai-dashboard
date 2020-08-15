@@ -15,18 +15,19 @@ from sklearn.preprocessing import StandardScaler
 
 class DataPreparationSingleton:
     class __DataPreparationSingleton:
-        def __init__(self,redwine_dataset_path,whitewine_dataset_path):
+        def __init__(self,redwine_dataset_path = None,whitewine_dataset_path = None):
             try:
-                # read red wine set of observations
-                data_red = pd.read_csv(redwine_dataset_path,sep=',')
-                data_red['color'] = 1 #redwine
+                if not((redwine_dataset_path is None) and (whitewine_dataset_path is None)):
+                    # read red wine set of observations
+                    data_red = pd.read_csv(redwine_dataset_path,sep=',')
+                    data_red['color'] = 1 #redwine
 
-                # read white wine set of observations
-                data_white = pd.read_csv(whitewine_dataset_path,sep=',')
-                data_white['color'] = 0 #whitewine
-                # merge the two sets in one
-                self.merged_data = data_red.merge(data_white, how='outer')
-                self.fields = list(self.merged_data.columns)
+                    # read white wine set of observations
+                    data_white = pd.read_csv(whitewine_dataset_path,sep=',')
+                    data_white['color'] = 0 #whitewine
+                    # merge the two sets in one
+                    self.merged_data = data_red.merge(data_white, how='outer')
+                    self.fields = list(self.merged_data.columns)
        
             except:
                 self.last_error = sys.exc_info()[1]
@@ -107,7 +108,7 @@ class DataPreparationSingleton:
         def __get_observations_and_labels__(self):
             return self.X, self.y
     instance = None
-    def __init__(self,redwine_dataset_path,whitewine_dataset_path):
+    def __init__(self,redwine_dataset_path = None,whitewine_dataset_path = None):
         if not DataPreparationSingleton.instance:
             DataPreparationSingleton.instance = DataPreparationSingleton.__DataPreparationSingleton(redwine_dataset_path,whitewine_dataset_path)
     def create_histrograms(self):
@@ -117,7 +118,7 @@ class DataPreparationSingleton:
     def identify_correlations(self):
         return self.instance.__identify_correlations__()
     def get_observations_and_labels(self):
-        return super().__get_observations_and_labels__()
+        return self.instance.__get_observations_and_labels__()
     def test_create_histrograms(self):
         chart_path = f'{os.getcwd()}/WineQuality_RestAPI/static'
 

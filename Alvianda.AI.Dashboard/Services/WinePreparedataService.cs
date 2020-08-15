@@ -35,7 +35,9 @@ namespace Alvianda.AI.Dashboard.Services
             try
             {
                 var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/validate";
-                return await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
+                var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
+
+                return new Tuple<string, string>("data", JsonConvert.DeserializeObject<string>(responseString.Item2));
             }
             catch (Exception ex)
             {
@@ -71,7 +73,7 @@ namespace Alvianda.AI.Dashboard.Services
             var responseDictionary = new Dictionary<string, string>();
             try
             {
-                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset";
+                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset/prepare";
                 var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
 
                 IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Item2) as IList<JToken>;
@@ -90,6 +92,9 @@ namespace Alvianda.AI.Dashboard.Services
                 responseDictionary.Add("correlationAttributes", responseList[5].Value<string>());
 
                 responseDictionary.Add("infomessage", responseList[6].Value<string>());
+
+                //responseDictionary.Add("preparredDataset", responseList[7].Value<string>());
+                //responseDictionary.Add("fieldSet", responseList[8].Value<string>());
 
                 //return await new Task<Dictionary<string,string>>(() => responseDictionary);
                 return responseDictionary;
@@ -110,22 +115,9 @@ namespace Alvianda.AI.Dashboard.Services
                 var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset/persist";
                 var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
 
-                IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Item2) as IList<JToken>;
+                //IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Item2) as IList<JToken>;
 
-                responseDictionary.Add("attributesHistogramTitle", responseList[1].Value<string>().Split(',')[0]);
-                responseDictionary.Add("qualityHistogramTitle", responseList[1].Value<string>().Split(',')[1]);
-
-                responseDictionary.Add("attributesHistogramChart", $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[0]}");
-                responseDictionary.Add("qualityHistogramChart", $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[1]}");
-
-                responseDictionary.Add("qualityValuesDropped", responseList[2].Value<string>());
-
-                responseDictionary.Add("correlationChart", $"http:////localhost:53535//static//{responseList[3].Value<string>()}");
-                responseDictionary.Add("correlationTitle", responseList[4].Value<string>());
-
-                responseDictionary.Add("correlationAttributes", responseList[5].Value<string>());
-
-                responseDictionary.Add("infomessage", responseList[6].Value<string>());
+                responseDictionary.Add("infomessage", JsonConvert.DeserializeObject<string>(responseString.Item2));
 
                 //return await new Task<Dictionary<string,string>>(() => responseDictionary);
                 return responseDictionary;

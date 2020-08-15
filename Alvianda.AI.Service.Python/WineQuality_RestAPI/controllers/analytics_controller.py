@@ -59,7 +59,7 @@ def algorithmlist():
     except:
         return make_response(jsonify(sys.exc_info()[0]), 500)
 
-@app.route('/api/wineanalytics/runanalyzer/dataset')
+@app.route('/api/wineanalytics/runanalyzer/dataset/prepare')
 def run_analysis():
     #query_parameters = request.args
     #algorithm = query_parameters.get('algorithm')
@@ -92,6 +92,8 @@ def run_analysis():
 
         rundata["correlated_attributes"],rundata["correlationchart"],rundata["correlationtitle"] = dtanalyzer.identify_correlations()
 
+        #rundata["preparred_dataset"],rundata["fieldSet"] = dtanalyzer.get_observations_and_labels()
+
         endproc = time.time()
         endprocstr = datetime.now().strftime("%H:%M:%S.%f")
         proc_duration = time.time() - startproc
@@ -105,7 +107,31 @@ def run_analysis():
                                  rundata["correlationchart"],
                                  rundata["correlationtitle"],
                                  rundata["correlated_attributes"],
+                                 #rundata["preparred_dataset"],
+                                 #rundata["field_set"],
                                  run_summary),200)
+
+@app.route('/api/wineanalytics/runanalyzer/dataset/persist')
+def run_analysis_persist():
+    
+    try:
+        startproc = time.time()
+        startprocstr = datetime.now().strftime("%H:%M:%S.%f")       
+        
+        dtanalyzer = DataPreparationSingleton()
+        observations, labels = dtanalyzer.get_observations_and_labels() 
+            
+        # save in db both observations and labels 
+
+        endproc = time.time()
+        endprocstr = datetime.now().strftime("%H:%M:%S.%f")
+        proc_duration = time.time() - startproc
+    except Exception as error:
+        return make_response(error,500)
+    run_summary = f'run dataset and labels persisting procedure from {startprocstr} to {endprocstr}, for the duration of {proc_duration} sec'
+    
+    return make_response(jsonify(run_summary),200)
+
 
 @app.route('/api/wineanalytics/processdata', methods=['GET', 'POST','DELETE'])
 def processdata():
