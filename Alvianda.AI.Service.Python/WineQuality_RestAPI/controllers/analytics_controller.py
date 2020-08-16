@@ -13,6 +13,8 @@ import os
 import sqlite3
 import sys
 import uuid
+import pandas as pd
+import numpy as np
 
 from WineQuality_RestAPI.models.decisiontree_correlation_class import DecisionTreeAnalyzer
 from WineQuality_RestAPI.models.data_preparation_singleton import DataPreparationSingleton
@@ -47,6 +49,59 @@ def algorithmlist():
         t = (int(algorithmType),)
         c.execute('SELECT Id,Name,DisplayName,Description FROM Algorithm WHERE TypeId=?', t)
         rows = c.fetchall()
+
+        #return make_response(jsonify(rows), 200)
+        result = json.dumps( [dict(ix) for ix in rows] )
+        return result
+    except (RuntimeError, TypeError, NameError) as err:
+        return make_response(jsonify(err.args), 500)
+    except:
+        return make_response(jsonify(sys.exc_info()[0]), 500)
+
+@app.route('/api/wineanalytics/worksessions')
+def workingsessionslist():
+    try:
+        query_parameters = request.args
+        applicationId = query_parameters.get('applicationid')
+
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        t = (int(applicationId),)
+        c.execute('SELECT SessionId, Description, CreatedOn from WorkingSession WHERE ApplicationId=?', t)
+        rows = c.fetchall()
+        
+        #return make_response(jsonify(rows), 200)
+        result = json.dumps( [dict(ix) for ix in rows] )
+        return result
+    except (RuntimeError, TypeError, NameError) as err:
+        return make_response(jsonify(err.args), 500)
+    except:
+        return make_response(jsonify(sys.exc_info()[0]), 500)
+
+@app.route('/api/wineanalytics/dobjs')
+def saveddataobjectlist():
+    query_parameters = request.args
+    applicationId = query_parameters.get('applicationid')
+
+    try:
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        t = (int(applicationId),)
+        c.execute('SELECT SessionId,DataobjectName,DataobjectDescription,DataobjectValue FROM ApplicationData WHERE ApplicationId=?', t)
+        rows = c.fetchall()
+        for row in rows:
+            print(row)
+        observations = pd.DataFrame(rows[0])
+        labels = np.Array(rows[1])
+
+        dtanalyzer = DataPreparationSingleton()
+        # save first row in 'observations'
+        # save second row in 'labels'
+        dtanalyzer.set_observations_and_labels(observations, labels)
 
         #return make_response(jsonify(rows), 200)
         result = json.dumps( [dict(ix) for ix in rows] )
@@ -112,6 +167,11 @@ def run_analysis():
 def run_analysis_persist():
     
     try:
+        query_parameters = request.args
+        description = query_parameters.get('description')
+        if (description == None):
+            description = '[Default] Saved preparred data objects'
+
         startproc = time.time()
         startprocstr = datetime.now().strftime("%H:%M:%S.%f")       
         
@@ -121,31 +181,42 @@ def run_analysis_persist():
         # save in db both observations and labels 
         guid = str(uuid.uuid4())
         conn = sqlite3.connect(DB_PATH)
+
         c = conn.cursor()
         
-        query = 'INSERT INTO  ApplicationData (SessionId,ApplicationId,AlgorithmId,DataobjectName,DataobjectDescription,DataobjectValue) '
-        query += 'VALUES (?,?,?,?,?,?)'
+        query = 'INSERT INTO  WorkingSession (SessionId,ApplicationId,AlgorithmId,Description) '
+        query += 'VALUES (?,?,?,?)'
+        t = (guid,1,99,description)
+        c.execute(query,t)
+
+        query = 'INSERT INTO  ApplicationData (SessionId,DataobjectName,DataobjectDescription,DataobjectValue) '
+        query += 'VALUES (?,?,?,?)'
         
-        t = (guid,1,99,'processed_observations','processed_observations',observations.to_json())
+        t = (guid,'processed_observations','processed_observations',observations.to_json())
         c.execute(query,t)
         
-        t = (guid,1,99,'processed_labels','processed_labels',labels.to_json())
+        t = (guid,'processed_labels','processed_labels',labels.to_json())
         c.execute(query,t)
         conn.commit();
 
         endproc = time.time()
         endprocstr = datetime.now().strftime("%H:%M:%S.%f")
         proc_duration = time.time() - startproc
+        duration = "{:.2f}".format(proc_duration)
+        run_summary = f'[sessionid:{guid}] run dataset and labels persisting procedure from {startprocstr} to {endprocstr}, for the duration of {duration} sec'
+        return make_response(jsonify(run_summary),200)
     except sqlite3.Error as error:
+        if (conn):
+            conn.rollback();
         return make_response(f'Failed to insert data into sqlite table: {error}',500)
     except Exception as error:
+        if (conn):
+            conn.rollback();
         return make_response(error,500)
     finally:
         if (conn):
             conn.close()
-        duration = "{:.2f}".format(proc_duration)
-        run_summary = f'[sessionid:{guid}] run dataset and labels persisting procedure from {startprocstr} to {endprocstr}, for the duration of {duration} sec'
-        return make_response(jsonify(run_summary),200)
+        
 
 @app.route('/api/wineanalytics/processdata', methods=['GET', 'POST','DELETE'])
 def processdata():

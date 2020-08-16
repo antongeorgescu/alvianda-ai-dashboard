@@ -1,4 +1,5 @@
-﻿using Alvianda.AI.Dashboard.Services;
+﻿using Alvianda.AI.Dashboard.ServiceModels;
+using Alvianda.AI.Dashboard.Services;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using Microsoft.Extensions.Configuration;
@@ -27,10 +28,15 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         public string SelectedAlgorithm { get; set; }
         public string SelectedAlgorithmType { get; set; }
         IList<Algorithm> Algorithms;
+
+        public string SelectedSessionId { get; set; }
+        IList<WorkingSession> WorkingSessions;
+        
         private List<Tuple<string, string>> messages = new List<Tuple<string, string>>();
 
         private bool isModelDataAvailable = false;
         private bool isAlgorithmListAvailable = false;
+        private bool isSessionsListAvailable = false;
         private string waitMessage = string.Empty;
 
         WineMlmodelService mlmodelService;
@@ -44,6 +50,8 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         {
             string algorithmType = arg.Value.ToString();
             await GetAlgorithmList(algorithmType).ConfigureAwait(true);
+
+            await PopulateWorkingSessionList(1).ConfigureAwait(true);
         }
 
         async Task GetAlgorithmList(string algorithmType)
@@ -64,6 +72,29 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
                 }
             }
             catch(Exception ex)
+            {
+                messages.Add(new Tuple<string, string>("error", ex.Message));
+            }
+        }
+
+        async Task PopulateWorkingSessionList(int applicationId)
+        {
+            try
+            {
+                isSessionsListAvailable = false;
+                var response = await mlmodelService.GetWorkingSessionList(applicationId).ConfigureAwait(true);
+                if (response.Item1 == "info")
+                {
+                    WorkingSessions = response.Item2;
+                    isSessionsListAvailable = true;
+                    return;
+                }
+                if (response.Item1 == "error")
+                {
+                    throw new Exception(response.Item3);
+                }
+            }
+            catch (Exception ex)
             {
                 messages.Add(new Tuple<string, string>("error", ex.Message));
             }

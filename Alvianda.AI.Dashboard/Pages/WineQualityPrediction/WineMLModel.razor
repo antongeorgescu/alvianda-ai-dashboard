@@ -33,6 +33,18 @@
     <thead style="background-color:gainsboro; border-color:gray;">
         <tr>
             <td>
+                <label for="start">Select algorithm type:</label>
+            </td>
+            <td>
+                <label for="start">Select algorithm:</label>
+            </td>
+            <td>
+                <label for="start">Select saved preparred data session:</label>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>
                 <div>
                     <input type="radio" id="classification" name="algtype" value="1" @onchange="PopulateAlgorithmList">
                     <label for="classification">Classification</label><br>
@@ -42,13 +54,25 @@
             </td>
             <td>
                 <div>
-                    <label for="start">Select algorithm:</label>
                     <select @bind="@SelectedAlgorithm" class="select-box">
                         <option value="None">== None ==</option>
                         @if (isAlgorithmListAvailable)
                             @foreach (var algorithm in Algorithms)
                             {
                                 <option value="@algorithm.Name">@algorithm.DisplayName</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </td>
+            <td>
+                <div>
+                    <select @bind="@SelectedSessionId" class="select-box">
+                        <option value="None">== None ==</option>
+                        @if (isSessionsListAvailable)
+                            @foreach (var session in WorkingSessions)
+                            {
+                                <option value="@session.SessionId">@session.Description (created on @session.CreatedOn)</option>
                             }
                         }
                     </select>

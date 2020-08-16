@@ -1,10 +1,12 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using Alvianda.AI.Dashboard.ServiceModels;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUglify.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Json;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -13,18 +15,13 @@ namespace Alvianda.AI.Dashboard.Services
     public interface IWineMlmodelService
     {
         Task<Tuple<string, IList<Algorithm>,string>> GetAlgorithmList(string algorithmType);
+        Task<Tuple<string, IList<WorkingSession>, string>> GetWorkingSessionList(int applicationId);
         Task<Dictionary<string, string>> RunMachineLearningModel(string algorithm);
         //Task<List<WinesetEntry>> GetPaginatedResult(string logCategory, int currentPage, int pageSize = 10);
         //Task<int> GetCount(string wineCategory);
     }
 
-    public class Algorithm
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public string DisplayName { get; set; }
-        public string Description { get; set; }
-    }
+    
 
     public class WineMlmodelService : BaseService, IWineMlmodelService
     {
@@ -57,6 +54,54 @@ namespace Alvianda.AI.Dashboard.Services
             catch (Exception ex)
             {
                 return await new Task<Tuple<string, IList<Algorithm>,string>>(() => new Tuple<string, IList<Algorithm>, string> ("error", null,ex.Message)).ConfigureAwait(true);
+            }
+        }
+
+        public async Task<Tuple<string, IList<WorkingSession>, string>> GetWorkingSessionList(int applicationId)
+        {
+            try
+            {
+                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/worksessions?applicationid={applicationId}";
+                var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
+                IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Item2) as IList<JToken>;
+
+                IList<WorkingSession> workSessions = new List<WorkingSession>();
+                responseList.ForEach(x => workSessions.Add(new WorkingSession()
+                {
+                    SessionId = x["SessionId"].ToString(),
+                    Description = x["Description"].ToString(),
+                    CreatedOn = DateTime.Parse(x["CreatedOn"].ToString())
+                }));
+                return new Tuple<string, IList<WorkingSession>, string>(item1: "info", item2: workSessions, item3: string.Empty);
+            }
+            catch (Exception ex)
+            {
+                return await new Task<Tuple<string, IList<WorkingSession>, string>>(() => new Tuple<string, IList<WorkingSession>, string>("error", null, ex.Message)).ConfigureAwait(true);
+            }
+        }
+
+        public async Task<Tuple<string, IList<DataObjectPersisted>, string>> GetSavedDataObjectList(int applicationId)
+        {
+            try
+            {
+                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/saveddataobjects?applicationid={applicationId}";
+                var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
+                IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Item2) as IList<JToken>;
+
+                IList<DataObjectPersisted> dobjs = new List<DataObjectPersisted>();
+                responseList.ForEach(x => dobjs.Add(new DataObjectPersisted()
+                {
+                    ApplicationId = int.Parse(x["ApplicationId"].ToString()),
+                    SessionId = x["SessionId"].ToString(),
+                    DONames = x["DONames"].ToString().Split(',').ToList<string>(),
+                    DODescriptions = x["DODescriptions"].ToString().Split(',').ToList<string>(),
+                    CreatedDates = x["CreatedDates"].ToString().Split(',').ToList<string>()
+                }));
+                return new Tuple<string, IList<DataObjectPersisted>, string>(item1: "info", item2: dobjs, item3: string.Empty);
+            }
+            catch (Exception ex)
+            {
+                return await new Task<Tuple<string, IList<DataObjectPersisted>, string>>(() => new Tuple<string, IList<DataObjectPersisted>, string>("error", null, ex.Message)).ConfigureAwait(true);
             }
         }
 

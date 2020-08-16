@@ -112,7 +112,9 @@ namespace Alvianda.AI.Dashboard.Services
             var responseDictionary = new Dictionary<string, string>();
             try
             {
-                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset/persist";
+                string description = "Saved in database (persisted) the processed data objects";
+
+                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset/persist?description={description}";
                 var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
 
                 //IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Item2) as IList<JToken>;
