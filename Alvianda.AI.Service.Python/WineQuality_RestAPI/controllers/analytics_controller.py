@@ -80,6 +80,28 @@ def workingsessionslist():
     except:
         return make_response(jsonify(sys.exc_info()[0]), 500)
 
+@app.route('/api/wineanalytics/worksessions/details')
+def workingsessiondetails():
+    try:
+        query_parameters = request.args
+        sessionId = query_parameters.get('sessionid')
+
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        t = (sessionId,)
+        c.execute('SELECT Description, Notes, CreatedOn from WorkingSession WHERE SessionId=?', t)
+        row = c.fetchone();
+        
+        #return make_response(jsonify(rows), 200)
+        result = jsonify(row)
+        return result
+    except (RuntimeError, TypeError, NameError) as err:
+        return make_response(jsonify(err.args), 500)
+    except:
+        return make_response(jsonify(sys.exc_info()[0]), 500)
+
 @app.route('/api/wineanalytics/dobjs')
 def saveddataobjectlist():
     query_parameters = request.args
@@ -163,14 +185,28 @@ def run_analysis():
                                  #rundata["field_set"],
                                  run_summary),200)
 
-@app.route('/api/wineanalytics/runanalyzer/dataset/persist')
+@app.route('/api/wineanalytics/runanalyzer/dataset/persist', methods=['GET','POST'])
 def run_analysis_persist():
     
     try:
-        query_parameters = request.args
-        description = query_parameters.get('description')
+        description = None
+        notes = None
+        attributes = None
+        if request.method == 'GET':
+            query_parameters = request.args
+            description = query_parameters.get('description')
+            notes = query_parameters.get('notes')
+            attributes = query_parameters.get('attributes')
+        if request.method == 'POST':
+            data = request.json
+            description = data['description']
+            notes = data['notes']
+            attributes = data['attributes']
+
         if (description == None):
             description = '[Default] Saved preparred data objects'
+        if (notes == None):
+                description = '[Default] No notes provided by user'
 
         startproc = time.time()
         startprocstr = datetime.now().strftime("%H:%M:%S.%f")       
@@ -184,15 +220,15 @@ def run_analysis_persist():
 
         c = conn.cursor()
         
-        query = 'INSERT INTO  WorkingSession (SessionId,ApplicationId,AlgorithmId,Description) '
-        query += 'VALUES (?,?,?,?)'
-        t = (guid,1,99,description)
+        query = 'INSERT INTO  WorkingSession (SessionId,ApplicationId,AlgorithmId,Description,Notes) '
+        query += 'VALUES (?,?,?,?,?)'
+        t = (guid,1,99,description,notes)
         c.execute(query,t)
 
-        query = 'INSERT INTO  ApplicationData (SessionId,DataobjectName,DataobjectDescription,DataobjectValue) '
-        query += 'VALUES (?,?,?,?)'
+        query = 'INSERT INTO  ApplicationData (SessionId,DataobjectName,DataobjectDescription,DataobjectValue,DataobjectAttributes) '
+        query += 'VALUES (?,?,?,?,?)'
         
-        t = (guid,'processed_observations','processed_observations',observations.to_json())
+        t = (guid,'processed_observations','processed_observations',observations.to_json(),attributes)
         c.execute(query,t)
         
         t = (guid,'processed_labels','processed_labels',labels.to_json())

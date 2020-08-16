@@ -14,7 +14,12 @@ namespace Alvianda.AI.Dashboard.Services
         Task<Tuple<string, string>> ValidateGetPrepDataService();
         Task<Tuple<string, string>> ValidatePostPrepDataService();
         Task<Dictionary<string, string>> RunPrepDataAnalysis();
-        Task<Dictionary<string, string>> PersistProcessedData();
+        Task<Dictionary<string, string>> PersistProcessedDataGet(string attributes,
+                                                                    string userDescription = null, 
+                                                                    string userNotes = null);
+        Task<Dictionary<string, string>> PersistProcessedDataPost(string attributes,
+                                                                    string userDescription = null, 
+                                                                    string userNotes = null);
         //Task<List<WinesetEntry>> GetPaginatedResult(string logCategory, int currentPage, int pageSize = 10);
         //Task<int> GetCount(string wineCategory);
     }
@@ -107,15 +112,56 @@ namespace Alvianda.AI.Dashboard.Services
             }
         }
 
-        public async Task<Dictionary<string, string>> PersistProcessedData()
+        public async Task<Dictionary<string, string>> PersistProcessedDataGet(
+                                                                string dataObjectAttributes,
+                                                                string userNotes = null, 
+                                                                string userDescription = null)
         {
             var responseDictionary = new Dictionary<string, string>();
             try
             {
-                string description = "Saved in database (persisted) the processed data objects";
+                string description = string.IsNullOrEmpty(userDescription) ?  "[Default] Saved in database (persisted) the processed data objects" :  userDescription;
+                string notes = string.IsNullOrEmpty(userNotes) ? "[Default] No notes entered by user." : userNotes;
 
-                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset/persist?description={description}";
+
+                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset/persist?description={description}&notes={userNotes}&attributes={dataObjectAttributes}";
                 var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
+
+                //IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Item2) as IList<JToken>;
+
+                responseDictionary.Add("infomessage", JsonConvert.DeserializeObject<string>(responseString.Item2));
+
+                //return await new Task<Dictionary<string,string>>(() => responseDictionary);
+                return responseDictionary;
+
+            }
+            catch (Exception ex)
+            {
+                responseDictionary.Add("error", ex.Message);
+                return responseDictionary;
+            }
+        }
+
+        public async Task<Dictionary<string, string>> PersistProcessedDataPost(
+                                                                string dataObjectAttributes,
+                                                                string userNotes = null,
+                                                                string userDescription = null)
+        {
+            var responseDictionary = new Dictionary<string, string>();
+            try
+            {
+                string description = string.IsNullOrEmpty(userDescription) ? "[Default] Saved in database (persisted) the processed data objects" : userDescription;
+                string notes = string.IsNullOrEmpty(userNotes) ? "[Default] No notes entered by user." : userNotes;
+
+                var dobjContent = new StringContent(JsonConvert.SerializeObject(new
+                {
+                    attributes = dataObjectAttributes,
+                    description = userDescription,
+                    notes = userNotes
+                }), Encoding.UTF8, "application/json");
+
+                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset/persist?description={description}&notes={userNotes}&attributes={dataObjectAttributes}";
+                var responseString = await HttpPostRequest(serviceEndpoint, dobjContent).ConfigureAwait(true);
 
                 //IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Item2) as IList<JToken>;
 

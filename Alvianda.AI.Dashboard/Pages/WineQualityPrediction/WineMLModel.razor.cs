@@ -37,6 +37,10 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         private bool isModelDataAvailable = false;
         private bool isAlgorithmListAvailable = false;
         private bool isSessionsListAvailable = false;
+        private bool isSavedDODetailsAvailable = false;
+
+        private string PersistedDODetails;
+
         private string waitMessage = string.Empty;
 
         WineMlmodelService mlmodelService;
@@ -52,6 +56,14 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
             await GetAlgorithmList(algorithmType).ConfigureAwait(true);
 
             await PopulateWorkingSessionList(1).ConfigureAwait(true);
+        }
+
+        async Task PopulateSessionDetails(ChangeEventArgs arg)
+        {
+            SelectedSessionId = arg.Value.ToString();
+
+            await GetSessionDetails(SelectedSessionId).ConfigureAwait(true);
+
         }
 
         async Task GetAlgorithmList(string algorithmType)
@@ -76,6 +88,33 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
                 messages.Add(new Tuple<string, string>("error", ex.Message));
             }
         }
+
+        async Task GetSessionDetails(string sessionId)
+        {
+            try
+            {
+                this.isSavedDODetailsAvailable = false;
+                var response = await mlmodelService.GetSessionDetails(sessionId).ConfigureAwait(true);
+                if (response.Item1 == "info")
+                {
+                    var jsonData = response.Item2 as JToken;
+                    PersistedDODetails = $"Description:{jsonData["Description"]}{Environment.NewLine}" + 
+                        $"Notes:{jsonData["Notes"]}{Environment.NewLine}" +
+                        $"Created On:{jsonData["CreatedOn"]}";
+                    isSavedDODetailsAvailable = true;
+                    return;
+                }
+                if (response.Item1 == "error")
+                {
+                    throw new Exception(response.Item3);
+                }
+            }
+            catch (Exception ex)
+            {
+                messages.Add(new Tuple<string, string>("error", ex.Message));
+            }
+        }
+
 
         async Task PopulateWorkingSessionList(int applicationId)
         {

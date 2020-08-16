@@ -67,12 +67,12 @@
             </td>
             <td>
                 <div>
-                    <select @bind="@SelectedSessionId" class="select-box">
+                    <select @onchange="@PopulateSessionDetails" class="select-box">
                         <option value="None">== None ==</option>
                         @if (isSessionsListAvailable)
                             @foreach (var session in WorkingSessions)
                             {
-                                <option value="@session.SessionId">@session.Description (created on @session.CreatedOn)</option>
+                                <option value="@session.SessionId">@session.SessionId (created on @session.CreatedOn)</option>
                             }
                         }
                     </select>
@@ -84,6 +84,22 @@
             </td>
         </tr>
     </thead>
+    <tr>
+        <td colspan="4">
+            <div class="form-group">
+                @if (isSavedDODetailsAvailable)
+                {
+                    <label for="start">Details of persisted data object:</label>
+                    <textarea class="form-control" @bind="PersistedDODetails" rows="5"></textarea>
+                }
+                else
+                {
+                    <label for="start" style="visibility:hidden">Details of persisted data object:</label>
+                    <textarea class="form-control" @bind="PersistedDODetails" rows="5" style="visibility:hidden"></textarea>
+                }
+            </div>
+        </td>
+    </tr>
 </table>
 <hr />
 

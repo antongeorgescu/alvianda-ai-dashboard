@@ -2,7 +2,6 @@
 @*@implements IDisposable*@
 
 @inject IJSRuntime JSRuntime;
-
 @*<div class="form-group">
         <table style="padding:5px;">
             <thead>
@@ -33,18 +32,25 @@
     <thead style="background-color:gainsboro; border-color:gray;">
         <tr>
             @*<td>
-                <div>
-                    <label for="start">Select algorithm:</label>
-                    <select @bind="@SelectedAlgorithm" class="select-box">
-                        <option value="None">== None ==</option>
-                        <option value="decision-tree">Decision Tree</option>
-                        <option value="naive-bayes">Naive Bayes</option>
-                    </select>
-                </div>
-            </td>*@
+                    <div>
+                        <label for="start">Select algorithm:</label>
+                        <select @bind="@SelectedAlgorithm" class="select-box">
+                            <option value="None">== None ==</option>
+                            <option value="decision-tree">Decision Tree</option>
+                            <option value="naive-bayes">Naive Bayes</option>
+                        </select>
+                    </div>
+                </td>*@
             <td class="text-left">
                 <button class="btn btn-primary" @onclick="@RunDatasetAnalysis" style='font-size:small;line-height: 1.428;'>Run Dataset Analysis</button>
-                <button class="btn btn-primary" @onclick="@PersistProcessedData" style='font-size:small;line-height: 1.428;'>Persists Processed Data</button>
+                @if (!isRunDatasetAnalysisAvailable)
+                {
+                    <button class="btn btn-primary" disabled style='font-size:small;line-height: 1.428;'>Persists Processed Data</button>
+                }
+                else
+                {
+                    <button class="btn btn-primary" @onclick="@PersistProcessedData" style='font-size:small;line-height: 1.428;'>Persists Processed Data</button>
+                }
                 <button class="btn btn-primary" @onclick="() => { messages.Clear(); }" style='font-size:small;line-height: 1.428;'>Clear MessagesList</button>
                 @*<button class="btn btn-primary" @onclick="@TestDataPreparationService" style='font-size:small;line-height: 1.428;'>Test Data Preparation Service</button>*@
             </td>
@@ -84,7 +90,7 @@
                          width="30" height="20"
                          onmouseover="JavaScript:this.style.cursor='pointer'"
                          onmouseout="JavaScript:this.style.cursor='default'"
-                         @onclick="@(x => ModalShow(attributesHistogramTitle,attributesHistogramChart))" />&nbsp;(click for chart image)
+                         @onclick="@(() => ModalShow(attributesHistogramTitle,attributesHistogramChart))" />&nbsp;(click for chart image)
                 </td>
             </tr>
             <tr style="visibility:@isVisibleQualityHistogram">
@@ -112,10 +118,18 @@
                          width="30" height="20"
                          onmouseover="JavaScript:this.style.cursor='pointer'"
                          onmouseout="JavaScript:this.style.cursor='default'"
-                         @onclick="@(x => ModalShow(correlationTitle,correlationChart))" />&nbsp;(click for chart image)
+                         @onclick="@(() => ModalShow(correlationTitle,correlationChart))" />&nbsp;(click for chart image)
                 </td>
             </tr>
         </table>
+    </div><br/>
+    <div class="form-group">
+        <label for="start">Description for persisted data object:</label>
+        <textarea class="form-control" @bind="PersistedDODescription" rows="2"></textarea>
+    </div><br/>
+    <div class="form-group">
+        <label for="start">Notes for persisted data object:</label>
+        <textarea class="form-control" @bind="PersistedDONotes" rows="5"></textarea>
     </div>
 }
 <hr />

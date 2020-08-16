@@ -80,6 +80,22 @@ namespace Alvianda.AI.Dashboard.Services
             }
         }
 
+        public async Task<Tuple<string, JToken, string>> GetSessionDetails(string sessionId)
+        {
+            try
+            {
+                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/worksessions/details?sessionid={sessionId}";
+                var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
+                var jsonDetails = JsonConvert.DeserializeObject(responseString.Item2) as JToken;
+                
+                return new Tuple<string, JToken, string>(item1: "info", item2: jsonDetails, item3: string.Empty);
+            }
+            catch (Exception ex)
+            {
+                return await new Task<Tuple<string, JToken, string>>(() => new Tuple<string, JToken, string>("error", null, ex.Message)).ConfigureAwait(true);
+            }
+        }
+
         public async Task<Tuple<string, IList<DataObjectPersisted>, string>> GetSavedDataObjectList(int applicationId)
         {
             try

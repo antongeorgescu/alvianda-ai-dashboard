@@ -55,6 +55,10 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
 
         WinePreparedataService prepdataService;
 
+        string PersistedDONotes;
+        string PersistedDODescription;
+        string PersistedDOAttributes;
+
         protected override async Task OnInitializedAsync()
         {
             //Uri _url = new Uri("http://localhost:53535/api/wineanalytics/chathub");
@@ -155,7 +159,10 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
                 isRunDatasetAnalysisAvailable = false;
                 waitMessage = "Wait while we save both preparred dataset and its labels...";
 
-                var responseDictionary = await prepdataService.PersistProcessedData().ConfigureAwait(true);
+                var responseDictionary = await prepdataService.PersistProcessedDataPost(
+                                                                            PersistedDOAttributes,
+                                                                            PersistedDONotes,
+                                                                            PersistedDODescription).ConfigureAwait(true);
                 if (responseDictionary.ContainsKey("error"))
                 {
                     messages.Add(new Tuple<string, string>("error", responseDictionary["error"]));
