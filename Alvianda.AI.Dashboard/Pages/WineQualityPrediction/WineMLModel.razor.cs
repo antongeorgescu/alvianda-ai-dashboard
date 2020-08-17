@@ -99,9 +99,9 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
                 {
                     var jsonData = response.Item2 as JToken;
                     
-                    var description = jsonData["Description"].Value<string>();
-                    var notes = jsonData["Notes"].Value<string>();
-                    var createdOn = jsonData["CreatedOn"].Value<string>();
+                    var description = jsonData[0]["Description"].Value<string>();
+                    var notes = jsonData[0]["Notes"].Value<string>();
+                    var createdOn = jsonData[0]["CreatedOn"].Value<string>();
                     PersistedDODetails = $"Description:{description}{Environment.NewLine}" +
                         $"Notes:{notes}{Environment.NewLine}" +
                         $"Created On:{createdOn}";

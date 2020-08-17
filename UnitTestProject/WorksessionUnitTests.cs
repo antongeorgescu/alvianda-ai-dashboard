@@ -16,26 +16,20 @@ namespace UnitTestProject
             HttpClient _httpClient = new HttpClient();
             var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/worksessions/details?sessionid=85ce9e27-b727-4a95-b218-1a4a9e0bb6a9";
             var resultCode = string.Empty;
-            try
+            var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
+            
+            var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+            if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
             {
-                var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
-
-                var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
-                if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
-                {
-                    responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
-                    var result = Uglify.HtmlToText(responseString);
-                    resultCode = result.Code.Replace('"', ' ');
-                    Assert.IsFalse(resultCode != string.Empty);
-                }
-
-                var jsonDetails = JToken.Parse(responseString);
-                Assert.IsTrue(jsonDetails["Description"].Value<string>().Contains("test 1122"));
+                responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
+                var result = Uglify.HtmlToText(responseString);
+                resultCode = result.Code.Replace('"', ' ');
+                Assert.IsFalse(resultCode != string.Empty);
             }
-            catch (Exception ex)
-            {
-                Assert.IsFalse(ex != null, ex.Message);
-            }
+            
+            var jsonDetails = JToken.Parse(responseString);
+            Assert.IsTrue(jsonDetails[0]["Description"].Value<string>().Contains("test 1122"));
+
         }
     }
 }

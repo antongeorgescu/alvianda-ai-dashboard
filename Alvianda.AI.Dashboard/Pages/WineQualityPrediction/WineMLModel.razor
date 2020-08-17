@@ -72,7 +72,7 @@
                         @if (isSessionsListAvailable)
                             @foreach (var session in WorkingSessions)
                             {
-                                <option value="@session.SessionId">@session.SessionId</option>
+                                <option value="@session.SessionId">@session.SessionId (created on @session.CreatedOn)</option>
                             }
                         }
                     </select>
