@@ -98,9 +98,13 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
                 if (response.Item1 == "info")
                 {
                     var jsonData = response.Item2 as JToken;
-                    PersistedDODetails = $"Description:{jsonData["Description"]}{Environment.NewLine}" + 
-                        $"Notes:{jsonData["Notes"]}{Environment.NewLine}" +
-                        $"Created On:{jsonData["CreatedOn"]}";
+                    //PersistedDODetails = $"Description:{jsonData["Description"]}{Environment.NewLine}" + 
+                    //    $"Notes:{jsonData["Notes"]}{Environment.NewLine}" +
+                    //    $"Created On:{jsonData["CreatedOn"]}";
+                    //PersistedDODetails = $"Description:{jsonData.Value<string>(0)}{Environment.NewLine}" +
+                    //    $"Notes:{jsonData.Value<string>(1)}{Environment.NewLine}" +
+                    //    $"Created On:{jsonData.Value<string>(2)}";
+                    PersistedDODetails = response.Item2.Children()[0].ToString();
                     isSavedDODetailsAvailable = true;
                     return;
                 }

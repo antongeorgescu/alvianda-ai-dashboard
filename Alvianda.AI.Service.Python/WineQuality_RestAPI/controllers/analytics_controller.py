@@ -95,7 +95,7 @@ def workingsessiondetails():
         row = c.fetchone();
         
         #return make_response(jsonify(rows), 200)
-        result = jsonify(row)
+        result = json.dumps( [dict(row)] )
         return result
     except (RuntimeError, TypeError, NameError) as err:
         return make_response(jsonify(err.args), 500)
@@ -204,9 +204,11 @@ def run_analysis_persist():
             attributes = data['attributes']
 
         if (description == None):
-            description = '[Default] Saved preparred data objects'
+            description = '[System] Saved preparred data objects'
         if (notes == None):
-                description = '[Default] No notes provided by user'
+            notes = '[System] No notes provided by user'
+        if (attributes == None):
+            attributes = '[System] No persisted data object attributes available'
 
         startproc = time.time()
         startprocstr = datetime.now().strftime("%H:%M:%S.%f")       
@@ -231,7 +233,7 @@ def run_analysis_persist():
         t = (guid,'processed_observations','processed_observations',observations.to_json(),attributes)
         c.execute(query,t)
         
-        t = (guid,'processed_labels','processed_labels',labels.to_json())
+        t = (guid,'processed_labels','processed_labels',labels.to_json(),'')
         c.execute(query,t)
         conn.commit();
 

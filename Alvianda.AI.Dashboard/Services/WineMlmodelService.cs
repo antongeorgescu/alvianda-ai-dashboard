@@ -86,7 +86,7 @@ namespace Alvianda.AI.Dashboard.Services
             {
                 var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/worksessions/details?sessionid={sessionId}";
                 var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
-                var jsonDetails = JsonConvert.DeserializeObject(responseString.Item2) as JToken;
+                var jsonDetails = JToken.Parse(responseString.Item2);
                 
                 return new Tuple<string, JToken, string>(item1: "info", item2: jsonDetails, item3: string.Empty);
             }
