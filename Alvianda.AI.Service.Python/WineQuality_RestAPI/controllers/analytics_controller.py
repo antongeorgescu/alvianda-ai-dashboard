@@ -94,8 +94,7 @@ def workingsessiondetails():
         c.execute('SELECT Description, Notes, CreatedOn from WorkingSession WHERE SessionId=?', t)
         row = c.fetchone();
         
-        #return make_response(jsonify(rows), 200)
-        result = json.dumps( [dict(row)] )
+        result = json.dumps(dict(row))
         return result
     except (RuntimeError, TypeError, NameError) as err:
         return make_response(jsonify(err.args), 500)
