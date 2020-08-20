@@ -14,12 +14,15 @@ from sklearn.metrics import confusion_matrix,f1_score
 from sklearn.preprocessing import StandardScaler
 
 class BaseAlgorithmClass:
+    merged_data = None
+    fields = None
+    y_test = None
+    y_pred = None
     def __init__(self,merged_dataset,field_list):
-        merged_data = merged_dataset
-        fields = field_list
+        self.merged_data = merged_dataset
+        self.fields = field_list
     def scale_dataset(self,scaler = 'MINMAXSCALER'):
         # two types of scalers: MINMAXSCALER, STANDARDSCALER
-        
         try:
             self.X = self.merged_data[self.fields]
             if (scaler == 'MINMAXSCALER'):
@@ -32,7 +35,7 @@ class BaseAlgorithmClass:
                 # Fit on training set only.
                 self.X = scaler.fit_transform(self.X)
 
-            self.X = pd.DataFrame(X, columns=['%s_scaled' % fld for fld in self.fields])
+            self.X = pd.DataFrame(self.X, columns=['%s_scaled' % fld for fld in self.fields])
             return self.X
         except:
             self.last_error = sys.exc_info()[1]

@@ -15,11 +15,13 @@ import sys
 import uuid
 import pandas as pd
 import numpy as np
+from sqlalchemy import create_engine
 
 from WineQuality_RestAPI.models.decisiontree_correlation_class import DecisionTreeAnalyzer
 from WineQuality_RestAPI.models.data_preparation_singleton import DataPreparationSingleton
 
 DB_PATH = f'{os.getcwd()}/Database/Sqlite/DatasetMLAnalytics.db'
+SAVEDFDB_PATH = f'{os.getcwd()}/Database/Sqlite/SavedDataframes.db'
 
 @app.route('/api/wineanalytics/validate', methods=['GET','POST'])
 def validate():
@@ -167,12 +169,12 @@ def run_analysis():
 
         #rundata["preparred_dataset"],rundata["fieldSet"] = dtanalyzer.get_observations_and_labels()
 
-        endproc = time.time()
         endprocstr = datetime.now().strftime("%H:%M:%S.%f")
         proc_duration = time.time() - startproc
+        duration = "{:.2f}".format(proc_duration)
     except Exception as error:
         return make_response(error,500)
-    run_summary = f'run dataset analyzer from {startprocstr} to {endprocstr}, for the duration of {proc_duration} sec'
+    run_summary = f'run dataset analyzer from {startprocstr} to {endprocstr}, for the duration of {duration} sec'
     
     return make_response(jsonify(rundata["cshistogramcharts"],
                                  rundata["cshistogramtitles"],
@@ -229,14 +231,21 @@ def run_analysis_persist():
         query = 'INSERT INTO  ApplicationData (SessionId,DataobjectName,DataobjectDescription,DataobjectValue,DataobjectAttributes) '
         query += 'VALUES (?,?,?,?,?)'
         
-        t = (guid,'processed_observations','processed_observations',observations.to_json(),attributes)
+        #t = (guid,'processed_observations','processed_observations',observations.to_json(),attributes)
+        t = (guid,'processed_observations','processed_observations',f'savedfdb_{guid}',attributes)
         c.execute(query,t)
         
         t = (guid,'processed_labels','processed_labels',labels.to_json(),'')
         c.execute(query,t)
         conn.commit();
 
-        endproc = time.time()
+        #save dataframe as separate table with sessionid name
+        engine = create_engine(f'sqlite:///{SAVEDFDB_PATH}', echo=False)
+        sqlite_connection = engine.connect()
+        sqlite_table = guid
+        observations.to_sql(sqlite_table, sqlite_connection, if_exists='fail')
+        sqlite_connection.close()
+        
         endprocstr = datetime.now().strftime("%H:%M:%S.%f")
         proc_duration = time.time() - startproc
         duration = "{:.2f}".format(proc_duration)
@@ -249,6 +258,8 @@ def run_analysis_persist():
     except Exception as error:
         if (conn):
             conn.rollback();
+        if (sqlite_connection):
+            sqlite_connection.rollback();    
         return make_response(error,500)
     finally:
         if (conn):
@@ -308,7 +319,6 @@ def processdataall():
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
 
-        t = (1,)
         query = 'select ad.SessionId, a.Name, a.Description,'
         query += 'ag.Name, ag.DisplayName, t.Name,'
         query += 't.Description, ad.DataobjectName,'
@@ -332,30 +342,97 @@ def processdataall():
     except:
         return make_response(jsonify(sys.exc_info()[0]), 500)
 
-@app.route('/api/wineanalytics/trainmodel')
+@app.route('/api/wineanalytics/runanalyzer/trainmodel')
 def train_model():
-    query_parameters = request.args
-    algorithm = query_parameters.get('algorithm')
-    
-    REDWINE_PATH = f'{os.getcwd()}/WineQuality_RestAPI/datasets/winequality-red.csv'
-    WHITEWINE_PATH = f'{os.getcwd()}/WineQuality_RestAPI/datasets/winequality-white.csv'
-
-    rundata = None  # should be a dictionary
-    dtanalyzer = None
-
     try:
+        query_parameters = request.args
+        algorithm = query_parameters.get('algorithm')
+        sessionId = query_parameters.get('sessionid')
+        
+        rundata = None  # should be a dictionary
+        
+        # get from database observations (X.train) and labels (y.train)
+        XTrainDataFrame = None
+        yTrainArrow = None
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        t = (sessionId,)
+        query = 'SELECT DataobjectName,DataobjectDescription,DataobjectValue,DataobjectAttributes '
+        query += 'FROM ApplicationData '
+        query += 'WHERE SessionId = ?'
+        c.execute(query,t)
+        rows = c.fetchall()
+
+        observations = json.loads(rows[0]["DataobjectValue"])
+        labels = json.loads(rows[1]["DataobjectValue"])
+
+        #XTrainDataFrame = pd.json_normalize(observations)
+        XTrainDataFrame = pd.json_normalize(observations)
+        yTrainArrow = np.array(labels)
+
         if (algorithm == "decision-tree"):
-            dtanalyzer = DecisionTreeAnalyzer(REDWINE_PATH,WHITEWINE_PATH)  
+            dtanalyzer = DecisionTreeAnalyzer(XTrainDataFrame,yTrainArrow)
             dtanalyzer.scale_dataset()
-            X_test,y_pred = dtanalyzer.train_and_fit_model()
+            dtanalyzer.train_and_fit_model()
             dtanalyzer.calculate_accuracy()
             dtanalyzer.calculate_confusion_matrix()
             dtanalyzer.save_model()
+    
     except Exception as error:
         return make_response(error,500)
 
     return make_response(jsonify(rundata),200)
 
+@app.route('/api/wineanalytics/runanalyzer/persist/dataframe')
+def get_saved_dataframe():
+    try:
+        query_parameters = request.args
+        sessionId = query_parameters.get('sessionid')
+        
+        # get from database observations (X.train) and labels (y.train)
+        conn = sqlite3.connect(DB_PATH)
+        #conn.row_factory = sqlite3.Row
+        #c = conn.cursor()
+
+        # t = (sessionId,)
+        query = 'SELECT DataobjectValue FROM ApplicationData '
+        query += 'WHERE DataobjectName = \'processed_observations\' '
+        query += f'AND SessionId = \'{sessionId}\''
+        # c.execute(query,t)
+        # rows = c.fetchall()
+
+        # df = pd.read_sql_query(query, conn)
+
+        jrow = '{'
+        jrow += '"fixed acidity": {"0": 7.4,"1": 7.4,"2": 7.8,"3": 7.8,"4": 11.2,"5": 7.4,"6": 7.9,"7": 7.3,"8": 7.8,"9": 7.5},'
+        jrow += '"volatile acidity": {"0": 0.7,"1": 0.7,"2": 0.88,"3": 0.76,"4": 0.28,"5": 0.66,"6": 0.6,"7": 0.65,"8": 0.58,"9": 0.5},'
+        jrow += '"citric acid": {"0": 0.0,"1": 0.0,"2": 0.0,"3": 0.04,"4": 0.56,"5": 0.0,"6": 0.06,"7": 0.0,"8": 0.02,"9": 0.36}'    
+        jrow += '}'
+        
+        jobj = json.loads(jrow)
+        jdic = {}
+        jdic["fixed acidity"] = [x[1] for x in jobj["fixed acidity"]]
+        jdic["volatile acidity"] = [x[1] for x in jobj["volatile acidity"]]
+        jdic["citric acid"] = [x[1] for x in jobj["citric acid"]]
+
+        df = pd.DataFrame.from_dict(jdic)
+
+        # Verify that result of SQL query is stored in the dataframe
+        print(df.head())
+
+        #observations = json.loads(rows[0]["DataobjectValue"])
+        #labels = json.loads(rows[1]["DataobjectValue"])
+
+        #XTrainDataFrame = pd.json_normalize(observations)
+        #df = pd.json_normalize(observations)
+        #yTrainArrow = np.array(labels)
+    
+    except Exception as error:
+        return make_response(error,500)
+
+    return make_response(jsonify(df),200)
 
 @app.route('/api/wineanalytics/chathub')
 def chat():

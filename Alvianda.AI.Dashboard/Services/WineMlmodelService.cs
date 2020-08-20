@@ -16,7 +16,7 @@ namespace Alvianda.AI.Dashboard.Services
     {
         Task<Tuple<string, IList<Algorithm>,string>> GetAlgorithmList(string algorithmType);
         Task<Tuple<string, IList<WorkingSession>, string>> GetWorkingSessionList(int applicationId);
-        Task<Dictionary<string, string>> RunMachineLearningModel(string algorithm);
+        Task<Dictionary<string, string>> RunMachineLearningModel(string algorithm, string SessionId);
         //Task<List<WinesetEntry>> GetPaginatedResult(string logCategory, int currentPage, int pageSize = 10);
         //Task<int> GetCount(string wineCategory);
     }
@@ -121,13 +121,13 @@ namespace Alvianda.AI.Dashboard.Services
             }
         }
 
-        public async Task<Dictionary<string, string>> RunMachineLearningModel(string algorithm)
+        public async Task<Dictionary<string, string>> RunMachineLearningModel(string algorithm, string sessionId)
         {
             var responseDictionary = new Dictionary<string, string>();
             try
             {
-                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/trainmodel?algorithm={algorithm}";
-                var responseString = await base.HttpGetRequest(serviceEndpoint);
+                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/trainmodel?algorithm={algorithm}&sessionid={sessionId}";
+                var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
 
                 IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Item2) as IList<JToken>;
 

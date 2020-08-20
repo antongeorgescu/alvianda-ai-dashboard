@@ -151,7 +151,7 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
                 isModelDataAvailable = false;
                 waitMessage = "Wait while we are running the selected algorithm and analyze the model...";
 
-                var responseDictionary = await mlmodelService.RunMachineLearningModel(SelectedAlgorithm).ConfigureAwait(true);
+                var responseDictionary = await mlmodelService.RunMachineLearningModel(SelectedAlgorithm, SelectedSessionId).ConfigureAwait(true);
                 if (responseDictionary.ContainsKey("error"))
                 {
                     messages.Add(new Tuple<string, string>("error", responseDictionary["error"]));

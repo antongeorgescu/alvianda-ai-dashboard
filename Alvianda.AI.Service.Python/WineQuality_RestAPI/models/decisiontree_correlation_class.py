@@ -19,8 +19,9 @@ class DecisionTreeAnalyzer(BaseAlgorithmClass):
     def __init__(self,merged_dataset,field_list):
         self.merged_data = merged_dataset
         self.fields = field_list
-        self.y = merged_data['quality']
-        super()._init__(merged_dataset,field_list)
+        self.y = field_list
+        #super()._init__(merged_dataset,field_list)
+        super().__init__(self.merged_data,self.fields)
     
     def scale_dataset(self,scaler = 'MINMAXSCALER'):
         # two types of scalers: MINMAXSCALER, STANDARDSCALER
@@ -36,14 +37,14 @@ class DecisionTreeAnalyzer(BaseAlgorithmClass):
             dtree = DecisionTreeClassifier(max_depth=10, random_state=101,
                                         max_features = None, min_samples_leaf = 30)
 
-            startproc = time.time()
+            #startproc = time.time()
 
             # fit the model with training data
             dtree.fit(self.X_train, self.y_train)
 
             # predict the wine rankings for the test data set
             self.y_pred = dtree.predict(self.X_test)
-            proctime = time.time() - startproc
+            #proctime = time.time() - startproc
 
             return self.X_test,self.y_pred
         except:
@@ -51,14 +52,14 @@ class DecisionTreeAnalyzer(BaseAlgorithmClass):
             raise Exception(self.last_error)
 
     def about_confusion_matrix(self):
-        result = super().about_confusion_matrix()
+        return super().about_confusion_matrix()
 
     def calculate_confusion_matrix(self):
         # Get the confusion matrix
-        result = super().calculate_confusion_matrix()
+        return super().calculate_confusion_matrix()
     
     def save_model(self):
-        result = super().save_model()
+        return super().save_model()
     
     def get_model(self,model_id):
         result = super().get_model()    

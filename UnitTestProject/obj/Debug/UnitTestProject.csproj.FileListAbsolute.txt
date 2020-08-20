@@ -15,4 +15,3 @@ C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\Unit
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\obj\Debug\UnitTestProject.csproj.CopyComplete
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\obj\Debug\UnitTestProject.dll
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\obj\Debug\UnitTestProject.pdb
-C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\obj\Debug\UnitTestProject.csprojAssemblyReference.cache

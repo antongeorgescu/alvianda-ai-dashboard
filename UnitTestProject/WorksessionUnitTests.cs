@@ -31,5 +31,49 @@ namespace UnitTestProject
             Assert.IsTrue(jsonDetails[0]["Description"].Value<string>().Contains("test 1122"));
 
         }
+
+        [TestMethod]
+        public async Task RunTrainModel()
+        {
+            HttpClient _httpClient = new HttpClient();
+            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel?algorithm=decision-tree&sessionid=85ce9e27-b727-4a95-b218-1a4a9e0bb6a9";
+            var resultCode = string.Empty;
+            var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
+            
+            var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+            if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
+            {
+                responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
+                var result = Uglify.HtmlToText(responseString);
+                resultCode = result.Code.Replace('"', ' ');
+                Assert.IsFalse(resultCode != string.Empty);
+            }
+
+            var jsonDetails = JToken.Parse(responseString);
+            Assert.IsTrue(jsonDetails[0]["Description"].Value<string>().Contains("test 1122"));
+
+        }
+
+        [TestMethod]
+        public async Task GetSavedDataFrame()
+        {
+            HttpClient _httpClient = new HttpClient();
+            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/persist/dataframe?sessionid=85ce9e27-b727-4a95-b218-1a4a9e0bb6a9";
+            var resultCode = string.Empty;
+            var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
+
+            var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+            if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
+            {
+                responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
+                var result = Uglify.HtmlToText(responseString);
+                resultCode = result.Code.Replace('"', ' ');
+                Assert.IsFalse(resultCode != string.Empty);
+            }
+
+            var jsonDetails = JToken.Parse(responseString);
+            Assert.IsTrue(jsonDetails[0]["Description"].Value<string>().Contains("test 1122"));
+
+        }
     }
 }
