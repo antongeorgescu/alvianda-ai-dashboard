@@ -31,7 +31,6 @@ def validate():
     
     if request.method == 'GET':
         d = f'validate analytics controller method=GET at {current_time}'
-        snowUrl = url_for('static',filename='John-Snow.jpg')
         return make_response(jsonify(d), 200)
     
     if request.method == 'POST':
