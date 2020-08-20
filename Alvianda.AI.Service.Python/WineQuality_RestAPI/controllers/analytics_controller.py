@@ -268,6 +268,7 @@ def run_analysis_persist():
 
 @app.route('/api/wineanalytics/processdata', methods=['GET', 'POST','DELETE'])
 def processdata():
+    # FIXME: Pass the right parameters to endpoint
     try:
         if request.method == 'GET':
             sessionId = request.args.get('sessionid', default='', type=str)
@@ -342,6 +343,12 @@ def processdataall():
     except:
         return make_response(jsonify(sys.exc_info()[0]), 500)
 
+@app.route('/api/wineanalytics/runanalyzer/about_confusion_matrix')
+def about_confusion_matrix():
+    about_file_path = f'{os.getcwd()}/WineQuality_RestAPI/models/about_confusion_matrix.txt'
+    f = open(about_file_path, "r")
+    return make_response(f.read(),200)
+
 @app.route('/api/wineanalytics/runanalyzer/trainmodel')
 def train_model():
     try:
@@ -352,87 +359,76 @@ def train_model():
         rundata = None  # should be a dictionary
         
         # get from database observations (X.train) and labels (y.train)
-        XTrainDataFrame = None
-        yTrainArrow = None
-        conn = sqlite3.connect(DB_PATH)
-        conn.row_factory = sqlite3.Row
-        c = conn.cursor()
-
-        t = (sessionId,)
-        query = 'SELECT DataobjectName,DataobjectDescription,DataobjectValue,DataobjectAttributes '
-        query += 'FROM ApplicationData '
-        query += 'WHERE SessionId = ?'
-        c.execute(query,t)
-        rows = c.fetchall()
-
-        observations = json.loads(rows[0]["DataobjectValue"])
-        labels = json.loads(rows[1]["DataobjectValue"])
-
-        #XTrainDataFrame = pd.json_normalize(observations)
-        XTrainDataFrame = pd.json_normalize(observations)
-        yTrainArrow = np.array(labels)
-
+        response, observations_name, labels_name, observations, labels = read_saved_dataframe_db(sessionId) 
+        if response != "Ok":
+            raise Exception(response)
+        
+        XObservations = observations
+        yLabels = labels
+        
         if (algorithm == "decision-tree"):
-            dtanalyzer = DecisionTreeAnalyzer(XTrainDataFrame,yTrainArrow)
+            dtanalyzer = DecisionTreeAnalyzer(XObservations,yLabels)
             dtanalyzer.scale_dataset()
             dtanalyzer.train_and_fit_model()
-            dtanalyzer.calculate_accuracy()
-            dtanalyzer.calculate_confusion_matrix()
-            dtanalyzer.save_model()
-    
+            accuracy = dtanalyzer.calculate_accuracy()
+            cm = dtanalyzer.calculate_confusion_matrix()
+            savedmodel = dtanalyzer.save_model()
+
+        rundata = accuracy +'|'+ str(cm) + '|' + savedmodel
+        return make_response(jsonify(rundata),200)
     except Exception as error:
         return make_response(error,500)
 
-    return make_response(jsonify(rundata),200)
+def read_saved_dataframe_db(sessionId):
+    try:
+        # get from database observations (X.train) and labels (y.train)
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+        query = 'SELECT DataobjectName, DataobjectAttributes, DataobjectValue FROM ApplicationData '
+        query += f'WHERE SessionId = \'{sessionId}\''
+        c.execute(query)
+        rows = c.fetchall()
+        conn.close()
+
+        observations_name = rows[0]['DataobjectName']
+        labels_name = rows[1]['DataobjectName']
+        
+        jdata = json.loads(rows[1]["DataobjectValue"])
+        labels = np.array(list(jdata.values()), dtype=int)
+                
+        conn2 = sqlite3.connect(SAVEDFDB_PATH)
+        query = f'SELECT * FROM \'{sessionId}\''
+        observations = pd.read_sql_query(query, conn2)
+        conn2.close()      
+
+        # Verify that result of SQL query is stored in the dataframe
+        print(observations.head())
+
+        return "Ok",observations_name,labels_name,observations,labels
+    
+    except Exception as error:
+        return error
 
 @app.route('/api/wineanalytics/runanalyzer/persist/dataframe')
-def get_saved_dataframe():
+def get_saved_dataframe_db():
     try:
         query_parameters = request.args
         sessionId = query_parameters.get('sessionid')
         
-        # get from database observations (X.train) and labels (y.train)
-        conn = sqlite3.connect(DB_PATH)
-        #conn.row_factory = sqlite3.Row
-        #c = conn.cursor()
+        response, observations_name, labels_name, observations, labels = read_saved_dataframe_db(sessionId)     
 
-        # t = (sessionId,)
-        query = 'SELECT DataobjectValue FROM ApplicationData '
-        query += 'WHERE DataobjectName = \'processed_observations\' '
-        query += f'AND SessionId = \'{sessionId}\''
-        # c.execute(query,t)
-        # rows = c.fetchall()
-
-        # df = pd.read_sql_query(query, conn)
-
-        jrow = '{'
-        jrow += '"fixed acidity": {"0": 7.4,"1": 7.4,"2": 7.8,"3": 7.8,"4": 11.2,"5": 7.4,"6": 7.9,"7": 7.3,"8": 7.8,"9": 7.5},'
-        jrow += '"volatile acidity": {"0": 0.7,"1": 0.7,"2": 0.88,"3": 0.76,"4": 0.28,"5": 0.66,"6": 0.6,"7": 0.65,"8": 0.58,"9": 0.5},'
-        jrow += '"citric acid": {"0": 0.0,"1": 0.0,"2": 0.0,"3": 0.04,"4": 0.56,"5": 0.0,"6": 0.06,"7": 0.0,"8": 0.02,"9": 0.36}'    
-        jrow += '}'
-        
-        jobj = json.loads(jrow)
-        jdic = {}
-        jdic["fixed acidity"] = [x[1] for x in jobj["fixed acidity"]]
-        jdic["volatile acidity"] = [x[1] for x in jobj["volatile acidity"]]
-        jdic["citric acid"] = [x[1] for x in jobj["citric acid"]]
-
-        df = pd.DataFrame.from_dict(jdic)
+        if response != "Ok":
+            raise Exception(response)
 
         # Verify that result of SQL query is stored in the dataframe
-        print(df.head())
+        print(observations.head())
 
-        #observations = json.loads(rows[0]["DataobjectValue"])
-        #labels = json.loads(rows[1]["DataobjectValue"])
+        run_summary = f'[sessionid:{sessionId}] retrieved observations [{observations_name}] and labels [{labels_name}]'
+        return make_response(run_summary,200)
 
-        #XTrainDataFrame = pd.json_normalize(observations)
-        #df = pd.json_normalize(observations)
-        #yTrainArrow = np.array(labels)
-    
     except Exception as error:
         return make_response(error,500)
-
-    return make_response(jsonify(df),200)
 
 @app.route('/api/wineanalytics/chathub')
 def chat():

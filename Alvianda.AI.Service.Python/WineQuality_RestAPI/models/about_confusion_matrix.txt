@@ -1,0 +1,38 @@
+A confusion matrix is a table that is often used to describe the performance of a classification model (or "classifier") 
+on a set of test data for which the true values are known.
+
+Here is a set of the most basic terms, which are whole numbers (not rates):
+1. true positives (TP): These are cases in which we predicted "yes" where it is actually "yes".
+2. true negatives (TN): We predicted no, and it is actually "no".
+3. false positives (FP): We predicted "yes", and was actually "no" (Also known as a "Type I error."
+4. false negatives (FN): We predicted "no", and was actually "yes". (Also known as a "Type II error.")
+ 
+This is a list of rates that are often computed from a confusion matrix for a binary classifier:
+
+**Accuracy**: Overall, how often is the classifier correct? 
+ <br>&emsp;accuracy = (TP+TN)/total
+
+**Misclassification Rate**: Overall, how often is it wrong? 
+ <br>&emsp;misrate = (FP+FN)/total
+ <br>&emsp;equivalent to 1 minus Accuracy
+ <br>&emsp;also known as "Error Rate"
+
+**True Positive Rate**: When it's actually yes, how often does it predict yes? 
+ <br>&emsp;tprate = TP/actual_yes
+ <br>&emsp;also known as "Sensitivity" or "Recall"
+
+**False Positive Rate**: When it's actually no, how often does it predict yes?
+ <br>&emsp;fprate = FP/actual_no
+
+**True Negative Rate**: When it's actually no, how often does it predict no? 
+ <br>&emsp;tnrate = TN/actual_no
+ <br>&emsp;equivalent to 1 minus False Positive Rate
+ <br>&emsp;also known as "Specificity"
+
+**Precision**: When it predicts yes, how often is it correct? 
+ <br>&emsp;precision = TP/predicted_yes
+
+**Prevalence**: How often does the yes condition actually occur in our sample? 
+ <br>&emsp;prevalence = actual_yes/total
+ 
+![Confusion Matrix - Theoretical Foundation](https://raw.githubusercontent.com/antongeorgescu/machine-learning-documentation/master/images/Confusion-Matrix-2.PNG) 

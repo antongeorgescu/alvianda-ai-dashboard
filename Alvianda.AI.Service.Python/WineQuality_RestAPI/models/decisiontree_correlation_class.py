@@ -16,12 +16,11 @@ from sklearn.preprocessing import StandardScaler
 from WineQuality_RestAPI.models.base_algorithm_class import BaseAlgorithmClass
 
 class DecisionTreeAnalyzer(BaseAlgorithmClass):
-    def __init__(self,merged_dataset,field_list):
+    def __init__(self,merged_dataset,labels):
         self.merged_data = merged_dataset
-        self.fields = field_list
-        self.y = field_list
+        self.y = labels
         #super()._init__(merged_dataset,field_list)
-        super().__init__(self.merged_data,self.fields)
+        super().__init__(self.merged_data)
     
     def scale_dataset(self,scaler = 'MINMAXSCALER'):
         # two types of scalers: MINMAXSCALER, STANDARDSCALER
@@ -51,9 +50,6 @@ class DecisionTreeAnalyzer(BaseAlgorithmClass):
             self.last_error = sys.exc_info()[1]
             raise Exception(self.last_error)
 
-    def about_confusion_matrix(self):
-        return super().about_confusion_matrix()
-
     def calculate_confusion_matrix(self):
         # Get the confusion matrix
         return super().calculate_confusion_matrix()
@@ -62,4 +58,4 @@ class DecisionTreeAnalyzer(BaseAlgorithmClass):
         return super().save_model()
     
     def get_model(self,model_id):
-        result = super().get_model()    
+        return super().get_model(model_id)    
