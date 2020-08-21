@@ -487,8 +487,8 @@ def loadall_train_model():
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
-        query = 'SELECT SessionId,DataobjectTypeId,DataobjectName,DataobjectDescription,DataobjectBlob '
-        query += 'FROM Application Data WHERE DataobjectTypeId = 3'
+        query = 'SELECT SessionId,DataobjectName,DataobjectDescription,DataobjectBlob '
+        query += 'FROM ApplicationData WHERE DataobjectTypeId = 3'
        
         cursor.execute(query)
         records = cursor.fetchall()
@@ -497,9 +497,9 @@ def loadall_train_model():
         for record in records:
             # a Python object (dict):
             result = {
-                "sessionid": record['SessionId'],
-                "modelid": record['DataobjectName'],
-                "modeldescription": record['DataobjectDescription']
+                "sessionid": record[0],
+                "modelid": record[1],
+                "modeldescription": record[2]
             }
             results.append(result)
 
