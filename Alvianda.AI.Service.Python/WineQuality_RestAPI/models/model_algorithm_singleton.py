@@ -6,10 +6,9 @@ class ModelAlgorithmSingleton:
             return
         def __set_session__(self,sessionid):
             self.sessionid = sessionid
-        def __set_model__(self,model,model_name):
+        def __set_model__(self,model,model_id):
             self.model = model
-            self.model_nm = model_name
-            self.model_id = str(uuid.uuid4())
+            self.model_id = model_id
             return self.model_id
         def __get_model__(self):
             return self.model, self.model_id

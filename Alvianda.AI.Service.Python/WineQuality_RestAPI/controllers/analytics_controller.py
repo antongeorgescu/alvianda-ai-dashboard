@@ -380,26 +380,30 @@ def train_model():
         model, model_id = dtanalyzer.get_model()
         modelalg.set_model(model,model_id)
 
-        rundata = accuracy +'|'+ str(cm)
+        rundata = accuracy +'|'+ str(cm) + f'|modelid:{model_id}'
         return make_response(jsonify(rundata),200)
     except Exception as error:
         return make_response(error,500)
 
-@app.route('/api/wineanalytics/runanalyzer/trainmodel/save')
+@app.route('/api/wineanalytics/runanalyzer/trainmodel/save',methods=['POST'])
 def save_train_model():
     try:
         runinfo = None
 
-        sessionid = request.form.get('sessionid')
-        modeldescription = request.form.get('modeldescription')
+        sessionid = request.json['sessionid']
+        modelid = request.json['modelid']
+        modeldescription = request.json['modeldescription']
         
         # retrieve model from temporary holding class
         modelalg = ModelAlgorithmSingleton()
         trainmodel, trainmodel_id = modelalg.get_model()
 
+        if modelid != trainmodel_id:
+            raise Exception('ModelAlgorithSingleton class corrupted. Abort execution.')
+
         #TODO: will remove the file save, and leave only db save
         # dump model in a temporary file
-        filename = f'{os.getcwd()}/WineQuality_RestAPI/model_files/dt_{trainmodel_id}.sav'
+        filename = f'{os.getcwd()}/WineQuality_RestAPI/model_files/{trainmodel_id}.sav'
         
         writefile = open(filename, 'wb')
         pickle.dump(trainmodel, writefile)

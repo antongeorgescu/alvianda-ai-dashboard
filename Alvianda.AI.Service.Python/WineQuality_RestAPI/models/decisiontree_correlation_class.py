@@ -47,7 +47,7 @@ class DecisionTreeAnalyzer(BaseAlgorithmClass):
             self.y_pred = dtree_model.predict(self.X_test)
             #proctime = time.time() - startproc
 
-            model_name = f'decision_tree_{modelid}'
+            model_name = f'dt_{modelid}'
 
             super().set_model(dtree_model,model_name)
             return self.X_test,self.y_pred
