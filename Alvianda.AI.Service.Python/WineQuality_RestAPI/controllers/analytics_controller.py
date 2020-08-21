@@ -16,12 +16,15 @@ import uuid
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
+import pickle
 
 from WineQuality_RestAPI.models.decisiontree_correlation_class import DecisionTreeAnalyzer
 from WineQuality_RestAPI.models.data_preparation_singleton import DataPreparationSingleton
+from WineQuality_RestAPI.models.model_algorithm_singleton import ModelAlgorithmSingleton
 
 DB_PATH = f'{os.getcwd()}/Database/Sqlite/DatasetMLAnalytics.db'
 SAVEDFDB_PATH = f'{os.getcwd()}/Database/Sqlite/SavedDataframes.db'
+mlModelAlgorithm = None
 
 @app.route('/api/wineanalytics/validate', methods=['GET','POST'])
 def validate():
@@ -93,7 +96,7 @@ def workingsessiondetails():
 
         t = (sessionId,)
         c.execute('SELECT Description, Notes, CreatedOn from WorkingSession WHERE SessionId=?', t)
-        row = c.fetchone();
+        row = c.fetchone()
         
         result = json.dumps(dict(row))
         return result
@@ -227,16 +230,16 @@ def run_analysis_persist():
         t = (guid,1,99,description,notes)
         c.execute(query,t)
 
-        query = 'INSERT INTO  ApplicationData (SessionId,DataobjectName,DataobjectDescription,DataobjectValue,DataobjectAttributes) '
+        query = 'INSERT INTO  ApplicationData (SessionId,DataobjectTypeId,DataobjectName,DataobjectDescription,DataobjectValue,DataobjectAttributes) '
         query += 'VALUES (?,?,?,?,?)'
         
         #t = (guid,'processed_observations','processed_observations',observations.to_json(),attributes)
-        t = (guid,'processed_observations','processed_observations',f'savedfdb_{guid}',attributes)
+        t = (guid,1,'processed_observations','processed_observations',f'savedfdb_{guid}',attributes)
         c.execute(query,t)
         
-        t = (guid,'processed_labels','processed_labels',labels.to_json(),'')
+        t = (guid,2,'processed_labels','processed_labels',labels.to_json(),'')
         c.execute(query,t)
-        conn.commit();
+        conn.commit()
 
         #save dataframe as separate table with sessionid name
         engine = create_engine(f'sqlite:///{SAVEDFDB_PATH}', echo=False)
@@ -252,11 +255,11 @@ def run_analysis_persist():
         return make_response(jsonify(run_summary),200)
     except sqlite3.Error as error:
         if (conn):
-            conn.rollback();
+            conn.rollback()
         return make_response(f'Failed to insert data into sqlite table: {error}',500)
     except Exception as error:
         if (conn):
-            conn.rollback();
+            conn.rollback()
         if (sqlite_connection):
             sqlite_connection.rollback();    
         return make_response(error,500)
@@ -368,15 +371,66 @@ def train_model():
         if (algorithm == "decision-tree"):
             dtanalyzer = DecisionTreeAnalyzer(XObservations,yLabels)
             dtanalyzer.scale_dataset()
-            dtanalyzer.train_and_fit_model()
+            dtanalyzer.train_and_fit_model(sessionId)
             accuracy = dtanalyzer.calculate_accuracy()
             cm = dtanalyzer.calculate_confusion_matrix()
-            savedmodel = dtanalyzer.save_model()
+        
+        # temporary hold the model in ModelAlgorithmSingleton
+        modelalg = ModelAlgorithmSingleton()
+        model, model_id = dtanalyzer.get_model()
+        modelalg.set_model(model,model_id)
 
-        rundata = accuracy +'|'+ str(cm) + '|' + savedmodel
+        rundata = accuracy +'|'+ str(cm)
         return make_response(jsonify(rundata),200)
     except Exception as error:
         return make_response(error,500)
+
+@app.route('/api/wineanalytics/runanalyzer/trainmodel/save')
+def save_train_model():
+    try:
+        runinfo = None
+
+        sessionid = request.form.get('sessionid')
+        modeldescription = request.form.get('modeldescription')
+        
+        # retrieve model from temporary holding class
+        modelalg = ModelAlgorithmSingleton()
+        trainmodel, trainmodel_id = modelalg.get_model()
+
+        #TODO: will remove the file save, and leave only db save
+        # dump model in a temporary file
+        filename = f'{os.getcwd()}/WineQuality_RestAPI/model_files/dt_{trainmodel_id}.sav'
+        
+        writefile = open(filename, 'wb')
+        pickle.dump(trainmodel, writefile)
+        writefile.close()
+
+        # save the model in binary format to sqlite BLOB record
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        query = 'INSERT INTO ApplicationData (SessionId,DataobjectTypeId,'
+        query += 'DataobjectName,DataobjectDescription,DataobjectBlob) '
+        query += 'VALUES (?,?,?,?,?)'
+
+        readfile = open(filename, 'rb')
+        btrainmodel = readfile.read()
+        readfile.close()
+        
+        # Convert data into tuple format
+        data_tuple = (sessionid,3,trainmodel_id, modeldescription, btrainmodel)
+        cursor.execute(query, data_tuple)
+        conn.commit()
+        cursor.close()
+
+        runinfo = f'Saved into database trained model {trainmodel_id} and temporary saved in file system at {filename}'
+        return make_response(runinfo,200)
+    except Exception as error:
+        return make_response(error,500)
+    finally:
+        if (conn):
+            conn.close()
+
 
 def read_saved_dataframe_db(sessionId):
     try:

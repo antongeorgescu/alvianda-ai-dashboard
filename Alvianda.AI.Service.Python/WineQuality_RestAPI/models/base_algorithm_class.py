@@ -18,6 +18,8 @@ class BaseAlgorithmClass:
     fields = None
     y_test = None
     y_pred = None
+    trainmodel = None
+
     def __init__(self,merged_dataset):
         self.merged_data = merged_dataset
         self.fields = list(self.merged_data.columns[1:-2])
@@ -57,7 +59,7 @@ class BaseAlgorithmClass:
             rundata = cm
             cm = cm.astype('float') / cm.sum(axis=1)[:, np.newaxis]
 
-            sns.heatmap(cm, annot=True, fmt='.2g');
+            sns.heatmap(cm, annot=True, fmt='.2g')
             plt.title('Confusion matrix of the KNN classifier')    
             plt.tight_layout()
             return rundata
@@ -86,17 +88,9 @@ class BaseAlgorithmClass:
             self.last_error = sys.exc_info()[1]
             raise Exception(self.last_error)
 
-    #TODO: Finish this method
-    def save_model(self):
-        try:
-            # save model
-            model_id = '872135125127351763517653'
-            rundata = f'Saved model with id: {model_id}'
-            return rundata
-        except:
-            self.last_error = sys.exc_info()[1]
-            raise Exception(self.last_error)
-    
-    #TODO: Finish this method
-    def get_model(self,model_id):
-        return None  
+    def set_model(self,model,model_name):
+        self.trainmodel = model
+        self.modelname = model_name 
+
+    def get_model(self):
+        return self.trainmodel, self.modelname

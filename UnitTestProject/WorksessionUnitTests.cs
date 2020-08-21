@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -114,7 +115,10 @@ namespace UnitTestProject
             }
 
             var jsonDetails = JToken.Parse(responseString);
-            Assert.IsTrue(jsonDetails.Value<string>().Split('|').Length == 2);
+
+            Trace.Write(jsonDetails.Value<string>());
+
+            Assert.IsTrue(jsonDetails.Value<string>().Split('|').Length == 3);
 
         }
 
