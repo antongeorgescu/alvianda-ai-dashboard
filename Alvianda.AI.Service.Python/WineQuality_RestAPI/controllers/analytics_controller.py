@@ -435,6 +435,49 @@ def save_train_model():
         if (conn):
             conn.close()
 
+@app.route('/api/wineanalytics/runanalyzer/trainmodel/load',methods=['GET'])
+def load_train_model():
+    try:
+        runinfo = None
+
+        modelId = request.args.get('modelid', default='', type=str)
+        
+        if modelId == '':
+            raise Exception('Unable to read model_id parameter.Abort the execution.')
+
+        # save the model in binary format to sqlite BLOB record
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        query = 'SELECT SessionId,DataobjectTypeId,DataobjectName,DataobjectDescription,DataobjectBlob '
+        query += 'FROM Application Data WHERE DataobjectTypeId = 3 AND DataobjectName = ?'
+       
+        cursor.execute(query, (modelId,))
+        record = cursor.fetchone()
+        
+        # a Python object (dict):
+        result = {
+            "sessionid": record['SessionId'],
+            "modelid": record['DataobjectName'],
+            "modelblob": record['DataobjectBlob'],
+            "modeldescription": record['DataobjectDescription']
+        }
+
+        # convert into JSON:
+        runinfo = json.dumps(result)
+
+        cursor.close()
+
+        modelalg = ModelAlgorithmSingleton()
+        modelalg.set_model(modelblob,modelId)
+
+        return make_response(runinfo,200)
+    except Exception as error:
+        return make_response(error,500)
+    finally:
+        if (conn):
+            conn.close()
+
 
 def read_saved_dataframe_db(sessionId):
     try:
