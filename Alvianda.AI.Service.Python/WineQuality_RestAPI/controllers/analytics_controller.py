@@ -469,7 +469,7 @@ def load_train_model():
         cursor.close()
 
         modelalg = ModelAlgorithmSingleton()
-        modelalg.set_model(modelblob,modelId)
+        modelalg.set_model(result['modelblob'],result['modelid'])
 
         return make_response(runinfo,200)
     except Exception as error:
@@ -478,6 +478,42 @@ def load_train_model():
         if (conn):
             conn.close()
 
+@app.route('/api/wineanalytics/runanalyzer/trainmodel/load/all',methods=['GET'])
+def loadall_train_model():
+    try:
+        runinfo = None
+
+        # save the model in binary format to sqlite BLOB record
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        query = 'SELECT SessionId,DataobjectTypeId,DataobjectName,DataobjectDescription,DataobjectBlob '
+        query += 'FROM Application Data WHERE DataobjectTypeId = 3'
+       
+        cursor.execute(query)
+        records = cursor.fetchall()
+        
+        results = []
+        for record in records:
+            # a Python object (dict):
+            result = {
+                "sessionid": record['SessionId'],
+                "modelid": record['DataobjectName'],
+                "modeldescription": record['DataobjectDescription']
+            }
+            results.append(result)
+
+        # convert into JSON:
+        runinfo = json.dumps(results)
+
+        cursor.close()
+
+        return make_response(runinfo,200)
+    except Exception as error:
+        return make_response(error,500)
+    finally:
+        if (conn):
+            conn.close()
 
 def read_saved_dataframe_db(sessionId):
     try:
