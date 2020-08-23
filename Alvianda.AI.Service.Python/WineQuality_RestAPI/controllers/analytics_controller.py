@@ -460,42 +460,6 @@ def save_train_model():
         return make_response(runinfo,200)
     except Exception as error:
         return make_response(error,500)
-    
-# def load_model(model_id):
-
-#     # retrieve model from temporary holding class
-#     modelalg = AlgorithmModelSingleton()
-#     modelval, modelid = modelalg.get_model()
-
-#     if modelid is None:
-#         # get the model in binary format from sqlite BLOB record
-#         conn = sqlite3.connect(DB_PATH)
-#         cursor = conn.cursor()
-        
-#         query = 'SELECT ad.DataobjectName,ad.DataobjectDescription,ad.DataobjectBlob ' 
-#         query += 'FROM ApplicationData ad '
-#         query += 'WHERE ad.DataobjectTypeId = 3 AND ad.DataobjectName = ?'
-        
-#         cursor.execute(query, (model_id,))
-#         records = cursor.fetchall()
-#         conn.close()
-
-#         # a Python object (dict):
-#         result = {
-#             "sessionid": records[0][0],
-#             "modelid": records[0][1],
-#             "modeldescription": records[0][2]
-#         }
-        
-#         modelval = records[0][3]
-#     else:
-#         result = {
-#             "sessionid": records[0][0],
-#             "modelid": records[0][1],
-#             "modeldescription": records[0][2]
-#         }
-
-#     return json.dumps(result),modelval
 
 @app.route('/api/wineanalytics/runanalyzer/trainmodel/load',methods=['GET'])
 def load_train_model():
@@ -507,12 +471,13 @@ def load_train_model():
 
         # retrieve model from temporary holding class
         modelalg = AlgorithmModelSingleton()
-        modelid = modelalg.model_id
+        modelalg.model_id = modelId
+        modelalg.dbpath = DB_PATH
         description = modelalg.description
         modelblob = modelalg.modelbinary
 
         modelinfo = {
-            "model_id" : modelid,
+            "model_id" : modelId,
             "description" : description,
             "size" : len(modelblob)
         }
@@ -526,6 +491,7 @@ def load_train_model():
     
 @app.route('/api/wineanalytics/runanalyzer/trainmodel/predict',methods=['POST'])
 def model_predict():
+    # REF: https://www.kaggle.com/prmohanty/python-how-to-save-and-load-ml-models
     try:
         runinfo = None
 
@@ -539,7 +505,16 @@ def model_predict():
         modelalg.dbpath = DB_PATH
         modelbinary = modelalg.modelbinary
         
-        prediction = modelbinary.predict(observations)
+        #TODO: Finish this part of the code
+        lstobs =  list(map(float,observations.split(',')))
+        dfobs = pd.DataFrame([lstobs])
+        print(dfobs)
+        prediction = modelbinary.predict(dfobs)
+        
+        filename = f'{os.getcwd()}/WineQuality_RestAPI/model_files/{modelId}.sav'
+        fsmodel = pickle.load(open(filename, 'rb'))
+        prediction = fsmodel.predict(dfobs)
+        
 
         runinfo = f'Quality:{prediction}|Predicted label (quality) for {modelId} is {prediction}'
         return make_response(runinfo,200)

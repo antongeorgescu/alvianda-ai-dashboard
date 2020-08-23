@@ -3,6 +3,7 @@ C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\Unit
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\bin\Debug\Microsoft.VisualStudio.TestPlatform.MSTestAdapter.PlatformServices.dll
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\bin\Debug\UnitTestProject.dll
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\bin\Debug\UnitTestProject.pdb
+C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\bin\Debug\LoremNET.dll
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.dll
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.dll
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\bin\Debug\Newtonsoft.Json.dll
@@ -11,9 +12,8 @@ C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\Unit
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\bin\Debug\Microsoft.VisualStudio.TestPlatform.TestFramework.Extensions.xml
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\bin\Debug\Newtonsoft.Json.xml
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\bin\Debug\NUglify.xml
+C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\obj\Debug\UnitTestProject.csprojAssemblyReference.cache
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\obj\Debug\UnitTestProject.csproj.CoreCompileInputs.cache
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\obj\Debug\UnitTestProject.csproj.CopyComplete
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\obj\Debug\UnitTestProject.dll
 C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\obj\Debug\UnitTestProject.pdb
-C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\bin\Debug\LoremNET.dll
-C:\Users\ag4488\Documents\Visual Studio 2019\Projects\Alvianda-AI-Dashboard\UnitTestProject\obj\Debug\UnitTestProject.csprojAssemblyReference.cache
