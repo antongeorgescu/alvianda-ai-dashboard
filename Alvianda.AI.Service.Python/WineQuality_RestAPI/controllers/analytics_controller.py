@@ -27,7 +27,7 @@ SAVEDFDB_PATH = f'{os.getcwd()}/Database/Sqlite/SavedDataframes.db'
 mlModelAlgorithm = None
 
 @app.route('/api/wineanalytics/validate', methods=['GET','POST'])
-def validate():
+def validate_wineanalytics_controller():
     """Renders the controller greeting."""
     t = time.localtime()
     current_time = time.strftime("%D %H:%M:%S", t)

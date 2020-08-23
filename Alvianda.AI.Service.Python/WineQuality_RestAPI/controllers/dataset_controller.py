@@ -24,6 +24,20 @@ def startup():
     d = f'dataset controller accessed at {current_time}'
     return make_response(jsonify(d), 200)
 
+@app.route('/api/winedataset/validate', methods=['GET','POST'])
+def validate_dataset_controller():
+    """Renders the controller greeting."""
+    t = time.localtime()
+    current_time = time.strftime("%D %H:%M:%S", t)
+    
+    if request.method == 'GET':
+        d = f'validate observations dataset controller method=GET at {current_time}'
+        return make_response(jsonify(d), 200)
+    
+    if request.method == 'POST':
+        d = request.json
+        return make_response(jsonify(d), 200)
+
 @app.route('/api/winedataset/settings')
 def settings():
     """Renders the pagination settings."""
