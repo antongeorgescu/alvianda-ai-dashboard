@@ -50,6 +50,7 @@ class DecisionTreeAnalyzer(BaseAlgorithmClass):
             model_name = f'dt_{modelid}'
 
             super().set_model(dtree_model,model_name)
+
             return self.X_test,self.y_pred
         except:
             self.last_error = sys.exc_info()[1]

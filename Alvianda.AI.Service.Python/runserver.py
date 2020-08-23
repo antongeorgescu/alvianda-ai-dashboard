@@ -1,6 +1,8 @@
 """
 This script runs the WQE_Service_Python application using a development server.
 """
+from gevent import monkey
+monkey.patch_all()
 
 from os import environ
 from WineQuality_RestAPI import app

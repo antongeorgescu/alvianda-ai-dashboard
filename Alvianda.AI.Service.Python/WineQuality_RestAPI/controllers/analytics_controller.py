@@ -20,7 +20,7 @@ import pickle
 
 from WineQuality_RestAPI.models.decisiontree_correlation_class import DecisionTreeAnalyzer
 from WineQuality_RestAPI.models.data_preparation_singleton import DataPreparationSingleton
-from WineQuality_RestAPI.models.model_algorithm_singleton import ModelAlgorithmSingleton
+from WineQuality_RestAPI.models.algorithm_model_singleton import AlgorithmModelSingleton
 
 DB_PATH = f'{os.getcwd()}/Database/Sqlite/DatasetMLAnalytics.db'
 SAVEDFDB_PATH = f'{os.getcwd()}/Database/Sqlite/SavedDataframes.db'
@@ -351,12 +351,13 @@ def about_confusion_matrix():
     f = open(about_file_path, "r")
     return make_response(f.read(),200)
 
-@app.route('/api/wineanalytics/runanalyzer/trainmodel')
+@app.route('/api/wineanalytics/runanalyzer/trainmodel', methods=['POST'])
 def train_model():
     try:
-        query_parameters = request.args
-        algorithm = query_parameters.get('algorithm')
-        sessionId = query_parameters.get('sessionid')
+        algorithm = request.json['algorithm']
+        sessionId = request.json['sessionid']
+        description = request.json['description']
+        notes = request.json['notes']
         
         rundata = None  # should be a dictionary
         
@@ -375,15 +376,39 @@ def train_model():
             accuracy = dtanalyzer.calculate_accuracy()
             cm = dtanalyzer.calculate_confusion_matrix()
         
-        # temporary hold the model in ModelAlgorithmSingleton
-        modelalg = ModelAlgorithmSingleton()
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        query = 'SELECT Id FROM Algorithm WHERE Name = ?'
+        c.execute(query,(algorithm,))
+        algorithmId = c.fetchone()[0]
+
+        param = (sessionId, algorithmId, description,notes,)
+        query = 'INSERT INTO WorkingSession (SessionId,ApplicationId,AlgorithmId,Description,Notes) '
+        query += 'VALUES (?,1,?,?,?)'
+        c.execute(query,param)
+
+        conn.commit()
+
+        # temporary hold the model in AlgorithmModelSingleton
         model, model_id = dtanalyzer.get_model()
-        modelalg.set_model(model,model_id)
+
+        modelalg = AlgorithmModelSingleton()
+        modelalg.session_id = sessionId
+        modelalg.model_id = model_id
+        modelalg.description = 'temporary hold the model in AlgorithmModelSingleton class'
+        modelalg.modelbinary = model
 
         rundata = accuracy +'|'+ str(cm) + f'|modelid:{model_id}'
         return make_response(jsonify(rundata),200)
     except Exception as error:
+        if (conn):
+            conn.rollback()
         return make_response(error,500)
+    finally:
+        if (conn):
+            conn.close()
 
 @app.route('/api/wineanalytics/runanalyzer/trainmodel/save',methods=['POST'])
 def save_train_model():
@@ -395,91 +420,134 @@ def save_train_model():
         modeldescription = request.json['modeldescription']
         
         # retrieve model from temporary holding class
-        modelalg = ModelAlgorithmSingleton()
-        trainmodel, trainmodel_id = modelalg.get_model()
+        modelalg = AlgorithmModelSingleton()
+        
+        if modelalg.model_id is None:
+            modelalg.model_id = modelid
+        else:    
+            trainmodel_id = modelalg.model_id
+            if modelid != trainmodel_id:
+                raise Exception('ModelAlgorithSingleton class corrupted. Abort execution.')
 
-        if modelid != trainmodel_id:
-            raise Exception('ModelAlgorithSingleton class corrupted. Abort execution.')
+        modelalg.session_id = sessionid
+        modelalg.description = modeldescription
 
-        #TODO: will remove the file save, and leave only db save
+        modelalg.dbpath = DB_PATH
+        trainmodel = modelalg.modelbinary
+        
+        # save the model in binary format to sqlite BLOB record
+        modelalg.save_model_to_db()
+
         # dump model in a temporary file
-        filename = f'{os.getcwd()}/WineQuality_RestAPI/model_files/{trainmodel_id}.sav'
+        filename = f'{os.getcwd()}/WineQuality_RestAPI/model_files/{modelid}.sav'
         
         writefile = open(filename, 'wb')
         pickle.dump(trainmodel, writefile)
         writefile.close()
 
-        # save the model in binary format to sqlite BLOB record
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        
-        query = 'INSERT INTO ApplicationData (SessionId,DataobjectTypeId,'
-        query += 'DataobjectName,DataobjectDescription,DataobjectBlob) '
-        query += 'VALUES (?,?,?,?,?)'
 
-        readfile = open(filename, 'rb')
-        btrainmodel = readfile.read()
-        readfile.close()
+        # readfile = open(filename, 'rb')
+        # btrainmodel = readfile.read()
+        # readfile.close()
         
-        # Convert data into tuple format
-        data_tuple = (sessionid,3,trainmodel_id, modeldescription, btrainmodel)
-        cursor.execute(query, data_tuple)
-        conn.commit()
-        cursor.close()
+        # # Convert data into tuple format
+        # data_tuple = (sessionid,3,trainmodel_id, modeldescription, btrainmodel)
+        # cursor.execute(query, data_tuple)
+        # conn.commit()
+        # cursor.close()
 
-        runinfo = f'Saved into database trained model {trainmodel_id} and temporary saved in file system at {filename}'
+        runinfo = f'Saved into database trained model {modelid} and also saved in file system at {filename}'
         return make_response(runinfo,200)
     except Exception as error:
         return make_response(error,500)
-    finally:
-        if (conn):
-            conn.close()
+    
+# def load_model(model_id):
+
+#     # retrieve model from temporary holding class
+#     modelalg = AlgorithmModelSingleton()
+#     modelval, modelid = modelalg.get_model()
+
+#     if modelid is None:
+#         # get the model in binary format from sqlite BLOB record
+#         conn = sqlite3.connect(DB_PATH)
+#         cursor = conn.cursor()
+        
+#         query = 'SELECT ad.DataobjectName,ad.DataobjectDescription,ad.DataobjectBlob ' 
+#         query += 'FROM ApplicationData ad '
+#         query += 'WHERE ad.DataobjectTypeId = 3 AND ad.DataobjectName = ?'
+        
+#         cursor.execute(query, (model_id,))
+#         records = cursor.fetchall()
+#         conn.close()
+
+#         # a Python object (dict):
+#         result = {
+#             "sessionid": records[0][0],
+#             "modelid": records[0][1],
+#             "modeldescription": records[0][2]
+#         }
+        
+#         modelval = records[0][3]
+#     else:
+#         result = {
+#             "sessionid": records[0][0],
+#             "modelid": records[0][1],
+#             "modeldescription": records[0][2]
+#         }
+
+#     return json.dumps(result),modelval
 
 @app.route('/api/wineanalytics/runanalyzer/trainmodel/load',methods=['GET'])
 def load_train_model():
     try:
-        runinfo = None
-
         modelId = request.args.get('modelid', default='', type=str)
         
         if modelId == '':
             raise Exception('Unable to read model_id parameter.Abort the execution.')
 
-        # save the model in binary format to sqlite BLOB record
-        conn = sqlite3.connect(DB_PATH)
-        cursor = conn.cursor()
-        
-        query = 'SELECT SessionId,DataobjectTypeId,DataobjectName,DataobjectDescription,DataobjectBlob '
-        query += 'FROM Application Data WHERE DataobjectTypeId = 3 AND DataobjectName = ?'
-       
-        cursor.execute(query, (modelId,))
-        record = cursor.fetchone()
-        
-        # a Python object (dict):
-        result = {
-            "sessionid": record['SessionId'],
-            "modelid": record['DataobjectName'],
-            "modelblob": record['DataobjectBlob'],
-            "modeldescription": record['DataobjectDescription']
+        # retrieve model from temporary holding class
+        modelalg = AlgorithmModelSingleton()
+        modelid = modelalg.model_id
+        description = modelalg.description
+        modelblob = modelalg.modelbinary
+
+        modelinfo = {
+            "model_id" : modelid,
+            "description" : description,
+            "size" : len(modelblob)
         }
-
+        
         # convert into JSON:
-        runinfo = json.dumps(result)
-
-        cursor.close()
-
-        modelalg = ModelAlgorithmSingleton()
-        modelalg.set_model(result['modelblob'],result['modelid'])
+        runinfo = json.dumps(modelinfo)
 
         return make_response(runinfo,200)
     except Exception as error:
         return make_response(error,500)
-    finally:
-        if (conn):
-            conn.close()
+    
+@app.route('/api/wineanalytics/runanalyzer/trainmodel/predict',methods=['POST'])
+def model_predict():
+    try:
+        runinfo = None
 
-@app.route('/api/wineanalytics/runanalyzer/trainmodel/load/all',methods=['GET'])
-def loadall_train_model():
+        modelId = request.json['modelid']
+        observations = request.json['observations']
+        fields = request.json["attributes"]
+        
+        # retrieve model from temporary holding class
+        modelalg = AlgorithmModelSingleton()
+        modelalg.model_id = modelId
+        modelalg.dbpath = DB_PATH
+        modelbinary = modelalg.modelbinary
+        
+        prediction = modelbinary.predict(observations)
+
+        runinfo = f'Quality:{prediction}|Predicted label (quality) for {modelId} is {prediction}'
+        return make_response(runinfo,200)
+    except Exception as error:
+        return make_response(error,500)
+    
+@app.route('/api/wineanalytics/runanalyzer/trainmodel/saved/listall',methods=['GET'])
+def list_all_models():
     try:
         runinfo = None
 
@@ -514,6 +582,34 @@ def loadall_train_model():
     finally:
         if (conn):
             conn.close()
+
+@app.route('/api/wineanalytics/runanalyzer/trainmodel/saved/listone',methods=['GET'])
+def list_one_model():
+    try:
+        runinfo = None
+
+        modelId = request.args.get('modelid', default='', type=str)
+        
+        if modelId == '':
+            raise Exception('Unable to read model_id parameter.Abort the execution.')
+
+        modelalg = AlgorithmModelSingleton()
+        modelalg.model_id = modelId
+        modelalg.dbpath = DB_PATH
+        model = modelalg.modelbinary
+        
+        result = {
+            "sessionid": modelalg.session_id,
+            "modelid": modelalg.model_id,
+            "modeldescription": modelalg.description
+        }
+        
+        # convert into JSON:
+        runinfo = json.dumps(result)
+
+        return make_response(runinfo,200)
+    except Exception as error:
+        return make_response(error,500)
 
 def read_saved_dataframe_db(sessionId):
     try:

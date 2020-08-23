@@ -7,6 +7,9 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUglify;
+using LoremNET;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace UnitTestProject
 {
@@ -39,9 +42,18 @@ namespace UnitTestProject
         public async Task TrainModel_DecisionTree()
         {
             HttpClient _httpClient = new HttpClient();
-            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel?sessionid=3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62&algorithm=decision-tree";
+            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel";
             var resultCode = string.Empty;
-            var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
+
+            var testContent = new StringContent(JsonConvert.SerializeObject(new
+            {
+                sessionid = "3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62",
+                algorithm = "decision-tree",
+                notes = Lorem.Words(35,40),
+                description = Lorem.Words(20, 25)
+            }), Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync(serviceEndpoint, testContent).ConfigureAwait(true);
 
             var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
             if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
@@ -65,38 +77,19 @@ namespace UnitTestProject
         {
             HttpClient _httpClient = new HttpClient();
 
-            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel?sessionid=3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62&algorithm=decision-tree";
-            var resultCode = string.Empty;
-            var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
-
-            var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
-            if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
-            {
-                responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
-                var result = Uglify.HtmlToText(responseString);
-                resultCode = result.Code.Replace('"', ' ');
-                Assert.IsFalse(resultCode != string.Empty);
-            }
-
-            var jsonDetails = JToken.Parse(responseString);
-
-            var modelId = jsonDetails.Value<string>().Split('|')[2].Split(':')[1].ToString();
-
-            serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel/save";
-
-            //var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/validate";
+            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel/save";
 
             var testContent = new StringContent(JsonConvert.SerializeObject(new
             {
                 sessionid = "3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62",
-                modelid = modelId,
-                modeldescription = "Quisque ac commodo orci, et faucibus massa. Praesent elit libero, feugiat vel pellentesque et, tristique ac ante."
-            }), Encoding.UTF8, "application/json"); ;
+                modelid = "dt_3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62",
+                modeldescription = Lorem.Words(25, 35)
+            }), Encoding.UTF8, "application/json");
 
-            resultCode = string.Empty;
-            response = await _httpClient.PostAsync(serviceEndpoint, testContent).ConfigureAwait(true);
+            var resultCode = string.Empty;
+            var response = await _httpClient.PostAsync(serviceEndpoint, testContent).ConfigureAwait(true);
 
-            responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+            var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
             if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
             {
                 responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
@@ -138,7 +131,7 @@ namespace UnitTestProject
         public async Task ReadAllSavedModels()
         {
             HttpClient _httpClient = new HttpClient();
-            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel/load/all";
+            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel/saved/listall";
             var resultCode = string.Empty;
             var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
 
@@ -151,9 +144,98 @@ namespace UnitTestProject
                 Assert.IsFalse(resultCode != string.Empty);
             }
 
-            var resultList = JToken.Parse(responseString);
+            var sessionId = JArray.Parse(responseString)[0]["sessionid"].Value<string>();
 
-            Assert.IsNotNull(resultList.Children().GetEnumerator());
+            Assert.IsTrue(sessionId == "3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62");
+
+        }
+
+        [TestMethod]
+        public async Task ReadOneSavedModel()
+        {
+            HttpClient _httpClient = new HttpClient();
+            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel/saved/listone?modelid=dt_3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62";
+            var resultCode = string.Empty;
+            var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
+
+            var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+            if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
+            {
+                responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
+                var result = Uglify.HtmlToText(responseString);
+                resultCode = result.Code.Replace('"', ' ');
+                Assert.IsFalse(resultCode != string.Empty);
+            }
+
+            var sessionId = JToken.Parse(responseString)["modelid"].Value<string>();
+
+            Assert.IsTrue(sessionId == "dt_3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62");
+
+        }
+
+        [TestMethod]
+        public async Task LoadTrainModel_DecisionTree()
+        {
+            HttpClient _httpClient = new HttpClient();
+
+            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel/load?modelid=dt_3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62";
+            var resultCode = string.Empty;
+            var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
+
+            var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+            if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
+            {
+                responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
+                var result = Uglify.HtmlToText(responseString);
+                resultCode = result.Code.Replace('"', ' ');
+                Assert.IsFalse(resultCode != string.Empty);
+            }
+
+            var jsonDetails = JToken.Parse(responseString);
+            var jsonObject = jsonDetails.Children();
+            var outList = new List<string>();
+            foreach (var attribute in jsonObject)
+            {
+                outList.Add(attribute.First.ToString());
+            }
+
+            Trace.Write(responseString);
+
+            Assert.IsTrue(outList.Count == 3);
+
+        }
+
+        [TestMethod]
+        public async Task Predict_DecisionTree()
+        {
+            HttpClient _httpClient = new HttpClient();
+
+            //************************** Predict with saved model *********************************
+            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel/predict";
+            var resultCode = string.Empty;
+            var testContent = new StringContent(JsonConvert.SerializeObject(new
+            {
+                modelid = "dt_3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62",
+                attributes = "fixed acidity,volatile acidity,citric acid,residual sugar,chlorides,free sulfur dioxide,total sulfur dioxide,density,pH,sulphates,alcohol",
+                observations = "7.4,0.7,0.0,1.9,0.076,11.0,34.0,0.9978,3.51,0.56,9.4"
+            }), Encoding.UTF8, "application/json");
+
+            var response = await _httpClient.PostAsync(serviceEndpoint, testContent).ConfigureAwait(true);
+
+            var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+            if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
+            {
+                responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
+                var result = Uglify.HtmlToText(responseString);
+                resultCode = result.Code.Replace('"', ' ');
+                Assert.IsFalse(resultCode != string.Empty);
+            }
+
+            var jsonDetails = JToken.Parse(responseString);
+            var jsonObject = jsonDetails.Children();
+            var outList = new List<string>();
+
+            Assert.IsTrue(3 == 3);
 
         }
     }
