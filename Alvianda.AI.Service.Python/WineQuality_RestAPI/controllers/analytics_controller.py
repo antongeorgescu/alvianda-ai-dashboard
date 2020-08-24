@@ -509,18 +509,17 @@ def model_predict():
         lstobs =  list(map(float,observations.split(',')))
         dfobs = pd.DataFrame([lstobs])
         print(dfobs)
-        prediction = modelbinary.predict(dfobs)
+        # prediction = modelbinary.predict(dfobs)
         
         filename = f'{os.getcwd()}/WineQuality_RestAPI/model_files/{modelId}.sav'
-        fsmodel = pickle.load(open(filename, 'rb'))
-        prediction = fsmodel.predict(dfobs)
+        loaded_model = pickle.load(open(filename, 'rb'))
+        prediction = loaded_model.predict(dfobs)
         
-
-        runinfo = f'Quality:{prediction}|Predicted label (quality) for {modelId} is {prediction}'
+        runinfo = f'Predicted wine quality for {modelId}:{prediction}'
         return make_response(runinfo,200)
     except Exception as error:
         return make_response(error,500)
-    
+
 @app.route('/api/wineanalytics/runanalyzer/trainmodel/saved/listall',methods=['GET'])
 def list_all_models():
     try:

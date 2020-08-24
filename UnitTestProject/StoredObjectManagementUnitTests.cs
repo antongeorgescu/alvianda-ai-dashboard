@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace UnitTestProject
 {
     [TestClass]
-    public class StoredObjectManagement
+    public class StoredObjectManagementUnitTests
     {
         [TestMethod]
         public async Task RunControllerValidation()

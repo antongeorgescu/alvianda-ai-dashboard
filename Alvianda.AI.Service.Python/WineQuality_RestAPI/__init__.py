@@ -12,3 +12,4 @@ import WineQuality_RestAPI.views
 import WineQuality_RestAPI.controllers.dataset_controller
 import WineQuality_RestAPI.controllers.analytics_controller
 import WineQuality_RestAPI.controllers.storage_management_controller
+import WineQuality_RestAPI.controllers.test_controller
