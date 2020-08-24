@@ -554,7 +554,7 @@ def get_saved_dataframe_db():
         query_parameters = request.args
         sessionId = query_parameters.get('sessionid')
         
-        response, observations_name, labels_name, observations, labels = read_saved_dataframe(sessionId)     
+        response, observations_name, labels_name, observations, labels = read_saved_dataframe(sessionId,DB_PATH,SAVEDFDB_PATH)     
 
         if response != "Ok":
             raise Exception(response)
