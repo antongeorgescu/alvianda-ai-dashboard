@@ -73,11 +73,11 @@ namespace UnitTestProject
         }
 
         [TestMethod]
-        public async Task SaveTrainModel_DecisionTree()
+        public async Task UpdateTrainModel_DecisionTree()
         {
             HttpClient _httpClient = new HttpClient();
 
-            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel/save";
+            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel/update";
 
             var testContent = new StringContent(JsonConvert.SerializeObject(new
             {
@@ -154,7 +154,7 @@ namespace UnitTestProject
         public async Task ReadOneSavedModel()
         {
             HttpClient _httpClient = new HttpClient();
-            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel/saved/listone?modelid=dt_3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62";
+            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel/saved/listone?sessionid=3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62&modelid=dt_3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62";
             var resultCode = string.Empty;
             var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
 
@@ -167,9 +167,9 @@ namespace UnitTestProject
                 Assert.IsFalse(resultCode != string.Empty);
             }
 
-            var sessionId = JToken.Parse(responseString)["modelid"].Value<string>();
+            var modelId = JToken.Parse(responseString)["modelid"].Value<string>();
 
-            Assert.IsTrue(sessionId == "dt_3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62");
+            Assert.IsTrue(modelId == "dt_3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62");
 
         }
 
@@ -178,7 +178,7 @@ namespace UnitTestProject
         {
             HttpClient _httpClient = new HttpClient();
 
-            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel/load?modelid=dt_3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62";
+            var serviceEndpoint = @"http://localhost:53535/api/wineanalytics/runanalyzer/trainmodel/load?sessionid=3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62&modelid=dt_3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62";
             var resultCode = string.Empty;
             var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
 
@@ -216,6 +216,7 @@ namespace UnitTestProject
             var testContent = new StringContent(JsonConvert.SerializeObject(new
             {
                 modelid = "dt_3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62",
+                sessionid = "3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62",
                 attributes = "fixed acidity,volatile acidity,citric acid,residual sugar,chlorides,free sulfur dioxide,total sulfur dioxide,density,pH,sulphates,alcohol",
                 observations = "7.4,0.7,0.0,1.9,0.076,11.0,34.0,0.9978,3.51,0.56,9.4"
             }), Encoding.UTF8, "application/json");
@@ -231,11 +232,10 @@ namespace UnitTestProject
                 Assert.IsFalse(resultCode != string.Empty);
             }
 
-            var jsonDetails = JToken.Parse(responseString);
-            var jsonObject = jsonDetails.Children();
-            var outList = new List<string>();
+            var listDetail = responseString.Split(':');
+            Trace.Write($"{listDetail[0]} --> {listDetail[1]}");
 
-            Assert.IsTrue(3 == 3);
+            Assert.IsTrue(listDetail.Length == 2);
 
         }
     }
