@@ -132,7 +132,7 @@ namespace UnitTestProject
             var serviceEndpoint = @"http://localhost:53535/api/storagemanagement/deletemodels/onedbrec?sessionid=319b44d5-71b6-47e3-bcd3-a94ba27a0f2b&modelid=processed_observations";
             var resultCode = string.Empty;
             var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
-                
+
             var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
             if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
             {
@@ -169,8 +169,35 @@ namespace UnitTestProject
             {
                 Trace.WriteLine(rec["SessionId"].Value<string>());
             }
-            
+
             Assert.IsTrue(jsonWsList.Count > 0);
+
+        }
+
+        [TestMethod]
+        public async Task ReadApplicationDataBySession()
+        {
+            HttpClient _httpClient = new HttpClient();
+            var serviceEndpoint = @"http://localhost:53535/api/storagemanagement/applicationdata?sessionid=3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62";
+            var resultCode = string.Empty;
+            var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
+
+            var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+            if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
+            {
+                responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
+                var result = Uglify.HtmlToText(responseString);
+                resultCode = result.Code.Replace('"', ' ');
+                Assert.IsFalse(resultCode != string.Empty);
+            }
+
+            var jsonAppDataList = JArray.Parse(responseString);
+            foreach (var rec in jsonAppDataList)
+            {
+                Trace.WriteLine(rec["DataobjectName"].Value<string>());
+            }
+
+            Assert.IsTrue(jsonAppDataList.Count > 0);
 
         }
     }

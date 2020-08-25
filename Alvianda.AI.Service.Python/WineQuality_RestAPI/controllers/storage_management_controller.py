@@ -190,8 +190,8 @@ def get_all_db_appdata():
         conn = sqlite3.connect(DB_PATH)
         cursor = conn.cursor()
         
-        query = 'SELECT ws.SessionId, a.Name, alg.DisplayName, ws.Description, ws.Notes, ws.CreatedOn '
-        query += 'FROM sion ws ' 
+        query = 'SELECT DISTINCT ws.SessionId, a.Name, alg.DisplayName, ws.Description, ws.Notes, ws.CreatedOn '
+        query += 'FROM WorkSession ws ' 
         query += 'INNER JOIN Application a ON ws.ApplicationId = a.Id '
         query += 'INNER JOIN Algorithm alg ON alg.Id = ws.AlgorithmId '
         query += 'INNER JOIN AlgorithmType aty ON aty.Id = alg.TypeId'
@@ -223,3 +223,45 @@ def get_all_db_appdata():
     finally:
         if (conn):
             conn.close()
+
+@app.route('/api/storagemanagement/applicationdata', methods=['GET','POST'])
+def get_by_session_db_appdata():
+    runinfo = None
+    sessionId = request.args.get('sessionid', default='', type=str)    
+    try:
+        # save the model in binary format to sqlite BLOB record
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        query = 'SELECT DISTINCT ad.DataobjectName, ad.DataobjectDescription,doty.Name,doty.Description '
+        query += 'FROM ApplicationData ad ' 
+        query += 'INNER JOIN DataobjectType doty ON doty.Id = ad.DataobjectTypeId '
+        query += 'WHERE ad.SessionId = ?'
+
+        cursor.execute(query,(sessionId,))
+        rows = cursor.fetchall()
+
+        result = []
+        for row in rows:
+            result.append(
+                {
+                    "DataobjectName" : row[0],
+                    "DataobjectDescription" : row[1],
+                    "DataobjectTypeName" : row[2],
+                    "DataobjectTypeDescription" : row[3],
+                }
+            )
+        
+        # convert into JSON:
+        runinfo = json.dumps(result)
+
+        cursor.close()
+
+        return make_response(runinfo,200)
+    except Exception as error:
+        return make_response(error,500)
+    finally:
+        if (conn):
+            conn.close()
+
+
