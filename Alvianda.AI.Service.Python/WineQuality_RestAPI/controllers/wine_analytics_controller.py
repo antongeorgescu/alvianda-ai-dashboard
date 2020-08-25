@@ -305,10 +305,6 @@ def processdata():
             ##Do something like insert in DB or Render somewhere etc. it's up to you....... :)
         
         return make_response(jsonify(result), 200)
-        #return jsonify(isError= False,
-        #            message= "Success",
-        #            statusCode= 200,
-        #            data= data), 200    
 
     except (RuntimeError, TypeError, NameError) as err:
         return make_response(jsonify(err.args), 500)
@@ -335,10 +331,6 @@ def processdataall():
 
         result = json.dumps( [dict(ix) for ix in rows] )
         return make_response(jsonify(result), 200)
-        #return jsonify(isError= False,
-        #            message= "Success",
-        #            statusCode= 200,
-        #            data= data), 200    
 
     except (RuntimeError, TypeError, NameError) as err:
         return make_response(jsonify(err.args), 500)
@@ -397,13 +389,6 @@ def train_model():
 
         # save model into database
         model_save_todatabase(sessionId,modelId,description,model,DB_PATH)
-
-        # # temporary hold the model in AlgorithmModelSingleton
-        # modelalg = AlgorithmModelSingleton()
-        # modelalg.session_id = sessionId
-        # modelalg.model_id = modelId
-        # modelalg.description = 'temporary hold the model in AlgorithmModelSingleton class'
-        # modelalg.modelbinary = model
 
         rundata = accuracy +'|'+ str(cm) + f'|modelid:{modelId}'
         return make_response(jsonify(rundata),200)
