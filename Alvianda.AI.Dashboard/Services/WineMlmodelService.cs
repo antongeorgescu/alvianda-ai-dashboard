@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.Json;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Alvianda.AI.Dashboard.Services
@@ -16,7 +17,7 @@ namespace Alvianda.AI.Dashboard.Services
     {
         Task<Tuple<string, IList<Algorithm>,string>> GetAlgorithmList(string algorithmType);
         Task<Tuple<string, IList<WorkingSession>, string>> GetWorkingSessionList(int applicationId);
-        Task<Dictionary<string, string>> RunMachineLearningModel(string algorithm, string SessionId);
+        Task<Dictionary<string, string>> RunMachineLearningModel(string algorithm, string SessionId, string Decsription, string Notes);
         //Task<List<WinesetEntry>> GetPaginatedResult(string logCategory, int currentPage, int pageSize = 10);
         //Task<int> GetCount(string wineCategory);
     }
@@ -121,32 +122,33 @@ namespace Alvianda.AI.Dashboard.Services
             }
         }
 
-        public async Task<Dictionary<string, string>> RunMachineLearningModel(string algorithm, string sessionId)
+        public async Task<Dictionary<string, string>> RunMachineLearningModel(
+                                                                        string algorithm, 
+                                                                        string sessionId,
+                                                                        string description,
+                                                                        string notes)
         {
             var responseDictionary = new Dictionary<string, string>();
             try
             {
-                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/trainmodel?algorithm={algorithm}&sessionid={sessionId}";
-                var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
+                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/trainmodel";
+                var paramContent = new StringContent(JsonConvert.SerializeObject(new
+                {
+                    algorithm = algorithm,
+                    sessionid = sessionId,
+                    description = description,
+                    notes = notes
+                }), Encoding.UTF8, "application/json");   
+                var responseString = await HttpPostRequest(serviceEndpoint, paramContent).ConfigureAwait(true);
+                var jsonDetails = JToken.Parse(responseString.Item2);
+                var modelPerformance = jsonDetails.Value<string>().Split('|')[0];
+                var confusionMatrixArray = jsonDetails.Value<string>().Split('|')[1].Split("\n");
+                var modelId = jsonDetails.Value<string>().Split('|')[2];
 
-                IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Item2) as IList<JToken>;
+                responseDictionary.Add("Model Accuracy", modelPerformance);
+                responseDictionary.Add("Confusion Matrix", string.Join(",",confusionMatrixArray));
+                responseDictionary.Add("Model Id", modelId);
 
-                //responseDictionary.Add("attributesHistogramTitle", responseList[1].Value<string>().Split(',')[0]);
-                //responseDictionary.Add("qualityHistogramTitle", responseList[1].Value<string>().Split(',')[1]);
-
-                //responseDictionary.Add("attributesHistogramChart", $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[0]}");
-                //responseDictionary.Add("qualityHistogramChart", $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[1]}");
-
-                //responseDictionary.Add("qualityValuesDropped", responseList[2].Value<string>());
-
-                //responseDictionary.Add("correlationChart", $"http:////localhost:53535//static//{responseList[3].Value<string>()}");
-                //responseDictionary.Add("correlationTitle", responseList[4].Value<string>());
-
-                //responseDictionary.Add("correlationAttributes", responseList[5].Value<string>());
-
-                //responseDictionary.Add("infomessage", responseList[6].Value<string>());
-
-                //return await new Task<Dictionary<string,string>>(() => responseDictionary);
                 return responseDictionary;
 
             }

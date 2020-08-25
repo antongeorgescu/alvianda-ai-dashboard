@@ -230,8 +230,8 @@ def run_analysis_persist():
         t = (guid,1,99,description,notes)
         c.execute(query,t)
 
-        query = 'INSERT INTO  ApplicationData (SessionId,DataobjectTypeId,DataobjectName,DataobjectDescription,DataobjectValue,DataobjectAttributes) '
-        query += 'VALUES (?,?,?,?,?)'
+        query = 'INSERT INTO  ApplicationData (SessionId,DataobjectTypeId,DataobjectName,DataobjectDescription,DataobjectText,DataobjectAttributes) '
+        query += 'VALUES (?,?,?,?,?,?)'
         
         #t = (guid,'processed_observations','processed_observations',observations.to_json(),attributes)
         t = (guid,1,'processed_observations','processed_observations',f'savedfdb_{guid}',attributes)

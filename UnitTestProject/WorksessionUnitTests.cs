@@ -47,7 +47,7 @@ namespace UnitTestProject
 
             var testContent = new StringContent(JsonConvert.SerializeObject(new
             {
-                sessionid = "3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62",
+                sessionid = "1b99ed0b-37f3-4e70-9e54-99f9607675a9",
                 algorithm = "decision-tree",
                 notes = Lorem.Words(35,40),
                 description = Lorem.Words(20, 25)

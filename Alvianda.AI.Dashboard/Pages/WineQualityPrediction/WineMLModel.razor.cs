@@ -42,6 +42,10 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         private string PersistedDODetails;
 
         private string waitMessage = string.Empty;
+        private string description = string.Empty;
+        private string notes = string.Empty;
+
+        private Dictionary<string, string> trainingModelResults;
 
         WineMlmodelService mlmodelService;
 
@@ -99,8 +103,8 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
                 {
                     var jsonData = response.Item2 as JToken;
                     
-                    var description = jsonData["Description"].Value<string>();
-                    var notes = jsonData["Notes"].Value<string>();
+                    description = jsonData["Description"].Value<string>();
+                    notes = jsonData["Notes"].Value<string>();
                     var createdOn = jsonData["CreatedOn"].Value<string>();
                     PersistedDODetails = $"Description:{description}{Environment.NewLine}" +
                         $"Notes:{notes}{Environment.NewLine}" +
@@ -151,27 +155,14 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
                 isModelDataAvailable = false;
                 waitMessage = "Wait while we are running the selected algorithm and analyze the model...";
 
-                var responseDictionary = await mlmodelService.RunMachineLearningModel(SelectedAlgorithm, SelectedSessionId).ConfigureAwait(true);
-                if (responseDictionary.ContainsKey("error"))
+                trainingModelResults = await mlmodelService.RunMachineLearningModel(SelectedAlgorithm, SelectedSessionId, description,notes).ConfigureAwait(true);
+                if (trainingModelResults.ContainsKey("error"))
                 {
-                    messages.Add(new Tuple<string, string>("error", responseDictionary["error"]));
+                    messages.Add(new Tuple<string, string>("error", trainingModelResults["error"]));
                 }
                 else
                 {
-                    //attributesHistogramTitle = responseDictionary["attributesHistogramTitle"];
-                    //qualityHistogramTitle = responseDictionary["qualityHistogramTitle"];
-
-                    //attributesHistogramChart = responseDictionary["attributesHistogramChart"];
-                    //qualityHistogramChart = responseDictionary["qualityHistogramChart"];
-
-                    //qualityValuesDropped = responseDictionary["qualityValuesDropped"];
-
-                    //correlationChart = responseDictionary["correlationChart"];
-                    //correlationTitle = responseDictionary["correlationTitle"];
-
-                    //correlationAttributes = responseDictionary["correlationAttributes"];
-
-                    messages.Add(new Tuple<string, string>("info", responseDictionary["infomessage"]));
+                    messages.Add(new Tuple<string, string>("info",$"Trained model finished. {trainingModelResults.Count} results provided (see below)."));
 
                     waitMessage = string.Empty;
                     isModelDataAvailable = true;

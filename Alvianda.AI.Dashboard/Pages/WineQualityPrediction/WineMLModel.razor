@@ -126,12 +126,16 @@
 {
     <div>
         <label>Session Predictive Algorithm Modeling Results:</label>
-        @*<table border="1">
+        <table border="1">
+        @foreach (var result in trainingModelResults)
+        {
             <tr>
-                <td><b>@resultOneName</b></td>
-                <td>@resultOneData</td>
+                <td><b>@result.Key</b></td>
+                <td>@result.Value</td>
             </tr>
-        </table>*@
+
+        }
+        </table>
     </div>
 }
 <hr />

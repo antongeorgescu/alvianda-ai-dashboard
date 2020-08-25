@@ -11,8 +11,8 @@ import json
 from WineQuality_RestAPI.models import winedata_class
 
 PAGESIZE = 25
-TOTALRECORDS_RED = 0;
-TOTALRECORDS_WHITE = 0;
+TOTALRECORDS_RED = 0
+TOTALRECORDS_WHITE = 0
 
 @app.route('/')
 @app.route('/api/winedataset')
@@ -46,7 +46,7 @@ def settings():
     REDWINE_PATH = "WineQuality_RestAPI/datasets/winequality-red.csv"
     WHITEWINE_PATH = "WineQuality_RestAPI/datasets/winequality-white.csv"
 
-    wineobj = winedata_class.WineData(REDWINE_PATH,WHITEWINE_PATH);
+    wineobj = winedata_class.WineData(REDWINE_PATH,WHITEWINE_PATH)
     TOTALRECORDS_RED, TOTALRECORDS_WHITE = wineobj.datasets_lengths()
     
     settings = {
