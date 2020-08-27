@@ -13,7 +13,7 @@ def model_save_todatabase(sessionid,modelid,description,model,dbpath):
         #conn.row_factory = sqlite3.Row
         c = conn.cursor()
 
-        hash_model = hashlib.md5(model_saved.encode()).hexdigest()
+        hash_model = hashlib.md5(model_saved).hexdigest()
         
         # check if the model_id is already serialized; if so, use UPDATE
         query = 'SELECT COUNT(*) FROM ApplicationData WHERE DataobjectName = ? AND SessionId = ?'
