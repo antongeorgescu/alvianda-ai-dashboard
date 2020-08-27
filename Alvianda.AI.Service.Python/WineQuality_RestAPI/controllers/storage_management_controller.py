@@ -138,6 +138,36 @@ def delete_models_one_dbrec():
         if (conn):
             conn.close()
 
+@app.route('/api/storagemanagement/deletesession', methods=['GET','POST'])
+def delete_session():
+    runinfo = None
+    sessionId = request.args.get('sessionid', default='', type=str)
+
+    try:
+        # save the model in binary format to sqlite BLOB record
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        
+        query = 'DELETE FROM ApplicationData WHERE SessionId = ? AND DataobjectName = ?'
+        
+        cursor.execute(query,(sessionId,))
+        rowsdeleted = cursor.rowcount
+
+        conn.commit()
+
+        # convert into JSON:
+        runinfo = json.dumps(f'# rows deleted:{rowsdeleted}')
+
+        cursor.close()
+
+        return make_response(runinfo,200)
+    except Exception as error:
+        return make_response(error,500)
+    finally:
+        if (conn):
+            conn.close()
+
+
 @app.route('/api/storagemanagement/worksession/all', methods=['GET','POST'])
 def get_all_db_entities():
     runinfo = None

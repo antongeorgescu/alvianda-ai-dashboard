@@ -126,10 +126,10 @@ namespace UnitTestProject
         }
 
         [TestMethod]
-        public async Task DeleteOneDbmodel()
+        public async Task DeleteOneSession()
         {
             HttpClient _httpClient = new HttpClient();
-            var serviceEndpoint = @"http://localhost:53535/api/storagemanagement/deletemodels/onedbrec?sessionid=319b44d5-71b6-47e3-bcd3-a94ba27a0f2b&modelid=processed_observations";
+            var serviceEndpoint = @"http://localhost:53535/api/storagemanagement/deletesession?sessionid=319b44d5-71b6-47e3-bcd3-a94ba27a0f2b";
             var resultCode = string.Empty;
             var response = await _httpClient.GetAsync(serviceEndpoint).ConfigureAwait(true);
 

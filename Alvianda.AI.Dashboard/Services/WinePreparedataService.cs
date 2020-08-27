@@ -86,12 +86,12 @@ namespace Alvianda.AI.Dashboard.Services
                 responseDictionary.Add("attributesHistogramTitle", responseList[1].Value<string>().Split(',')[0]);
                 responseDictionary.Add("qualityHistogramTitle", responseList[1].Value<string>().Split(',')[1]);
 
-                responseDictionary.Add("attributesHistogramChart", $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[0]}");
-                responseDictionary.Add("qualityHistogramChart", $"http:////localhost:53535//static//{responseList[0].Value<string>().Split(',')[1]}");
+                responseDictionary.Add("attributesHistogramChart", $"http://localhost:53535/static/{responseList[0].Value<string>().Split(',')[0]}");
+                responseDictionary.Add("qualityHistogramChart", $"http://localhost:53535/static/{responseList[0].Value<string>().Split(',')[1]}");
 
                 responseDictionary.Add("qualityValuesDropped", responseList[2].Value<string>());
 
-                responseDictionary.Add("correlationChart", $"http:////localhost:53535//static//{responseList[3].Value<string>()}");
+                responseDictionary.Add("correlationChart", $"http://localhost:53535/static/{responseList[3].Value<string>()}");
                 responseDictionary.Add("correlationTitle", responseList[4].Value<string>());
 
                 responseDictionary.Add("correlationAttributes", responseList[5].Value<string>());

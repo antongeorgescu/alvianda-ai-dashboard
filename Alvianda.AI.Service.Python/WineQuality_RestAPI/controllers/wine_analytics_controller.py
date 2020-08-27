@@ -17,6 +17,7 @@ import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
 import pickle
+import hashlib
 
 from WineQuality_RestAPI.models.decisiontree_correlation_class import DecisionTreeAnalyzer
 from WineQuality_RestAPI.models.data_preparation_singleton import DataPreparationSingleton
@@ -224,20 +225,32 @@ def run_analysis_persist():
         conn = sqlite3.connect(DB_PATH)
 
         c = conn.cursor()
-        
+
+        # check if there's already saved an identical DataobjectText (by using Hashvalue)
+        hash_in_dataset = hashlib.md5(observations.to_json().encode()).hexdigest()
+        query = 'SELECT SessionId, DataobjectText, Hashvalue FROM ApplicationData'
+        c.execute(query)
+        rows = c.fetchall()
+        for row in rows:
+            hash_saved_dataset = row[2]
+            if hash_saved_dataset == hash_in_dataset:
+                sessionId = row[0]
+                run_summary = f'Dataset of observations and/or labels already saved in session_id:{sessionId}.Abort current execution.'
+                return make_response(jsonify(run_summary),200)
+           
+
         query = 'INSERT INTO  WorkingSession (SessionId,ApplicationId,AlgorithmId,Description,Notes) '
         query += 'VALUES (?,?,?,?,?)'
-        t = (guid,1,99,description,notes)
+        t = (guid,1,99,description,f'[{datetime.now()}] {notes}')
         c.execute(query,t)
 
-        query = 'INSERT INTO  ApplicationData (SessionId,DataobjectTypeId,DataobjectName,DataobjectDescription,DataobjectText,DataobjectAttributes) '
-        query += 'VALUES (?,?,?,?,?,?)'
+        query = 'INSERT INTO  ApplicationData (SessionId,DataobjectTypeId,DataobjectName,DataobjectDescription,DataobjectText,DataobjectBlob,DataobjectAttributes,Hashvalue) '
+        query += 'VALUES (?,?,?,?,?,?,?,?)'
         
-        #t = (guid,'processed_observations','processed_observations',observations.to_json(),attributes)
-        t = (guid,1,'processed_observations','processed_observations',f'savedfdb_{guid}',attributes)
+        t = (guid,1,'processed_observations','processed_observations',observations.to_json(),f'savedfdb_{guid}',attributes,str(hash_in_dataset))
         c.execute(query,t)
         
-        t = (guid,2,'processed_labels','processed_labels',labels.to_json(),'')
+        t = (guid,2,'processed_labels','processed_labels',labels.to_json(),None,None,str(hashlib.md5(labels.to_json().encode())))
         c.execute(query,t)
         conn.commit()
 
@@ -318,14 +331,14 @@ def processdataall():
         conn.row_factory = sqlite3.Row
         c = conn.cursor()
 
-        query = 'select ad.SessionId, a.Name, a.Description,'
+        query = 'SELECT ad.SessionId, a.Name, a.Description,'
         query += 'ag.Name, ag.DisplayName, t.Name,'
         query += 't.Description, ad.DataobjectName,'
         query += 'ad.DataobjectDescription, ad.DataobjectValue, ad.UpdateDt '
-        query += 'from ApplicationData ad '
-        query += 'inner join Application a on ad.ApplicationId = a.ApplicationId '
-        query += 'inner join Algorithm ag on ag.Id = ad.AlgorithmId '
-        query += 'inner join AlgorithmType t on ag.TypeId = t.Id'
+        query += 'FROM ApplicationData ad '
+        query += 'INNER JOIN Application a ON ad.ApplicationId = a.ApplicationId '
+        query += 'INNER JOIN Algorithm ag ON ag.Id = ad.AlgorithmId '
+        query += 'INNER JOIN AlgorithmType t ON ag.TypeId = t.Id'
         c.execute(query)
         rows = c.fetchall()
 
