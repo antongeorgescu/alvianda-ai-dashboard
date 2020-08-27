@@ -2,6 +2,7 @@ import pickle
 import sqlite3
 import json
 import pandas as pd, numpy as np
+import hashlib
 
 def model_save_todatabase(sessionid,modelid,description,model,dbpath):
     try:
@@ -12,15 +13,17 @@ def model_save_todatabase(sessionid,modelid,description,model,dbpath):
         #conn.row_factory = sqlite3.Row
         c = conn.cursor()
 
+        hash_model = hashlib.md5(model_saved.encode()).hexdigest()
+        
         # check if the model_id is already serialized; if so, use UPDATE
         query = 'SELECT COUNT(*) FROM ApplicationData WHERE DataobjectName = ? AND SessionId = ?'
         c.execute(query,(modelid,sessionid,))
         rowno = c.fetchone()[0]
         if rowno == 0:
-            param = (sessionid,modelid,description,model_saved, )
+            param = (sessionid,modelid,description,model_saved,str(hash_model), )
             query = 'INSERT INTO ApplicationData (SessionId,DataobjectTypeId,'
-            query += 'DataobjectName,DataobjectDescription,DataobjectBlob) '
-            query += 'VALUES (?,3,?,?,?)'
+            query += 'DataobjectName,DataobjectDescription,DataobjectBlob,Hashvalue) '
+            query += 'VALUES (?,3,?,?,?,?)'
         else:
             param = (description,model_saved,sessionid,modelid, )
             query = 'UPDATE ApplicationData SET DataobjectDescription = ?, DataobjectBlob = ? '
