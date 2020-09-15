@@ -11,4 +11,12 @@ namespace Alvianda.AI.Dashboard.ServiceModels
         public string Description { get; set; }
         public DateTime CreatedOn { get; set; }
     }
+
+    public class TrainModelSession
+    {
+        public string SessionId { get; set; }
+        public string AlgorithmName { get; set; }
+        public string Description { get; set; }
+        public DateTime CreatedOn { get; set; }
+    }
 }

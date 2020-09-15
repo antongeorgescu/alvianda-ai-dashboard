@@ -81,6 +81,30 @@ namespace Alvianda.AI.Dashboard.Services
             }
         }
 
+        public async Task<Tuple<string, IList<TrainModelSession>, string>> GetTrainModelSessionList(int applicationId)
+        {
+            try
+            {
+                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/worksessions/trainmodel?applicationid={applicationId}";
+                var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
+                IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Item2) as IList<JToken>;
+
+                IList<TrainModelSession> trainModelSessions = new List<TrainModelSession>();
+                responseList.ForEach(x => trainModelSessions.Add(new TrainModelSession()
+                {
+                    SessionId = x["SessionId"].ToString(),
+                    AlgorithmName = x["DisplayName"].ToString(),
+                    Description = x["Description"].ToString(),
+                    CreatedOn = DateTime.Parse(x["CreatedOn"].ToString())
+                }));
+                return new Tuple<string, IList<TrainModelSession>, string>(item1: "info", item2: trainModelSessions, item3: string.Empty);
+            }
+            catch (Exception ex)
+            {
+                return await new Task<Tuple<string, IList<TrainModelSession>, string>>(() => new Tuple<string, IList<TrainModelSession>, string>("error", null, ex.Message)).ConfigureAwait(true);
+            }
+        }
+
         public async Task<Tuple<string, JToken, string>> GetSessionDetails(string sessionId)
         {
             try
@@ -89,6 +113,22 @@ namespace Alvianda.AI.Dashboard.Services
                 var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
                 var jsonDetails = JToken.Parse(responseString.Item2);
                 
+                return new Tuple<string, JToken, string>(item1: "info", item2: jsonDetails, item3: string.Empty);
+            }
+            catch (Exception ex)
+            {
+                return await new Task<Tuple<string, JToken, string>>(() => new Tuple<string, JToken, string>("error", null, ex.Message)).ConfigureAwait(true);
+            }
+        }
+
+        public async Task<Tuple<string, JToken, string>> GetTrainSessionDetails(string sessionId)
+        {
+            try
+            {
+                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/worksessions/trainmodel/details?sessionid={sessionId}";
+                var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
+                var jsonDetails = JToken.Parse(responseString.Item2);
+
                 return new Tuple<string, JToken, string>(item1: "info", item2: jsonDetails, item3: string.Empty);
             }
             catch (Exception ex)
@@ -156,6 +196,47 @@ namespace Alvianda.AI.Dashboard.Services
             {
                 responseDictionary.Add("error", ex.Message);
                 return responseDictionary;
+            }
+        }
+
+        public async Task<Tuple<string,string>> RunModelPrediction(string modelid,
+                                                string sessionId,
+                                                string attributes,
+                                                string observations)
+        {
+            try
+            {
+                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/trainmodel/predict";
+                var paramContent = new StringContent(JsonConvert.SerializeObject(new
+                {
+                    modelid = "dt_07b4b4b3-6485-4967-8af3-38ef46055866",
+                    sessionid = "07b4b4b3-6485-4967-8af3-38ef46055866",
+                    attributes = "fixed acidity,volatile acidity,citric acid,residual sugar,chlorides,free sulfur dioxide,total sulfur dioxide,density,pH,sulphates,alcohol",
+                    observations = "7.4,0.7,0.0,1.9,0.076,11.0,34.0,0.9978,3.51,0.56,9.4"
+                }), Encoding.UTF8, "application/json");
+
+
+                var responseTuple = await HttpPostRequest(serviceEndpoint, paramContent).ConfigureAwait(true);
+
+                return responseTuple;
+
+
+                //var responseString = await response.Content.ReadAsStringAsync().ConfigureAwait(true);
+                //if (responseString.Contains("!DOCTYPE HTML PUBLIC"))
+                //{
+                //    responseString = string.Concat("\"", responseString.Replace('"', '*'), "\"");
+                //    var result = Uglify.HtmlToText(responseString);
+                //    resultCode = result.Code.Replace('"', ' ');
+                //    Assert.IsFalse(resultCode != string.Empty);
+                //}
+
+                //var listDetail = responseString.Split(':');
+                //Trace.Write($"{listDetail[0]} --> {listDetail[1]}");
+
+            }
+            catch (Exception ex)
+            {
+                return new Tuple<string,string>("error",ex.Message);
             }
         }
     }

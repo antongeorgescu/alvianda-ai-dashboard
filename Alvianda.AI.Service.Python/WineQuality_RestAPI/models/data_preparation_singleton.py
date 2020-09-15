@@ -33,7 +33,7 @@ class DataPreparationSingleton:
                 self.last_error = sys.exc_info()[1]
                 raise Exception(self.last_error)
         def __get_attributes__(self):
-            return  ','.join(self.fields)
+            return  ','.join(self.fields[:-2])
         def __create_histrograms__(self):
             chart_path = f'{os.getcwd()}/WineQuality_RestAPI/static'
             try:

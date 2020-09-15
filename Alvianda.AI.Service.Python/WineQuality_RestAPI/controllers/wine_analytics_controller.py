@@ -85,6 +85,34 @@ def workingsessionslist():
     except:
         return make_response(jsonify(sys.exc_info()[0]), 500)
 
+@app.route('/api/wineanalytics/worksessions/trainmodel')
+def trainmodelsessionslist():
+    try:
+        query_parameters = request.args
+        applicationId = query_parameters.get('applicationid')
+
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        query = 'SELECT ws.SessionId,a.DisplayName,ws.Description, ws.Notes, ws.CreatedOn from WorkingSession ws '
+        query += 'INNER JOIN ApplicationData ad ON ad.SessionId = ws.SessionId ' 
+        query += 'INNER JOIN Algorithm a ON a.Id = ws.AlgorithmId '
+        query += 'WHERE ad.DataobjectName = \'processed_observations\' '
+        query += 'AND a.Id < 99 AND ws.ApplicationId = ?'
+
+        t = (int(applicationId),)
+        c.execute(query, t)
+        rows = c.fetchall()
+        
+        #return make_response(jsonify(rows), 200)
+        result = json.dumps( [dict(ix) for ix in rows] )
+        return result
+    except (RuntimeError, TypeError, NameError) as err:
+        return make_response(jsonify(err.args), 500)
+    except:
+        return make_response(jsonify(sys.exc_info()[0]), 500)
+
 @app.route('/api/wineanalytics/worksessions/details')
 def workingsessiondetails():
     try:
@@ -97,6 +125,34 @@ def workingsessiondetails():
 
         t = (sessionId,)
         c.execute('SELECT Description, Notes, CreatedOn from WorkingSession WHERE SessionId=?', t)
+        row = c.fetchone()
+        
+        result = json.dumps(dict(row))
+        return result
+    except (RuntimeError, TypeError, NameError) as err:
+        return make_response(jsonify(err.args), 500)
+    except:
+        return make_response(jsonify(sys.exc_info()[0]), 500)
+
+@app.route('/api/wineanalytics/worksessions/trainmodel/details')
+def trainsessiondetails():
+    try:
+        query_parameters = request.args
+        sessionId = query_parameters.get('sessionid')
+
+        conn = sqlite3.connect(DB_PATH)
+        conn.row_factory = sqlite3.Row
+        c = conn.cursor()
+
+        query = 'SELECT ad.DataobjectAttributes,a.DisplayName,ws.Description, ws.Notes, ws.CreatedOn from WorkingSession ws '
+        query += 'INNER JOIN ApplicationData ad ON ad.SessionId = ws.SessionId '
+        query += 'INNER JOIN Algorithm a ON a.Id = ws.AlgorithmId '
+        query += 'WHERE ad.DataobjectName = ? '
+        query += 'AND ws.SessionId=? '
+        query += 'AND a.Id < 99'
+
+        t = ('processed_observations',sessionId,)
+        c.execute(query, t)
         row = c.fetchone()
         
         result = json.dumps(dict(row))
@@ -465,7 +521,7 @@ def load_train_model():
         return make_response(runinfo,200)
     except Exception as error:
         return make_response(error,500)
-    
+
 @app.route('/api/wineanalytics/runanalyzer/trainmodel/predict',methods=['POST'])
 def model_predict():
     # REF: https://www.kaggle.com/prmohanty/python-how-to-save-and-load-ml-models

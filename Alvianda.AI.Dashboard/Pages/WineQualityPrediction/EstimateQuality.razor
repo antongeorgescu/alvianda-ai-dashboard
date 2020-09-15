@@ -3,7 +3,7 @@
 
 @inject IJSRuntime JSRuntime;
 
-<h3>Machine Learning: Predictive Algorithm Modeling</h3>
+<h3>Machine Learning: Algorithm Prediction</h3>
 <table class="table" style='font-size:small;line-height: 1.428;'>
     <thead style="background-color:gainsboro; border-color:gray;">
         <tr>
@@ -18,9 +18,9 @@
                     <select @onchange="@PopulateSessionDetails" class="select-box">
                         <option value="None">== None ==</option>
                         @if (isSessionsListAvailable)
-                            @foreach (var session in WorkingSessions)
+                            @foreach (var session in TrainModelSessions)
                             {
-                                <option value="@session.SessionId" title="created on @session.CreatedOn">@session.SessionId</option>
+                                <option value="@session.SessionId" title="created on @session.CreatedOn">@session.SessionId [@session.AlgorithmName]</option>
                             }
                         }
                     </select>
@@ -29,26 +29,40 @@
             <td class="text-left">
                 <button class="btn btn-primary" @onclick="@RunPrediction" style='font-size:small;line-height: 1.428;'>Calculate Prediction</button>
                 <button class="btn btn-primary" @onclick="() => { messages.Clear(); }" style='font-size:small;line-height: 1.428;'>Clear MessagesList</button>
+                <button class="btn btn-primary" @onclick="@FillTestObservation" style='font-size:small;line-height: 1.428;'>Fill Test Observation</button>
             </td>
         </tr>
     </thead>
-    <tr>
-        <td colspan="2">
-            <table>
-                <tr>
-                    <td style="text-align:right">Fixed Acidity</td>
-                    <td><input id="fixed_acidity" name="fixed_acidity" type="text" /></td>
-                    <td style="text-align:right">Volatile Acidity</td>
-                    <td><input id="volatile_acidity" name="volatile_acidity" type="text" /></td>
-                </tr>
-                <tr>
-                    <td style="text-align:right">Citric Acid</td>
-                    <td><input id="fixed_acidity" name="fixed_acidity" type="text" /></td>
-                    <td colspan="2">&nbsp;</td>
-                </tr>
-            </table>
-        </td>
-    </tr>
+    @if (isSavedDODetailsAvailable)
+    {
+        <tr>
+            <td colspan="2">
+                <table>
+                    @for (var i = 0; i < attributeKeys.Count; i = i + 2)
+                    {
+                        <tr>
+                            <td style="text-align:right">@attributeNames[i]</td>
+                            <td><input id="@attributeKeys[i].Replace(' ','_')" name="@attributeKeys[i].Replace(' ','_')" type="text" @bind="@attributeVals[i]" @oninput="@((e) => { attributeVals[i]=(double)e.Value;})" /></td>
+                            @if ((i + 1) < attributeKeys.Count)
+                            {
+                                <td style="text-align:right">@attributeNames[i + 1]</td>
+                                <td><input id="@attributeKeys[i].Replace(' ','_')" name="@attributeKeys[i].Replace(' ','_')" type="text" @bind="@attributeVals[i+1]" @oninput="@((e) => { attributeVals[i+1]=(double)e.Value;})" /></td>
+                            }
+                            else
+                            {
+                                <td>&nbsp;</td>
+                                <td>&nbsp;</td>
+                            }
+                        </tr>
+                    }
+                </table>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left"><b>@ResultMessage</b></td>
+            <td><b>@ResultValue</b></td>
+        </tr>
+    }
     <tr>
         <td colspan="2">
             <div class="form-group">
