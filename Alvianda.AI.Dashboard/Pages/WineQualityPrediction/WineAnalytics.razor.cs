@@ -59,6 +59,8 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
         string PersistedDODescription;
         string PersistedDOAttributes;
 
+        private bool forceCreate = false;
+
         protected override async Task OnInitializedAsync()
         {
             //Uri _url = new Uri("http://localhost:53535/api/wineanalytics/chathub");
@@ -133,6 +135,7 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
                     correlationTitle = responseDictionary["correlationTitle"];
 
                     correlationAttributes = responseDictionary["correlationAttributes"];
+                    PersistedDOAttributes = responseDictionary["attributes"];
 
                     messages.Add(new Tuple<string, string>("info", responseDictionary["infomessage"]));
 
@@ -161,6 +164,7 @@ namespace Alvianda.AI.Dashboard.Pages.WineQualityPrediction
 
                 var responseDictionary = await prepdataService.PersistProcessedDataPost(
                                                                             PersistedDOAttributes,
+                                                                            forceCreate,
                                                                             PersistedDONotes,
                                                                             PersistedDODescription).ConfigureAwait(true);
                 if (responseDictionary.ContainsKey("error"))

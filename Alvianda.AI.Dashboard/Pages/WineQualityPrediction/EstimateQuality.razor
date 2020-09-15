@@ -1,0 +1,158 @@
+﻿@page "/winequalityprediction/estimatequality"
+@*@implements IDisposable*@
+
+@inject IJSRuntime JSRuntime;
+
+<h3>Machine Learning: Predictive Algorithm Modeling</h3>
+<table class="table" style='font-size:small;line-height: 1.428;'>
+    <thead style="background-color:gainsboro; border-color:gray;">
+        <tr>
+            <td>
+                <label for="start">Select saved preparred data session:</label>
+            </td>
+            <td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>
+                <div>
+                    <select @onchange="@PopulateSessionDetails" class="select-box">
+                        <option value="None">== None ==</option>
+                        @if (isSessionsListAvailable)
+                            @foreach (var session in WorkingSessions)
+                            {
+                                <option value="@session.SessionId" title="created on @session.CreatedOn">@session.SessionId</option>
+                            }
+                        }
+                    </select>
+                </div>
+            </td>
+            <td class="text-left">
+                <button class="btn btn-primary" @onclick="@RunPrediction" style='font-size:small;line-height: 1.428;'>Calculate Prediction</button>
+                <button class="btn btn-primary" @onclick="() => { messages.Clear(); }" style='font-size:small;line-height: 1.428;'>Clear MessagesList</button>
+            </td>
+        </tr>
+    </thead>
+    <tr>
+        <td colspan="2">
+            <table>
+                <tr>
+                    <td style="text-align:right">Fixed Acidity</td>
+                    <td><input id="fixed_acidity" name="fixed_acidity" type="text" /></td>
+                    <td style="text-align:right">Volatile Acidity</td>
+                    <td><input id="volatile_acidity" name="volatile_acidity" type="text" /></td>
+                </tr>
+                <tr>
+                    <td style="text-align:right">Citric Acid</td>
+                    <td><input id="fixed_acidity" name="fixed_acidity" type="text" /></td>
+                    <td colspan="2">&nbsp;</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            <div class="form-group">
+                @if (isSavedDODetailsAvailable)
+                {
+                    <label for="start">Details of persisted data object:</label>
+                    <textarea class="form-control" @bind="PersistedDODetails" rows="5"></textarea>
+                }
+                else
+                {
+                    <label for="start" style="visibility:hidden">Details of persisted data object:</label>
+                    <textarea class="form-control" @bind="PersistedDODetails" rows="5" style="visibility:hidden"></textarea>
+                }
+            </div>
+        </td>
+    </tr>
+</table>
+<hr />
+
+<div>
+    <label>Session Messages:</label>
+    <ul id="messagesList">
+        @foreach (var message in messages)
+        {
+            if (message.Item1 == "error")
+            {
+                <li style="color:red">[@message.Item1] @message.Item2</li>
+            }
+            if (message.Item1 == "info")
+            {
+                <li style="color:green">[@message.Item1] @message.Item2</li>
+            }
+        }
+    </ul>
+</div>
+
+<p><i><mark>@waitMessage</mark></i></p>
+
+@if (isModelDataAvailable)
+{
+    <div>
+        <label>Session Predictive Algorithm Modeling Results:</label>
+        <table border="1">
+        @foreach (var result in trainingModelResults)
+        {
+            <tr>
+                <td><b>@result.Key</b></td>
+                <td>@result.Value</td>
+            </tr>
+
+        }
+        </table>
+    </div>
+}
+<hr />
+
+@if (showModal)
+{
+    <div class="modal fade show" id="myModal" style="display:block;" aria-modal="true" role="dialog">
+        <div class="modal-dialog" modal-lg>
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">@selectedResultName</h4>
+                    <button type="button" class="close" @onclick="@ModalCancel">&times;</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <p>@selectedResultContent</p>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-link" @onclick=@ModalOk>Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+<!--<img src="http://localhost:53535/static/John-Snow.jpg" />-->
+@code {
+
+    bool showModal = false;
+    string selectedResultName;
+    string selectedResultContent;
+
+    void ModalShow(string resultName, string resultContent)
+    {
+        selectedResultName = resultName;
+        selectedResultContent = resultContent;
+        showModal = true;
+    }
+    void ModalCancel()
+    {
+        showModal = false;
+    }
+
+    void ModalOk()
+    {
+        Console.WriteLine("Modal ok");
+        showModal = false;
+    }
+
+}

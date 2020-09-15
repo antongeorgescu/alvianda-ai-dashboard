@@ -46,11 +46,14 @@
                 @if (!isRunDatasetAnalysisAvailable)
                 {
                     <button class="btn btn-primary" disabled style='font-size:small;line-height: 1.428;'>Persist Preparred Data</button>
+                    <input type="checkbox" disabled @bind="forceCreate" id="forceCreateCheck" name="forceCreateCheck" />
                 }
                 else
                 {
                     <button class="btn btn-primary" @onclick="@PersistProcessedData" style='font-size:small;line-height: 1.428;'>Persist Preparred Data</button>
+                    <input type="checkbox" @bind="forceCreate"  id="forceCreateCheck" name="forceCreateCheck" />
                 }
+                <label for="horns">Force Create New</label>
                 <button class="btn btn-primary" @onclick="() => { messages.Clear(); }" style='font-size:small;line-height: 1.428;'>Clear MessagesList</button>
                 @*<button class="btn btn-primary" @onclick="@TestDataPreparationService" style='font-size:small;line-height: 1.428;'>Test Data Preparation Service</button>*@
             </td>

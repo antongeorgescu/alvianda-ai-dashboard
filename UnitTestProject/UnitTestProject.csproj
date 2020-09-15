@@ -63,6 +63,7 @@
   <ItemGroup>
     <Compile Include="TestControllerUnitTests.cs" />
     <Compile Include="StoredObjectManagementUnitTests.cs" />
+    <Compile Include="DatasetManageUnitTests.cs" />
     <Compile Include="WorksessionUnitTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

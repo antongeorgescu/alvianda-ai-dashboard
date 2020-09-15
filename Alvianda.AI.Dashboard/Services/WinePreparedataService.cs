@@ -15,9 +15,11 @@ namespace Alvianda.AI.Dashboard.Services
         Task<Tuple<string, string>> ValidatePostPrepDataService();
         Task<Dictionary<string, string>> RunPrepDataAnalysis();
         Task<Dictionary<string, string>> PersistProcessedDataGet(string attributes,
+                                                                    bool forceCreate,
                                                                     string userDescription = null, 
                                                                     string userNotes = null);
         Task<Dictionary<string, string>> PersistProcessedDataPost(string attributes,
+                                                                    bool forceCreate,
                                                                     string userDescription = null, 
                                                                     string userNotes = null);
         //Task<List<WinesetEntry>> GetPaginatedResult(string logCategory, int currentPage, int pageSize = 10);
@@ -95,8 +97,8 @@ namespace Alvianda.AI.Dashboard.Services
                 responseDictionary.Add("correlationTitle", responseList[4].Value<string>());
 
                 responseDictionary.Add("correlationAttributes", responseList[5].Value<string>());
-
-                responseDictionary.Add("infomessage", responseList[6].Value<string>());
+                responseDictionary.Add("attributes", responseList[6].Value<string>());
+                responseDictionary.Add("infomessage", responseList[7].Value<string>());
 
                 //responseDictionary.Add("preparredDataset", responseList[7].Value<string>());
                 //responseDictionary.Add("fieldSet", responseList[8].Value<string>());
@@ -114,6 +116,7 @@ namespace Alvianda.AI.Dashboard.Services
 
         public async Task<Dictionary<string, string>> PersistProcessedDataGet(
                                                                 string dataObjectAttributes,
+                                                                bool forceCreate,
                                                                 string userNotes = null, 
                                                                 string userDescription = null)
         {
@@ -124,7 +127,7 @@ namespace Alvianda.AI.Dashboard.Services
                 string notes = string.IsNullOrEmpty(userNotes) ? "[Default] No notes entered by user." : userNotes;
 
 
-                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset/persist?description={description}&notes={userNotes}&attributes={dataObjectAttributes}";
+                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset/persist?description={description}&notes={userNotes}&attributes={dataObjectAttributes}&forcecreate={forceCreate}";
                 var responseString = await HttpGetRequest(serviceEndpoint).ConfigureAwait(true);
 
                 //IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Item2) as IList<JToken>;
@@ -144,6 +147,7 @@ namespace Alvianda.AI.Dashboard.Services
 
         public async Task<Dictionary<string, string>> PersistProcessedDataPost(
                                                                 string dataObjectAttributes,
+                                                                bool forceCreate,
                                                                 string userNotes = null,
                                                                 string userDescription = null)
         {
@@ -157,10 +161,12 @@ namespace Alvianda.AI.Dashboard.Services
                 {
                     attributes = dataObjectAttributes,
                     description = userDescription,
-                    notes = userNotes
+                    notes = userNotes,
+                    forcecreate = forceCreate
                 }), Encoding.UTF8, "application/json");
 
-                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset/persist?description={description}&notes={userNotes}&attributes={dataObjectAttributes}";
+                //var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset/persist?description={description}&notes={userNotes}&attributes={dataObjectAttributes}";
+                var serviceEndpoint = $"{_configuration.GetValue<string>("WinesetServiceAPI:BaseURI")}{_configuration.GetValue<string>("WinesetServiceAPI:AnalyticsRouting")}/runanalyzer/dataset/persist";
                 var responseString = await HttpPostRequest(serviceEndpoint, dobjContent).ConfigureAwait(true);
 
                 //IList<JToken> responseList = JsonConvert.DeserializeObject(responseString.Item2) as IList<JToken>;

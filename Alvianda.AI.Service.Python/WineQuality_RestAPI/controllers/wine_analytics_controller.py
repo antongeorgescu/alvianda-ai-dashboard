@@ -163,7 +163,7 @@ def run_analysis():
         startprocstr = datetime.now().strftime("%H:%M:%S.%f")       
             
         dtanalyzer = DataPreparationSingleton(REDWINE_PATH,WHITEWINE_PATH)  
-            
+        rundata["attributes"] = dtanalyzer.get_attributes()
         rundata["cshistogramcharts"],rundata["cshistogramtitles"] = dtanalyzer.create_histrograms()
 
         rundata["quality_drop"] = dtanalyzer.reduce_dimensionality()
@@ -185,6 +185,7 @@ def run_analysis():
                                  rundata["correlationchart"],
                                  rundata["correlationtitle"],
                                  rundata["correlated_attributes"],
+                                 rundata["attributes"],
                                  #rundata["preparred_dataset"],
                                  #rundata["field_set"],
                                  run_summary),200)
@@ -196,17 +197,26 @@ def run_analysis_persist():
         description = None
         notes = None
         attributes = None
+        forcecreate = None
         if request.method == 'GET':
             query_parameters = request.args
             description = query_parameters.get('description')
             notes = query_parameters.get('notes')
             attributes = query_parameters.get('attributes')
+            if (query_parameters.get('forcecreate') == True):
+                forcecreate = True
+            else:
+                forcecreate = False
         if request.method == 'POST':
             data = request.json
             description = data['description']
             notes = data['notes']
             attributes = data['attributes']
-
+            if (data['forcecreate'] == True):
+                forcecreate = True
+            else:
+                forcecreate = False
+            
         if (description == None):
             description = '[System] Saved preparred data objects'
         if (notes == None):
@@ -226,19 +236,21 @@ def run_analysis_persist():
 
         c = conn.cursor()
 
-        # check if there's already saved an identical DataobjectText (by using Hashvalue)
         hash_in_dataset = hashlib.md5(observations.to_json().encode()).hexdigest()
-        query = 'SELECT SessionId, DataobjectText, Hashvalue FROM ApplicationData'
-        c.execute(query)
-        rows = c.fetchall()
-        for row in rows:
-            hash_saved_dataset = row[2]
-            if hash_saved_dataset == hash_in_dataset:
-                sessionId = row[0]
-                run_summary = f'Dataset of observations and/or labels already saved in session_id:{sessionId}.Abort current execution.'
-                return make_response(jsonify(run_summary),200)
-           
 
+        if not forcecreate:
+            # check if there's already saved an identical DataobjectText (by using Hashvalue)
+            query = 'SELECT SessionId, DataobjectText, Hashvalue FROM ApplicationData'
+            c.execute(query)
+            rows = c.fetchall()
+            for row in rows:
+                hash_saved_dataset = row[2]
+                if hash_saved_dataset == hash_in_dataset:
+                    sessionId = row[0]
+                    query = 'SELECT SessionId, DataobjectText, Hashvalue FROM ApplicationData'
+                    run_summary = f'Dataset of observations and/or labels already saved in session_id:{sessionId}.Abort current execution.'
+                    return make_response(jsonify(run_summary),200)
+        
         query = 'INSERT INTO  WorkingSession (SessionId,ApplicationId,AlgorithmId,Description,Notes) '
         query += 'VALUES (?,?,?,?,?)'
         t = (guid,1,99,description,f'[{datetime.now()}] {notes}')
@@ -250,7 +262,7 @@ def run_analysis_persist():
         t = (guid,1,'processed_observations','processed_observations',observations.to_json(),f'savedfdb_{guid}',attributes,str(hash_in_dataset))
         c.execute(query,t)
         
-        t = (guid,2,'processed_labels','processed_labels',labels.to_json(),None,None,str(hashlib.md5(labels.to_json().encode())))
+        t = (guid,2,'processed_labels','processed_labels',labels.to_json(),None,None,str(hashlib.md5(labels.to_json().encode()).hexdigest()))
         c.execute(query,t)
         conn.commit()
 

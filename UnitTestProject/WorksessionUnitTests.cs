@@ -215,8 +215,8 @@ namespace UnitTestProject
             var resultCode = string.Empty;
             var testContent = new StringContent(JsonConvert.SerializeObject(new
             {
-                modelid = "dt_3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62",
-                sessionid = "3c6ae2c0-9c2b-496e-ad7a-6a0a2598dc62",
+                modelid = "dt_07b4b4b3-6485-4967-8af3-38ef46055866",
+                sessionid = "07b4b4b3-6485-4967-8af3-38ef46055866",
                 attributes = "fixed acidity,volatile acidity,citric acid,residual sugar,chlorides,free sulfur dioxide,total sulfur dioxide,density,pH,sulphates,alcohol",
                 observations = "7.4,0.7,0.0,1.9,0.076,11.0,34.0,0.9978,3.51,0.56,9.4"
             }), Encoding.UTF8, "application/json");

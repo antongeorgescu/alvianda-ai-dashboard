@@ -32,6 +32,8 @@ class DataPreparationSingleton:
             except:
                 self.last_error = sys.exc_info()[1]
                 raise Exception(self.last_error)
+        def __get_attributes__(self):
+            return  ','.join(self.fields)
         def __create_histrograms__(self):
             chart_path = f'{os.getcwd()}/WineQuality_RestAPI/static'
             try:
@@ -114,6 +116,8 @@ class DataPreparationSingleton:
     def __init__(self,redwine_dataset_path = None,whitewine_dataset_path = None):
         if not DataPreparationSingleton.instance:
             DataPreparationSingleton.instance = DataPreparationSingleton.__DataPreparationSingleton(redwine_dataset_path,whitewine_dataset_path)
+    def get_attributes(self):
+        return self.instance.__get_attributes__()
     def create_histrograms(self):
         return self.instance.__create_histrograms__()
     def reduce_dimensionality(self):
