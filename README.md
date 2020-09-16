@@ -31,6 +31,13 @@ Persistance layer relies on a relational data structure that links a set of norm
 * Middle-tier is a REST API that uses Python Flask module
 * Persistance area manages work sessions and models and is using SqLite database
 
+## User Authentication
+**2AID** dashboard is Azure Active Directory authenticated. 
+The following user credentials can be used:
+
+	user: jake@alviandalabs.onmicrosoft.com
+	password: Finastra2020!!
+
 ## Snapshots
 Following is a set of snapshots taken from the running application (user interface):
 
