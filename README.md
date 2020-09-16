@@ -31,3 +31,12 @@ Persistance layer relies on a relational data structure that links a set of norm
 * Middle-tier is a REST API that uses Python Flask module
 * Persistance area manages work sessions and models and is using SqLite database
 
+## Snapshots
+Following is a set of snapshots taken from the running application (user interface):
+
+![2aid_model_training](https://user-images.githubusercontent.com/6631390/93342479-64e90200-f7fd-11ea-8c81-d16e91ab22ee.png)
+![2aid_quality_prediction](https://user-images.githubusercontent.com/6631390/93342481-65819880-f7fd-11ea-8230-487f1dfc2a09.png)
+![2aid_data_preparation](https://user-images.githubusercontent.com/6631390/93342485-661a2f00-f7fd-11ea-8666-dd4157af841a.png)
+![2aid_data_preparation_2](https://user-images.githubusercontent.com/6631390/93342486-661a2f00-f7fd-11ea-94bc-814ff85e80ee.png)
+![2aid_dataset_viewer](https://user-images.githubusercontent.com/6631390/93342490-661a2f00-f7fd-11ea-9022-d88aeb42d636.png)
+
