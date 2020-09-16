@@ -34,9 +34,9 @@ Persistance layer relies on a relational data structure that links a set of norm
 ## Snapshots
 Following is a set of snapshots taken from the running application (user interface):
 
-![2aid_model_training](https://user-images.githubusercontent.com/6631390/93342479-64e90200-f7fd-11ea-8c81-d16e91ab22ee.png)
-![2aid_quality_prediction](https://user-images.githubusercontent.com/6631390/93342481-65819880-f7fd-11ea-8230-487f1dfc2a09.png)
-![2aid_data_preparation](https://user-images.githubusercontent.com/6631390/93342485-661a2f00-f7fd-11ea-8666-dd4157af841a.png)
-![2aid_data_preparation_2](https://user-images.githubusercontent.com/6631390/93342486-661a2f00-f7fd-11ea-94bc-814ff85e80ee.png)
-![2aid_dataset_viewer](https://user-images.githubusercontent.com/6631390/93342490-661a2f00-f7fd-11ea-9022-d88aeb42d636.png)
+![2aid_model_training](https://user-images.githubusercontent.com/6631390/93343863-fdcc4d00-f7fe-11ea-81d3-ed9fc85e4331.png)
+![2aid_quality_prediction](https://user-images.githubusercontent.com/6631390/93343864-fe64e380-f7fe-11ea-9ff0-b16dcead29e4.png)
+![2aid_data_preparation](https://user-images.githubusercontent.com/6631390/93343867-fe64e380-f7fe-11ea-9763-5df4420fbf9b.png)
+![2aid_data_preparation_2](https://user-images.githubusercontent.com/6631390/93343868-fefd7a00-f7fe-11ea-88bc-850e33a53ade.png)
+![2aid_dataset_viewer](https://user-images.githubusercontent.com/6631390/93343869-fefd7a00-f7fe-11ea-9648-10a53e71c05e.png)
 
