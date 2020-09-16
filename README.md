@@ -1,4 +1,4 @@
-# [2AID] Machine Learning Training & Predictor with Injectable Logic and Conform Datasets 
+# [2AID] Machine Learning Training & Predictor with Injectable Logic and Conformed Datasets 
 
 ## Introduction
 **2AID** is an acrobym for **Alvianda Artificial Intelligence Dashboard**. It is a reusable and extensible machine learning framework that uses a set of popular algorithms
