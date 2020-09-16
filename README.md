@@ -26,7 +26,7 @@ Persistance layer relies on a relational data structure that links a set of norm
 ![2AID_Db_ERD_2](https://user-images.githubusercontent.com/6631390/93338447-58ae7600-f7f8-11ea-9fae-abfd0646f401.jpg)
 
 ## Technology
-2AID is bult with the following technologies:
+**2AID** is bult with the following technologies:
 * Front-end is a user interface is a browser based single page application (SPA) built with Blazor WASM technology
 * Middle-tier is a REST API that uses Python Flask module
 * Persistance area manages work sessions and models and is using SqLite database
